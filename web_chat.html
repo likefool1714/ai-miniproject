@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>운영 에이전트 채팅 (Vue)</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; height: 100vh; display: flex; flex-direction: column;
+    font-family: -apple-system, "Apple SD Gothic Neo", sans-serif;
+    background: #1e1e2e; color: #e2e2f0;
+    overflow: hidden;   /* #log만 스크롤되게, 바디 자체는 늘어나지 않게 고정 */
+  }
+  #app {
+    flex: 1; min-height: 0;   /* Vue 마운트 루트가 header/#log/form을 감싸므로,
+                                 body의 flex 흐름이 여기까지 이어지게 한다 */
+    display: flex; flex-direction: column;
+  }
+  header {
+    padding: 14px 20px; background: #262638; border-bottom: 1px solid #3a3a52;
+    font-weight: 600; font-size: 15px;
+  }
+  header span { color: #8b8bd8; font-weight: 400; font-size: 13px; margin-left: 8px; }
+  #log {
+    flex: 1; min-height: 0;   /* flex 자식 기본 최소높이(콘텐츠 크기)를 풀어줘야
+                                 내용이 길어져도 바디가 안 늘어나고 여기서만 스크롤됨 */
+    overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px;
+  }
+  #log::-webkit-scrollbar { width: 9px; }
+  #log::-webkit-scrollbar-track { background: transparent; }
+  #log::-webkit-scrollbar-thumb { background: #3a3a52; border-radius: 6px; }
+  #log::-webkit-scrollbar-thumb:hover { background: #4a4a68; }
+  .row { display: flex; }
+  .row.user { justify-content: flex-end; }
+  .bubble {
+    max-width: 70%; padding: 10px 14px; border-radius: 14px; line-height: 1.5;
+    font-size: 14px; white-space: pre-wrap;
+  }
+  .row.user .bubble { background: #5b5bd6; color: white; border-bottom-right-radius: 4px; }
+  .row.agent .bubble { background: #2e2e42; border-bottom-left-radius: 4px; }
+  .steps {
+    max-width: 70%; font-size: 12px; color: #9a9ac0; padding: 6px 14px;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .steps .step::before { content: "⏳ "; }
+  .steps .step.done::before { content: "✓ "; color: #7ee787; }
+  .prompt-box {
+    flex-shrink: 0;   /* #log가 스크롤 영역이 되면서(min-height:0) <details>가 flex
+                         자식으로서 내용 없이 찌그러지는 걸 방지 */
+    max-width: 70%; margin-top: -4px; background: #17171f; border: 1px solid #3a3a52;
+    border-radius: 10px; font-size: 12px; overflow: hidden;
+  }
+  .prompt-box summary {
+    cursor: pointer; padding: 7px 12px; color: #8b8bd8; user-select: none;
+    list-style: none;
+  }
+  .prompt-box summary::-webkit-details-marker { display: none; }
+  .prompt-box summary::before { content: "🔍 "; }
+  .prompt-box[open] summary::before { content: "🔽 "; }
+  .prompt-box pre {
+    margin: 0; padding: 10px 12px; border-top: 1px solid #3a3a52;
+    background: #11111a; color: #c3c3e0; white-space: pre-wrap; word-break: break-word;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; max-height: 320px; overflow-y: auto;
+  }
+  form { display: flex; gap: 8px; padding: 14px 20px; background: #262638; border-top: 1px solid #3a3a52; }
+  input {
+    flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid #3a3a52;
+    background: #1e1e2e; color: #e2e2f0; font-size: 14px;
+  }
+  input:focus { outline: 1px solid #5b5bd6; }
+  button {
+    padding: 11px 20px; border-radius: 10px; border: none; background: #5b5bd6;
+    color: white; font-size: 14px; cursor: pointer;
+  }
+  button:disabled { background: #3a3a52; cursor: default; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>운영 인시던트 대응 에이전트 <span>{{ backendLabel }}</span></header>
+  <div id="log" ref="logEl">
+    <template v-for="item in log" :key="item.id">
+      <div v-if="item.kind === 'user'" class="row user">
+        <div class="bubble">{{ item.text }}</div>
+      </div>
+
+      <div v-else-if="item.kind === 'steps'" class="steps">
+        <div v-for="(step, i) in item.steps" :key="i" class="step">{{ step }}</div>
+      </div>
+
+      <div v-else-if="item.kind === 'agent'" class="row agent">
+        <div class="bubble">{{ item.text }}</div>
+      </div>
+
+      <details v-else-if="item.kind === 'prompt'" class="prompt-box">
+        <summary>LLM에 전달된 최종 프롬프트 보기</summary>
+        <pre>{{ item.text }}</pre>
+      </details>
+    </template>
+  </div>
+  <form @submit.prevent="onSubmit">
+    <input
+      v-model="input"
+      autocomplete="off"
+      placeholder="예: auth-service 로그인 응답이 느려졌어요. 원인 확인해주세요"
+    />
+    <button type="submit" :disabled="sending">보내기</button>
+  </form>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+const { createApp, ref, reactive, nextTick } = Vue;
+
+const STEP_LABELS = {
+  PlanCreated: e => `계획 수립: 할 일 ${e.task_count}가지${e.targets?.length ? ` (시스템: ${e.targets.join(', ')})` : ''}`,
+  GateApplied: e => e.removed_analysis_tasks ? `불필요한 작업 ${e.removed_analysis_tasks}건 제거` : null,
+  TaskCompleted: e => (e.source === 'monitoring'
+      ? `모니터링 지표 확인 (시스템: ${e.target})`
+      : `대응 매뉴얼(runbook) 조회 (장애유형: ${e.target})`) + (e.retries ? ' (재시도 성공)' : ''),
+  ReplanCheck: e => e.is_sufficient ? null : `정보 부족 → 장애유형 "${e.target}"로 추가 조사`,
+  DraftWritten: e => `답변 초안 작성 (시도 ${e.attempt})`,
+  Validation: e => e.verdict === '합격' ? '검수 통과' : '검수 반려 → 다시 작성',
+  Finalize: () => '최종 답변 완성',
+};
+
+createApp({
+  setup() {
+    const backendLabel = ref('all_total_vue');
+    const log = ref([]);
+    const input = ref('');
+    const sending = ref(false);
+    const logEl = ref(null);
+    const thread = 't-web-' + Math.random().toString(36).slice(2, 8);
+    let nextId = 0;
+
+    fetch('/health').then(r => r.json()).then(h => {
+      backendLabel.value = `${h.llm_backend} 실모델(${h.fast_llm}/${h.quality_llm}) · all_total_vue`;
+    }).catch(() => {});
+
+    async function scrollToBottom() {
+      await nextTick();
+      if (logEl.value) logEl.value.scrollTop = logEl.value.scrollHeight;
+    }
+
+    function onSubmit() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      log.value.push({ id: nextId++, kind: 'user', text });
+      input.value = '';
+      sending.value = true;
+      scrollToBottom();
+
+      const stepsItem = reactive({ id: nextId++, kind: 'steps', steps: [] });
+      log.value.push(stepsItem);
+      scrollToBottom();
+
+      const url = `/chat/stream?message=${encodeURIComponent(text)}&thread_id=${encodeURIComponent(thread)}`;
+      const es = new EventSource(url);
+      let streamItem = null;
+      let streamAttempt = null;   // write_node 재작성(attempt 증가) 시 새 말풍선으로 끊는다
+
+      es.onmessage = (event) => {
+        if (event.data === '[DONE]') { es.close(); sending.value = false; return; }
+        let e;
+        try { e = JSON.parse(event.data); } catch { return; }
+
+        if (e.type === 'AnswerToken') {
+          if (!streamItem || streamAttempt !== e.attempt) {
+            streamItem = reactive({ id: nextId++, kind: 'agent', text: '' });
+            log.value.push(streamItem);
+            streamAttempt = e.attempt;
+          }
+          streamItem.text += e.delta;
+          scrollToBottom();
+          return;
+        }
+
+        if (e.type === 'FinalAnswer') {
+          if (!streamItem) {
+            streamItem = reactive({ id: nextId++, kind: 'agent', text: '' });
+            log.value.push(streamItem);
+          }
+          streamItem.text = e.reply;   // 토큰 합산 결과와 서버의 최종 텍스트를 일치시킨다
+          if (e.prompt) log.value.push({ id: nextId++, kind: 'prompt', text: e.prompt });
+          streamItem = null;
+          streamAttempt = null;
+          scrollToBottom();
+          return;
+        }
+
+        const fn = STEP_LABELS[e.type];
+        if (!fn) return;
+        const label = fn(e);
+        if (!label) return;
+        stepsItem.steps.push(label);
+        scrollToBottom();
+      };
+
+      es.onerror = () => { es.close(); sending.value = false; };
+    }
+
+    return { backendLabel, log, input, sending, logEl, onSubmit };
+  },
+}).mount('#app');
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# 이 머신에서 검증된 버전 (참고용 — 이미 설치돼 있다면 재설치 불필요)
+fastapi>=0.115
+uvicorn>=0.30
+langgraph>=1.0
+langchain-core>=0.3
+langsmith>=0.4
+fastmcp>=3.0
+mcp>=1.0
+httpx>=0.27
+python-dotenv>=1.0
+pydantic>=2.0

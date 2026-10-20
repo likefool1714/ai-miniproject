@@ -1,0 +1,38 @@
+{
+  "auth-service": {
+    "status": "degraded",
+    "cpu_base": 78.0,
+    "memory_base": 61.0,
+    "alerts": ["p95 latency 2.4s (threshold 1.0s)", "connection pool 92% used"]
+  },
+  "web-01": {
+    "status": "healthy",
+    "cpu_base": 34.0,
+    "memory_base": 48.0,
+    "alerts": []
+  },
+  "payments-service": {
+    "status": "degraded",
+    "cpu_base": 91.0,
+    "memory_base": 55.0,
+    "alerts": ["CPU 91% (threshold 80%)", "payments-service-3 instance responding slow"]
+  },
+  "cache-service": {
+    "status": "degraded",
+    "cpu_base": 42.0,
+    "memory_base": 89.0,
+    "alerts": ["memory usage climbing steadily over 6h", "heap near limit"]
+  },
+  "gateway-service": {
+    "status": "degraded",
+    "cpu_base": 30.0,
+    "memory_base": 45.0,
+    "alerts": ["upstream timeout to payments-service (504)", "network packet loss 3%"]
+  },
+  "log-service": {
+    "status": "degraded",
+    "cpu_base": 20.0,
+    "memory_base": 35.0,
+    "alerts": ["disk usage 95% on /var/log", "disk space low"]
+  }
+}
