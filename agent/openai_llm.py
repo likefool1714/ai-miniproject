@@ -95,7 +95,7 @@ class OpenAILLM:
             payload["response_format"] = {"type": "json_object"}
         headers = {"Authorization": f"Bearer {self.api_key}",
                    "Content-Type": "application/json"}
-        resp = httpx.post(OPENAI_URL, json=payload, headers=headers, timeout=120.0)
+        resp = httpx.post(OPENAI_URL, json=payload, headers=headers, timeout=20.0)
         resp.raise_for_status()
         data = resp.json()
         content = data["choices"][0]["message"]["content"]
@@ -207,6 +207,27 @@ class OpenAIFastLLM(OpenAILLM):
 
 class OpenAIQualityLLM(OpenAILLM):
     """최종 답변 작성 전담 (고품질 모델, 기본 gpt-4o)."""
+
+    @traceable(run_type="llm", name="openai_quality.write_grounded")
+    async def write_grounded(self, query: str, bundle: dict, feedback=None):
+        from .grounding import writer_prompt
+        if not self.api_key:
+            raise RuntimeError("OPENAI_API_KEY가 설정되지 않았습니다.")
+        system, user = writer_prompt(query, bundle, feedback)
+        # 기존 Chat Completions JSON 모드 유지. 형식·의미 검증은 공통 Validator가 수행한다.
+        payload = {"model": self.model, "messages": [
+            {"role": "system", "content": system}, {"role": "user", "content": user}],
+            "temperature": 0, "response_format": {"type": "json_object"}}
+        async with httpx.AsyncClient(timeout=40.0) as client:
+            resp = await client.post(OPENAI_URL, json=payload,
+                                     headers={"Authorization": f"Bearer {self.api_key}"})
+            resp.raise_for_status()
+            data = resp.json()
+        tokens = data.get("usage", {}).get("total_tokens", 0)
+        return data["choices"][0]["message"]["content"], {
+            "model": self.name, "tokens": tokens,
+            "usd": round(tokens / 1000 * self.usd_per_1k, 6),
+            "prompt": f"[SYSTEM]\n{system}\n\n[USER]\n{user}"}
 
     @traceable(run_type="llm", name="openai_quality.write")
     async def write(self, query: str, collected: list[dict], attempt: int,

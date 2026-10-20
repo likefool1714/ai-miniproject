@@ -8,9 +8,10 @@
 - recovery_store.py: 관측·판정·대상·실패 저장과 보고서
 - recovery_nodes.py: 대상/명령 해석과 기능 노드
 - monitoring.py, data/scenarios/: 샘플/대화별 고정 시나리오
+- grounding.py: 근거 묶음·구조화 제안 스키마·출처/적용 가능성 검증·답변 구성
 - server.py, graph.py, deps.py: 그래프·API·주입·요청 잠금/시간 제한
 - web_chat.html, web_demo_server.py: 기능 버튼·다운로드
-- tests/, eval/compare_recovery.py: 검사·전후 비교
+- tests/, eval/compare_recovery.py, eval/probe_grounding.py: 검사·전후 비교·일반 진단 재검증
 
 ## 재사용
 

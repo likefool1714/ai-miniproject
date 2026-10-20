@@ -40,10 +40,18 @@ async def proxy_health():
 @app.post("/chat")
 async def proxy_chat(req: Request):
     body = await req.body()
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        r = await client.post(f"{BACKEND}/chat", content=body,
-                              headers={"content-type": "application/json"})
-    return JSONResponse(r.json(), status_code=r.status_code)
+    try:
+        # 백엔드 전체 한도(120초)보다 여유를 둬 504 응답을 정상 중계한다.
+        async with httpx.AsyncClient(timeout=135.0) as client:
+            r = await client.post(f"{BACKEND}/chat", content=body,
+                                  headers={"content-type": "application/json"})
+        return JSONResponse(r.json(), status_code=r.status_code)
+    except httpx.TimeoutException:
+        return JSONResponse({"detail": "백엔드 응답 시간이 초과되었습니다. 복구 판단을 보류하며 재점검이 필요합니다."}, status_code=504)
+    except httpx.HTTPError:
+        return JSONResponse({"detail": "백엔드 연결에 실패했습니다. 복구 판단을 보류합니다."}, status_code=503)
+    except ValueError:
+        return JSONResponse({"detail": "백엔드 응답 형식을 확인할 수 없습니다. 복구 판단을 보류합니다."}, status_code=502)
 
 
 @app.get("/chat/stream")

@@ -1,0 +1,15 @@
+{"repetition": 1, "five_stages": "passed", "initial_seconds": 19.290816084016114}
+{"repetition": 2, "five_stages": "passed", "initial_seconds": 18.710868291993393}
+{"repetition": 3, "five_stages": "passed", "initial_seconds": 18.64386716700392}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/choiminseok/강의자료/10월 3주차 강의자료/ai 미니프로젝트/incident-runbook-agent/eval/probe_grounding.py", line 167, in <module>
+    asyncio.run(writer_probe(args.repeat)) if args.mode == "writer" else web_probe(args.repeat)
+                                                                         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choiminseok/강의자료/10월 3주차 강의자료/ai 미니프로젝트/incident-runbook-agent/eval/probe_grounding.py", line 137, in web_probe
+    response.raise_for_status()
+  File "/Users/choiminseok/강의자료/10월 3주차 강의자료/ai 미니프로젝트/incident-runbook-agent/.venv/lib/python3.12/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Server error '500 Internal Server Error' for url 'http://127.0.0.1:8600/chat'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500

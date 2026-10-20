@@ -5,7 +5,8 @@
 - 선택 과제: **1번 — 제공 Base AI Agent 기능 개선/추가**
 - 저장소: https://github.com/likefool1714/ai-miniproject (Public)
 - 진행 계획 초안 제출: **2026-10-20 17:00 KST**
-- 현재: 등록한 개선·추가 기능 구현, 단위·실제 MCP/API 검사 20개 통과. 원본/개선 각 15회 비교와 발표용 8장 PPT 작성 완료.
+- 현재: 등록한 개선·추가 기능 구현, 근거 검증 보완, 단위·로컬 MCP/HTTP 검사 48개 통과. 복구 비교와 일반 진단 재검증 기록 공개.
+- PDF·PPT: 이전 PPT 초안을 보존하고, 전체 검증이 끝난 뒤 최종본을 한 번 갱신합니다.
 - 제공 API / LangSmith: 로컬 키가 없어 실제 연결은 미검증.
 
 기존 에이전트는 현재 모니터링 수치를 조회하고 런북으로 대응 절차를 작성합니다. 이번 작업은 **이전 조사와 비교하고 복구 여부를 다시 확인하는 기능**을 추가합니다.
@@ -35,14 +36,18 @@ CPU가 95%에서 55%로 내려가도 메모리·알림이 남아 있거나 정�
 
 ```text
 Vue → FastAPI → 대화별 요청 직렬화 → 요청/대상 확인
-  ├─ 일반 대화·기존 진단 → 기존 Supervisor / MCP / LLM
-  │                       → 관측 저장·복구 판정 → 진단 + 정책 판정
+  ├─ 일반 대화 → LLM 직접 응답
+  ├─ 일반 진단 → 대상 확정 → 계획·게이트 → MCP 조회 → 부족한 런북 추가 조회
+  │            → 관측 저장·복구 판정 → 구조화 제안 → 근거 검증 → 답변 + 정책 판정
   ├─ 복구 재점검 → MCP 조회 → 관측 저장 → 변화 비교 → 복구·재발 판정
   ├─ 조사 이력 → SQLite 조회
   └─ 보고서 → 최신 기록 유효성 재평가 → Markdown 다운로드
 ```
 
-기존 진단의 분류·계획·조언에는 LLM을 사용합니다.
+일반 진단의 분류·계획·원인 후보와 런북 항목 선택에는 LLM을 사용합니다.
+모델은 근거 ID·원인 분류·런북 단계 ID를 제안하고, 코드는 출처와 서비스별 적용 가능성을 검사해 실제 수치와 문장을 구성합니다.
+미수집 로그 분석·조치 실행을 모델의 자유 문장으로 보고하지 않습니다. 재작성은 한 번이며 실패 시 검증 보류, 일부 자료가 없으면 해당 부분을 보류합니다.
+검증 전 진단 초안은 화면에 스트리밍하지 않습니다. 일반 대화는 기존 토큰 스트리밍을 사용합니다.
 **새 복구 재점검의 수치 비교·최종 판정은 코드가 수행**하고 LLM 호출을 생략합니다.
 기준을 일정하게 유지하고 지연을 줄이기 위한 선택입니다.
 
@@ -104,7 +109,8 @@ MONITORING_SCENARIO=recovery-demo SESSION_DB_PATH=recovery-demo.db \
 
 ## 검사·전후 비교
 
-- **20개 검사 통과**: 규칙, 중복/순서/신선도, 재발, 재개방, 대화 분리·동시 요청, 실제 stdio MCP와 POST/SSE, 다운로드, 시간 초과·재시도.
+- **48개 검사 통과**: 기존 복구 검사와 근거 없는 초안 차단, 다른 서비스 근거 혼용, 재작성 상한, 부분 조회 실패, 생성 중 자료 만료, null 모델 응답·잘못된 분석 입력, JSON 요청 계약 검사.
+- 제공 API 요청 계약 검사는 모의 HTTP이며, 유효 키를 사용하는 실제 API 호출과 구분합니다.
 - 실제 브라우저에서 5단계 변화·이력·보고서 다운로드 확인.
 - 원본 `d1043ff`와 현재 그래프에 같은 질문·고정 관측·고정 시계를 주입해 비교.
 - 그래프 비교의 MCP는 고정 fixture입니다. 실제 MCP/HTTP 검사는 별도입니다.
@@ -122,14 +128,21 @@ MONITORING_SCENARIO=recovery-demo SESSION_DB_PATH=recovery-demo.db \
 별도의 실제 웹 프록시·FastAPI·stdio MCP 검사에서는 **15/15건** 기대 판정과 일치했고 중앙값은 **약 7.9ms**였습니다. 이 경로도 합성 데이터와 코드 기반 복구 판정을 사용합니다.
 수치는 이 고정 시나리오의 결과이며 일반 장애 진단 정확도를 의미하지 않습니다.
 
+일반 진단도 별도로 재검증했습니다. 같은 CPU 89.5% 입력의 작성 단계 비교에서는 개선 후 3/3건이 근거 검증을 통과하고 `>90%` 조건 불충족을 표시했습니다.
+실제 웹·Ollama의 첫 일반 진단과 후속 복구 흐름을 세 번 실행해 15개 상태 판정을 확인했습니다.
+첫 일반 진단 중앙값은 약 15.64초이며, 빠른 후속 복구 경로 시간과 구분합니다.
+
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python eval/compare_recovery.py --backend ollama --repetitions 3
+# 일반 진단: 로컬 Ollama 연결 필요. web은 recovery-demo 서버를 먼저 실행합니다.
+.venv/bin/python -m eval.probe_grounding writer --repeat 3
+.venv/bin/python -m eval.probe_grounding web --repeat 3
 ```
 
-[새 기능 검증](docs/RECOVERY_VALIDATION.md) · [원본 검증](docs/BASELINE_VALIDATION.md)
+[일반 진단·근거 검증 재점검](docs/GROUNDING_VALIDATION.md) · [복구 기능 검증](docs/RECOVERY_VALIDATION.md) · [원본 검증](docs/BASELINE_VALIDATION.md)
 
-[발표용 PPT 다운로드](output/presentation/AI-Mini-Project_G028_최민석.pptx)
+[기존 PPT 초안 — 최종 검증 후 갱신 예정](output/presentation/AI-Mini-Project_G028_최민석.pptx)
 
 ## 평가 항목 대응
 
@@ -137,18 +150,18 @@ MONITORING_SCENARIO=recovery-demo SESSION_DB_PATH=recovery-demo.db \
 |---|---|
 | 기능 완성도 30 | 등록한 10개 개선/추가 항목의 API·웹·저장·다운로드 |
 | 전후 실측 보너스 10 | 같은 질문·관측, 원문·판정·시간·측정 범위 공개 |
-| 기술 요소 30 | 기존 Multi-Agent/MCP, LangGraph 분기, SQLite, 의존성 주입, 모듈화, 단위·통합 검사 |
+| 기술 요소 30 | 기존 Multi-Agent/MCP, LangGraph 분기, Pydantic·권위 게이트·Validator, SQLite, 의존성 주입·검사 |
 | 한계 20 | 확인 지연, 보수적 보류, 저장 비용, 정책·샘플 의존성 |
-| PPT·발표 20 | 문제 → 코드 → 실측 → 한계 순서의 8장 PPT 작성. 실제 발표는 대기 |
+| PPT·발표 20 | 8장 PPT 초안 보존. 최종 검증 후 갱신, 실제 발표 대기 |
 
 RAG·LLM-as-a-Judge를 새 구현으로 기재하지 않습니다. API·LangSmith도 실제 확인 전 완료로 표시하지 않습니다.
 
 ## 직접 기여
 
-- 새 모듈: `agent/recovery.py`, `recovery_store.py`, `recovery_nodes.py`, `monitoring.py`
+- 새 모듈: `agent/recovery.py`, `recovery_store.py`, `recovery_nodes.py`, `monitoring.py`, `grounding.py`
 - 새 정책·데이터: `data/recovery_policy.json`, `data/scenarios/`
 - 연결: 기존 그래프·FastAPI·MCP·Vue에 노드/경로/버튼 추가
-- 검사: `tests/`, `eval/compare_recovery.py`
+- 검사: `tests/`, `eval/compare_recovery.py`, `eval/probe_grounding.py`
 
 제공 Supervisor, MCP Tool/Resource/Prompt, 모델 백엔드, Vue/SSE, 대화 저장, 의존성 주입 구조를 재사용했습니다.
 
@@ -159,7 +172,8 @@ RAG·LLM-as-a-Judge를 새 구현으로 기재하지 않습니다. API·LangSmit
 - 규칙 기반 명령 해석은 지원 표현이 제한적이며 모호한 대상은 확인합니다.
 - API는 최근 100건, 판정은 최대 500건을 읽습니다. 장기 보관·정리 정책은 미구현입니다.
 - 로컬 데모로 인증·권한 통제, 운영 배포, 자동 조치, 주기적 감시는 범위 밖입니다.
-- 기존 LLM 진단의 모든 사실 오류를 해결한 것은 아닙니다. 새 정책 판정과 원인 추정·권장 조언을 구분합니다.
+- 근거 검증은 v2 일반 진단의 제한된 출력 구조에 적용합니다. 근본 원인·런북 자체의 정확성·일반 대화의 모든 사실을 검증하지 않습니다.
+- 자유로운 설명 대신 근거·분류·런북 항목으로 출력을 제한하므로 표현력과 진단 범위가 줄어듭니다.
 - cost_usd는 가상 단가 추정이며 실제 청구액이 아닙니다.
 
 ## 문서

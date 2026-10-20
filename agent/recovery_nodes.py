@@ -16,6 +16,7 @@ ALIASES = {"인증 서비스": "auth-service", "결제 서비스": "payments-ser
            "캐시 서비스": "cache-service", "게이트웨이 서비스": "gateway-service",
            "로그 서비스": "log-service", "웹 서버": "web-01"}
 SERVICE_PATTERN = re.compile(r"(?<![a-z0-9_-])[a-z][a-z0-9]*(?:-[a-z0-9]+)*-(?:service|\d+)(?![a-z0-9_-])", re.I)
+OPERATIONAL_PATTERN = re.compile(r"장애|진단|느려|느리|지연|모니터링|조사|점검|CPU|메모리|상태|다운", re.I)
 
 
 def extract_targets(query: str) -> tuple[list[str], list[str]]:
@@ -45,7 +46,9 @@ def completed(state, reply, event="RecoveryCompleted", **fields):
 @traceable(name="request_context_node")
 async def request_context_node(state, deps):
     if deps.recovery_store is None:
-        return {"recovery_action": "legacy"}
+        targets, _ = extract_targets(state["query"])
+        return {"recovery_action": "legacy", "resolved_targets": targets,
+                "operational_request": bool(OPERATIONAL_PATTERN.search(state["query"]))}
     store = deps.recovery_store
     query, thread = state["query"], state["thread_id"]
     context = store.context(thread)
@@ -55,13 +58,13 @@ async def request_context_node(state, deps):
     if re.fullmatch(r"\s*(취소|그만|취소해\s*줘)[.!?]?\s*", query):
         store.set_context(thread, pending=None)
         return {"recovery_action": "clarify", **completed(state, "확인 대기 중인 요청을 취소했습니다.", "ClarificationCancelled")}
-    if pending and targets and action == "legacy":
+    if pending and targets and action == "legacy" and not OPERATIONAL_PATTERN.search(query):
         action = pending["action"]
         query = f"{pending['query']}\n확인된 대상: {', '.join(targets)}"
-    elif pending and action != "legacy":
+    elif pending and (action != "legacy" or (targets and OPERATIONAL_PATTERN.search(query))):
         # 사용자가 새 명령을 보냈으면 이전 확인 질문을 이어붙이지 않는다.
         store.set_context(thread, pending=None)
-    operational = bool(unknown) or action != "legacy" or bool(re.search(r"장애|진단|느려|느리|지연|모니터링|조사|점검|CPU|메모리|상태|다운", query, re.I))
+    operational = bool(unknown) or action != "legacy" or bool(OPERATIONAL_PATTERN.search(query))
     explicit_reference = bool(re.search(r"그\s*서비스|그\s*시스템|이전\s*서비스|방금", query))
     if not targets and not unknown and (action != "legacy" or explicit_reference):
         last_targets = context.get("targets", [])
@@ -78,7 +81,8 @@ async def request_context_node(state, deps):
         events = events + [{"type": "RouteDecided", "route": action}, {"type": "TargetsResolved", "targets": targets}]
     if action == "legacy" and targets and explicit_reference:
         query += "\n조사 대상: " + ", ".join(targets)
-    return {"query": query, "resolved_targets": targets, "recovery_action": action, "events": events}
+    return {"query": query, "resolved_targets": targets, "recovery_action": action, "events": events,
+            "operational_request": operational}
 
 
 @traceable(name="recovery_collect_node")

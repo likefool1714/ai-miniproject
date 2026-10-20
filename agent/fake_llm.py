@@ -90,6 +90,15 @@ class FastLLM(FakeLLM):
 class QualityLLM(FakeLLM):
     """최종 답변 작성 전담 (고품질·고비용)."""
 
+    @traceable(run_type="llm", name="quality_llm.write_grounded")
+    async def write_grounded(self, query: str, bundle: dict, feedback=None):
+        from .grounding import default_draft, writer_prompt
+        system, user = writer_prompt(query, bundle, feedback)
+        content = default_draft(bundle).model_dump_json()
+        usage = self._usage(system + user, content)
+        usage["prompt"] = f"[SYSTEM]\n{system}\n\n[USER]\n{user}"
+        return content, usage
+
     @traceable(run_type="llm", name="quality_llm.write")
     async def write(self, query: str, collected: list[dict], attempt: int,
               feedback: str | None, on_token=None) -> tuple[str, dict]:

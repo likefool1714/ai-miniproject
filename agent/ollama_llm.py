@@ -97,11 +97,12 @@ class OllamaLLM:
             "messages": [{"role": "system", "content": system},
                          {"role": "user", "content": user}],
             "stream": False,
-            "options": {"temperature": 0.0},
+            "think": False,
+            "options": {"temperature": 0.0, "num_predict": 512},
         }
         if schema is not None:
             payload["format"] = schema
-        resp = httpx.post(OLLAMA_URL, json=payload, timeout=300.0)
+        resp = httpx.post(OLLAMA_URL, json=payload, timeout=20.0)
         resp.raise_for_status()
         data = resp.json()
         content = data["message"]["content"]
@@ -110,7 +111,7 @@ class OllamaLLM:
                  "usd": round(tokens / 1000 * self.usd_per_1k, 6)}
         return content, usage
 
-    async def _chat_stream(self, system: str, user: str, on_token=None) -> tuple[str, dict]:
+    async def _chat_stream(self, system: str, user: str, on_token=None, schema=None) -> tuple[str, dict]:
         """사용자 대면 텍스트(최종 답변류) 전용 — Ollama NDJSON 스트림을 토큰 단위로
         받아 on_token(조각)을 즉시 호출해 SSE로 실시간 중계할 수 있게 한다. 분류/계획
         등 JSON 스키마 출력(route/plan/analyze)은 부분 출력이 의미가 없어 그대로 _chat을
@@ -122,6 +123,10 @@ class OllamaLLM:
             "stream": True,
             "options": {"temperature": 0.0},
         }
+        if schema is not None:
+            payload["format"] = schema
+            payload["options"]["num_predict"] = 1024
+            payload["think"] = False
         chunks: list[str] = []
         usage = {"model": self.name, "tokens": 0, "usd": 0.0}
         async with httpx.AsyncClient(timeout=300.0) as client:
@@ -237,6 +242,13 @@ class OllamaFastLLM(OllamaLLM):
 
 class OllamaQualityLLM(OllamaLLM):
     """최종 답변 작성 전담 (상대적으로 큰 모델)."""
+
+    @traceable(run_type="llm", name="ollama_quality.write_grounded")
+    async def write_grounded(self, query: str, bundle: dict, feedback=None):
+        from .grounding import WriterDraft, writer_prompt
+        system, user = writer_prompt(query, bundle, feedback)
+        # 검증 전 토큰은 사용자에게 전달하지 않는다.
+        return await self._chat_stream(system, user, schema=WriterDraft.model_json_schema())
 
     @traceable(run_type="llm", name="ollama_quality.write")
     async def write(self, query: str, collected: list[dict], attempt: int,

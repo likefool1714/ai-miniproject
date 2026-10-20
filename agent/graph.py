@@ -21,6 +21,7 @@ from langsmith import traceable
 
 from .deps import SupervisorDeps
 from .retry import with_retry
+from .grounding import build_bundle, validate_draft, render_answer, fallback_draft, WriterDraft
 from .recovery_nodes import (
     request_context_node, recovery_collect_node, recovery_assess_node,
     recovery_answer_node, recovery_history_node, recovery_report_node, recovery_text,
@@ -39,16 +40,6 @@ def _load_known_systems() -> set[str]:
 
 
 KNOWN_SYSTEMS = _load_known_systems()
-
-
-def _extract_system_name(query: str) -> str:
-    """정규식 대신 실제 KNOWN_SYSTEMS 멤버십 매칭 — MCP Prompt(incident_analysis_
-    prompt)의 system_name은 "시스템: X" 한 줄짜리 컨텍스트라 항상 정해진 이름
-    중 하나로만 고정한다(여러 개 언급돼도 join하지 않음 — 실제 조사 대상 목록은
-    이후 plan()의 tasks가 별도로 결정). 쿼리에서 가장 먼저 등장하는 시스템을
-    고르고, 하나도 안 걸리면 가장 흔한 사례인 auth-service로 폴백."""
-    matches = [(query.index(s), s) for s in KNOWN_SYSTEMS if s in query]
-    return min(matches)[1] if matches else "auth-service"
 
 
 class AgentState(TypedDict, total=False):
@@ -75,6 +66,12 @@ class AgentState(TypedDict, total=False):
     recovery_results: list[dict]
     recovery_failures: list[dict]
     report_links: list[dict]
+    evidence_bundle: dict
+    validated_draft: dict
+    validation_status: str
+    validation_errors: list[str]
+    writer_error: str
+    operational_request: bool
 
 
 def _cost(state: AgentState, usage: dict) -> float:
@@ -84,13 +81,29 @@ def _cost(state: AgentState, usage: dict) -> float:
 @traceable(name="route_node")
 async def route_node(state: AgentState, deps: SupervisorDeps) -> dict:
     """Wave 5 — 모든 쿼리가 무거운 파이프라인을 탈 필요는 없다."""
-    result, usage = await asyncio.to_thread(deps.fast_llm.route, state["query"])
-    if state.get("resolved_targets"):
+    events = list(state.get("events", []))
+    try:
+        result, usage = await asyncio.to_thread(deps.fast_llm.route, state["query"])
+    except Exception as exc:
+        if not state.get("resolved_targets") or not state.get("operational_request"):
+            return {"route": "clarify", "final": "요청 분류 모델의 응답을 받지 못했습니다. 서비스를 명시해 다시 요청해 주세요.",
+                    "events": events + [{"type": "ModelFallback", "stage": "route", "reason": type(exc).__name__}]}
+        result, usage = {"route": "incident", "needs_analysis": False}, {"usd": 0}
+        events.append({"type": "ModelFallback", "stage": "route", "reason": type(exc).__name__})
+    if state.get("resolved_targets") and state.get("operational_request"):
         result = {"route": "incident", "needs_analysis": result.get("needs_analysis", False)}
+    if result["route"] == "incident" and not state.get("resolved_targets"):
+        # 라우터가 운영 요청으로 판단한 경우에도 임의의 기본 서비스를 조사하지 않는다.
+        if deps.recovery_store is not None:
+            deps.recovery_store.set_context(state["thread_id"], pending={"action": "legacy", "query": state["query"]})
+        return {"route": "clarify", "final": "어떤 서비스를 조사할까요? 등록 서비스: " + ", ".join(sorted(KNOWN_SYSTEMS)),
+                "cost_usd": _cost(state, usage), "events": state.get("events", []) + [{"type": "ClarificationRequired"}]}
+    if result["route"] == "incident" and deps.recovery_store is not None:
+        deps.recovery_store.set_context(state["thread_id"], targets=state["resolved_targets"], pending=None)
     event = {"type": "RouteDecided", "route": result["route"]}
     return {"route": result["route"], "needs_analysis": result["needs_analysis"],
             "cost_usd": _cost(state, usage),
-            "events": state.get("events", []) + [event]}
+            "events": events + [event]}
 
 
 @traceable(name="chat_answer_node")
@@ -118,22 +131,29 @@ async def plan_node(state: AgentState, deps: SupervisorDeps) -> dict:
     prompt_server = await deps.mcp.find_prompt("incident_analysis_prompt")
     procedure = await deps.mcp.get_prompt(
         "incident_analysis_prompt",
-        {"system_name": (state.get("resolved_targets") or [_extract_system_name(state["query"])])[0], "symptom": state["query"]},
+        {"system_name": state["resolved_targets"][0], "symptom": state["query"]},
         server=prompt_server,
     )
-    result, usage = await asyncio.to_thread(deps.fast_llm.plan, state["query"], procedure)
+    events = list(state["events"])
+    try:
+        result, usage = await asyncio.to_thread(deps.fast_llm.plan, state["query"], procedure)
+    except Exception as exc:
+        result = {"tasks": [], "needs_analysis": False}
+        usage = {"usd": 0}
+        events.append({"type": "ModelFallback", "stage": "plan", "reason": type(exc).__name__})
     # 모델이 문맥 대상을 덮어쓰거나 요청한 복수 서비스를 빠뜨리지 않도록 보정한다.
     if state.get("resolved_targets"):
         targets = state["resolved_targets"]
         others = [t for t in result["tasks"] if t.get("agent") != "research"]
         result["tasks"] = [{"id": f"task-{i}", "agent": "research", "kind": "monitoring",
                             "target": s, "status": "pending"} for i, s in enumerate(targets)] + others
+    # 모델이 계획한 별도 runbook은 관측 전 추측이므로 실행하지 않는다.
     targets = [t["target"] for t in result["tasks"]
                if t["agent"] == "research" and t.get("target")]
     event = {"type": "PlanCreated", "task_count": len(result["tasks"]),
              "targets": targets}
     return {"tasks": result["tasks"], "needs_analysis": result["needs_analysis"],
-            "cost_usd": _cost(state, usage), "events": state["events"] + [event]}
+            "cost_usd": _cost(state, usage), "events": events + [event]}
 
 
 @traceable(name="gate_node")
@@ -180,75 +200,69 @@ async def research_node(state: AgentState, deps: SupervisorDeps) -> dict:
             arguments = {"system_name": task["target"]}
             if deps.recovery_store is not None:
                 arguments["observation_context"] = state["thread_id"]
-            data, retries = await with_retry(
+            data, retries = await asyncio.wait_for(with_retry(
                 deps.mcp.call_tool, "get_monitoring_status",
-                arguments)
+                arguments), timeout=15)
             if data.get("system_name") != task["target"]:
                 raise ValueError("모니터링 응답 대상이 요청한 서비스와 다릅니다.")
             return {"idx": idx, "source": "monitoring", "data": data, "retries": retries}
         uri = runbook_uri_template.format(incident_type=task["target"])
         data = await deps.mcp.read_resource(uri, server=runbook_server)
-        return {"idx": idx, "source": "runbook", "data": data, "retries": 0}
+        return {"idx": idx, "source": "runbook", "data": data, "uri": uri, "retries": 0}
 
     started = time.perf_counter()
-    results = await asyncio.gather(*(run_one(i) for i in research_indices))
+    results = await asyncio.gather(*(run_one(i) for i in research_indices), return_exceptions=True)
     elapsed = round(time.perf_counter() - started, 2)
 
     new_tasks = [dict(t) for t in tasks]
     collected = list(state.get("collected", []))
     events = list(state["events"])
-    for r in results:
+    failures = list(state.get("recovery_failures", []))
+    for idx, r in zip(research_indices, results):
+        if isinstance(r, Exception):
+            task = new_tasks[idx]
+            task["status"] = "failed"
+            reason = f"자료 조회 실패 ({type(r).__name__})"
+            events.append({"type": "TaskFailed", "target": task["target"], "reason": reason})
+            if task["kind"] == "monitoring":
+                failures.append({"system_name": task["target"], "error": reason})
+                if deps.recovery_store is not None:
+                    deps.recovery_store.failed(state["thread_id"], task["target"], reason)
+            continue
         new_tasks[r["idx"]]["status"] = "done"
-        collected.append({"source": r["source"], "data": r["data"]})
+        collected.append({"source": r["source"], "data": r["data"], "target": new_tasks[r["idx"]]["target"],
+                          "uri": r.get("uri")})
         retry_total += r["retries"]
         events.append({"type": "TaskCompleted", "id": new_tasks[r["idx"]]["id"],
                        "source": r["source"], "target": new_tasks[r["idx"]]["target"],
                        "retries": r["retries"]})
     return {"tasks": new_tasks, "collected": collected, "retry_count": retry_total,
-            "parallel_elapsed": elapsed, "events": events}
+            "parallel_elapsed": elapsed, "events": events, "recovery_failures": failures}
 
 
-# 수집된 모니터링 결과(상태·알림 문구)를 보고 어떤 runbook이 맞는지 고른다. LLM에게
-# 다시 묻는 대신 코드 레벨 규칙으로 판단한다 — gate(Wave 6)·replan(Wave 7)과 같은 설계
-# 원칙: 모델의 판단을 그대로 믿지 않고, 실측 데이터로 검증 가능한 결정은 코드가 내린다.
-_INCIDENT_TYPE_RULES = [
-    ("latency", "high-latency"),
-    ("pool", "high-latency"),
-    ("cpu", "cpu-spike"),
-    ("memory", "memory-leak"),
-    ("heap", "memory-leak"),
-    ("timeout", "network-timeout"),
-    ("network", "network-timeout"),
-    ("disk", "disk-full"),
-    ("down", "db-down"),
-]
-
-
-def _classify_incident_type(collected: list[dict]) -> str:
-    text = " ".join(
-        f"{c['data'].get('status', '')} " + " ".join(c["data"].get("alerts", []))
-        for c in collected if c.get("source") == "monitoring"
-    ).lower()
-    for keyword, incident_type in _INCIDENT_TYPE_RULES:
-        if keyword in text:
-            return incident_type
-    return "db-down"   # 매칭되는 증상이 없으면 가장 일반적인 장애 대응 절차로 폴백
+def _bundle(state: AgentState, deps: SupervisorDeps) -> dict:
+    store = deps.recovery_store
+    return build_bundle(state.get("collected", []), state.get("resolved_targets", []),
+                        store.policy if store else None, store.clock() if store else None)
 
 
 @traceable(name="replan_check_node")
 async def replan_check_node(state: AgentState, deps: SupervisorDeps) -> dict:
-    """Wave 7 — 1차 수집 결과 평가. runbook이 없으면 gap task만 추가해 재조사."""
-    has_runbook = any(c["source"] == "runbook" for c in state.get("collected", []))
+    """Wave 7 — 관측에 맞는 런북만 한 차례 추가 조회. 정상 상태에는 기본 런북 없음."""
+    bundle = _bundle(state, deps)
+    available = {r["incident_type"] for r in bundle["runbooks"]}
+    required = {t for m in bundle["monitoring"] for t in m["incident_types"]}
+    missing = sorted(required - available)
     rounds = state.get("replan_rounds", 0)
-    if has_runbook or rounds >= 1:
-        verdict = {"type": "ReplanCheck", "round": rounds, "is_sufficient": True}
+    if not missing or rounds >= 1:
+        verdict = {"type": "ReplanCheck", "round": rounds, "is_sufficient": not missing,
+                   "stop": True, "missing_runbooks": missing}
         return {"events": state["events"] + [verdict]}
-    incident_type = _classify_incident_type(state.get("collected", []))
-    gap_task = {"id": "task-gap-runbook", "agent": "research", "kind": "runbook",
-                "target": incident_type, "status": "pending"}
+    gap_tasks = [{"id": f"task-gap-{t}", "agent": "research", "kind": "runbook",
+                  "target": t, "status": "pending"} for t in missing]
     verdict = {"type": "ReplanCheck", "round": rounds, "is_sufficient": False,
-               "gap_task": gap_task["id"], "target": incident_type}
-    return {"tasks": state["tasks"] + [gap_task], "replan_rounds": rounds + 1,
+               "target": ", ".join(missing)}
+    return {"tasks": state["tasks"] + gap_tasks, "replan_rounds": rounds + 1,
             "events": state["events"] + [verdict]}
 
 
@@ -262,7 +276,16 @@ async def analysis_node(state: AgentState, deps: SupervisorDeps) -> dict:
     if not pending:
         return {"events": state["events"] +
                 [{"type": "AnalysisSkipped", "reason": "analysis task 0개"}]}
-    summary, usage = await asyncio.to_thread(deps.fast_llm.analyze, state.get("collected", []))
+    valid_monitoring = [{"source": "monitoring", "data": m["snapshot"]}
+                        for m in _bundle(state, deps)["monitoring"]]
+    if not valid_monitoring:
+        return {"events": state["events"] +
+                [{"type": "AnalysisSkipped", "reason": "유효한 모니터링 자료 0개"}]}
+    try:
+        summary, usage = await asyncio.to_thread(deps.fast_llm.analyze, valid_monitoring)
+    except Exception as exc:
+        return {"events": state["events"] +
+                [{"type": "AnalysisSkipped", "reason": f"모델 분석 실패 ({type(exc).__name__}); 수집 근거만 사용"}]}
     new_tasks = [dict(t) for t in tasks]
     for t in new_tasks:
         if t["agent"] == "analysis" and t["status"] == "pending":
@@ -275,55 +298,76 @@ async def analysis_node(state: AgentState, deps: SupervisorDeps) -> dict:
 
 @traceable(name="write_node")
 async def write_node(state: AgentState, deps: SupervisorDeps) -> dict:
-    """Wave 8/10a — 고품질 모델로 초안 작성 (1차는 의도적 저품질).
-
-    토큰마다 attempt 번호를 같이 실어 보낸다 — validate가 반려해 재작성(attempt 증가)
-    될 때 프론트가 새 말풍선으로 끊어서 보여줄 수 있게 하기 위함(Wave 8 재작성 루프를
-    그대로 노출)."""
+    """구조화 제안 작성. 검증 이전의 모델 토큰은 화면으로 내보내지 않는다."""
     attempt = state.get("validation_attempts", 0) + 1
-    writer = get_stream_writer()
-    draft, usage = await deps.quality_llm.write(
-        state["query"], state.get("collected", []),
-        attempt, state.get("validation_feedback"),
-        on_token=lambda piece: writer(
-            {"type": "AnswerToken", "attempt": attempt, "delta": piece}))
+    get_stream_writer()({"type": "DraftStarted", "attempt": attempt})
+    bundle = _bundle(state, deps)
+    error, draft, usage = "", "", {"usd": 0}
+    if not bundle["monitoring"]:
+        error = "no_valid_observation"
+    else:
+        try:
+            draft, usage = await asyncio.wait_for(deps.quality_llm.write_grounded(
+                state["query"], bundle, state.get("validation_feedback")), timeout=40)
+            if not isinstance(draft, str):
+                draft = ""  # 거부 응답의 null 등은 스키마 반려 후 제한된 재작성으로 처리한다.
+        except Exception as exc:
+            error = "writer_timeout" if isinstance(exc, TimeoutError) else "writer_unavailable"
     return {"draft": draft, "last_prompt": usage.get("prompt"),
-            "cost_usd": _cost(state, usage),
+            "cost_usd": _cost(state, usage), "evidence_bundle": bundle, "writer_error": error,
             "events": state["events"] + [{"type": "DraftWritten", "attempt": attempt,
                                           "length": len(draft)}]}
 
 
 @traceable(name="validate_node")
 async def validate_node(state: AgentState, deps: SupervisorDeps) -> dict:
-    """Wave 8 — 코드 기준 검증: 30자 이상 + 절차 번호 포함이어야 합격."""
-    draft = state["draft"]
+    """스키마·출처·서비스별 적용 가능성을 검증. 재작성은 최대 한 번."""
+    bundle = _bundle(state, deps)  # 모델 생성 중 자료가 오래됐는지도 다시 확인한다.
     attempts = state.get("validation_attempts", 0) + 1
-    ok = len(draft) >= 30 and "1)" in draft
-    verdict = "합격" if ok else "불합격"
-    if not ok and attempts >= 3:   # 실모델 무한 재작성 방지 — 최대 3회 후 통과 처리
-        ok, verdict = True, "합격(최대 시도 도달 — 통과 처리)"
-    feedback = None if ok else (
-        f"응답이 너무 짧습니다({len(draft)}자, 최소 30자). 절차를 1) 2) 3) 번호로 "
-        f"구체적으로 설명하세요.")
-    event = {"type": "Validation", "attempt": attempts, "verdict": verdict}
+    draft, errors = validate_draft(state["draft"], bundle)
+    if state.get("writer_error"):
+        draft, errors = None, [state["writer_error"]]
+    retry = draft is None and not state.get("writer_error") and attempts < 2 and bool(bundle["monitoring"])
+    unavailable = bool(bundle["unavailable"]) or any(
+        t not in {r["incident_type"] for r in bundle["runbooks"] if r["steps"]}
+        for m in bundle["monitoring"] for t in m["incident_types"])
+    status = ("partial" if unavailable else "validated") if draft else "retry" if retry else "fallback"
+    verdict = ("부분합격" if unavailable else "합격") if draft else "불합격" if retry else "보류"
+    feedback = ", ".join(errors) if retry else None
+    event = {"type": "Validation", "attempt": attempts, "verdict": verdict, "errors": errors}
     return {"validation_attempts": attempts, "validation_feedback": feedback,
+            "validation_status": status,
+            "validation_errors": errors, "evidence_bundle": bundle,
+            "validated_draft": (draft or fallback_draft(bundle)).model_dump(),
             "events": state["events"] + [event]}
 
 
 @traceable(name="finalize_node")
 async def finalize_node(state: AgentState, deps: SupervisorDeps) -> dict:
+    # 생성 중 자료의 유효기간이 지나면 앞서 저장한 당시 복구 판정도 현재 답변에서는 보류한다.
+    unavailable = {m["system_name"]: m["reason"] for m in state["evidence_bundle"]["unavailable"]}
+    if unavailable:
+        state = dict(state)
+        state["recovery_results"] = [
+            {**r, "assessment": {**r["assessment"], "phase": "hold", "recurrence": False,
+                                  "reasons": [unavailable[r["snapshot"]["system_name"]]]}}
+            if r["snapshot"]["system_name"] in unavailable else r
+            for r in state.get("recovery_results", [])]
     recovery = "\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n" + recovery_text(state) if state.get("recovery_results") or state.get("recovery_failures") else ""
-    return {"final": state["draft"] + recovery,
+    answer = render_answer(state["evidence_bundle"], WriterDraft.model_validate(state["validated_draft"]), state["validation_status"])
+    return {"final": answer + recovery, "recovery_results": state.get("recovery_results", []),
             "events": state["events"] + [{"type": "Finalize", "pipeline": "incident-v2"}]}
 
 
 def _after_route(state: AgentState) -> str:
+    if state["route"] == "clarify":
+        return "clarify"
     return "chat_answer" if state["route"] == "chat" else "plan"
 
 
 def _after_replan_check(state: AgentState) -> str:
     last = state["events"][-1]
-    return "analysis" if last.get("is_sufficient") else "research"
+    return "analysis" if last.get("is_sufficient") or last.get("stop") else "research"
 
 
 def _after_validate(state: AgentState) -> str:
@@ -361,7 +405,7 @@ def build_graph(deps: SupervisorDeps):
     g.add_edge("recovery_history", END)
     g.add_edge("recovery_report", END)
     g.add_conditional_edges("route", _after_route,
-                            {"chat_answer": "chat_answer", "plan": "plan"})
+                            {"chat_answer": "chat_answer", "plan": "plan", "clarify": END})
     g.add_edge("chat_answer", END)
     g.add_edge("plan", "gate")
     g.add_edge("gate", "research")

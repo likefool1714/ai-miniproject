@@ -1,0 +1,167 @@
+[
+  {
+    "repetition": 1,
+    "query": "payments-service 장애 원인과 CPU 런북 조건을 진단해주세요.",
+    "collected": [
+      {
+        "source": "monitoring",
+        "data": {
+          "system_name": "payments-service",
+          "status": "degraded",
+          "cpu_percent": 89.5,
+          "memory_percent": 55.0,
+          "alerts": [
+            "CPU high (threshold 80%)"
+          ],
+          "last_checked": "2026-10-20T09:42:27.318720+00:00",
+          "sample_id": "writer-fixed-1",
+          "data_source": "controlled-writer-fixture"
+        }
+      },
+      {
+        "source": "runbook",
+        "target": "cpu-spike",
+        "data": "# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n"
+      }
+    ],
+    "before": {
+      "reply": "1) **장애 원인 진단**: CPU 사용률 89.5%가 임계치 80%를 초과하며, 'CPU high' 알림이 발생했으므로, 반복 호출 또는 배치 작업 같은 특정 요청 패턴이 원인일 가능성이 높음.  \n2) **CPU 런북 조건 확인**: CPU 사용률이 90%를 넘고 지속될 경우 오토스케일링 그룹에서 인스턴스를 1대 추가해 부하 분산해야 함. 현재 89.5%로 임계치에 근접해 조치 필요.  \n3) **정상화 후 대응**: 서비스 정상화 후 프로파일링을 통해 핫스팟 코드를 식별하고 최적화 작업을 등록해야 함.",
+      "usage": {
+        "model": "ollama:qwen3:8b",
+        "tokens": 911,
+        "usd": 0.001822,
+        "prompt": "[SYSTEM]\n당신은 ICT 운영 보고 작성자다. 수집된 사실만 사용해 한국어로 간결한 대응 보고를 작성하라. 반드시 '1) ... 2) ... 3) ...' 형식의 번호 절차로 답하고, 수치는 수집된 값을 그대로 인용하라.\n\n[USER]\n## 사용자 요청\npayments-service 장애 원인과 CPU 런북 조건을 진단해주세요.\n\n## 수집된 사실\n- 모니터링 payments-service: 상태=degraded, CPU 89.5%, 메모리 55.0%, 알림 1건 ['CPU high (threshold 80%)']\n- runbook 발췌:\n# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다."
+      },
+      "completed": true,
+      "elapsed_seconds": 25.177094459009822
+    },
+    "after": {
+      "status": "validated",
+      "reply": "## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 89.5%, 메모리 55%, 알림 1건.\n  관측 시각 2026-10-20T09:42:27.318720Z / 관측 ID writer-fixed-1 / 자료 controlled-writer-fixture\n  모니터링 알림 원문: CPU high (threshold 80%)\n\n## 추가 확인할 원인 후보 (미확정)\n- [M1] CPU 부하 원인을 추가 확인할 필요가 있습니다. 원인은 확정되지 않았습니다.\n\n## 권장 확인·대응 절차 (미실행)\n- [M1 → R1.3] 런북 수치 조건: CPU 89.5% > 90% → 불충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R1.1] cpu-spike 런북 원문: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n- [M1 → R1.2] cpu-spike 런북 원문: 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n- [M1 → R1.3] cpu-spike 런북 원문: CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n- [M1 → R1.4] cpu-spike 런북 원문: 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n- [M1 → R1.5] cpu-spike 런북 원문: 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw": "{\n  \"hypotheses\": [\n    {\"evidence_id\": \"M1\", \"kind\": \"cpu\"}\n  ],\n  \"recommendations\": [\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.1\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.2\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.3\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.4\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.5\"}\n  ]\n}",
+          "errors": [],
+          "usage": {
+            "model": "ollama:qwen3:8b",
+            "tokens": 1073,
+            "usd": 0.002146,
+            "prompt": "[SYSTEM]\n당신은 운영 진단 제안 선택기입니다. JSON 객체만 반환하세요. 자유 문장과 수치는 쓰지 마세요. 각 monitoring의 id마다 hypotheses에 evidence_id와 allowed_kinds 중 kind를 하나 선택하세요. allowed_step_ids가 있으면 recommendations에 evidence_id와 해당 step_id를 하나 이상 선택하세요. 서비스별 허용 목록을 지키세요. 이 선택은 원인 확정이나 조치 실행을 뜻하지 않습니다. 스키마: {\"$defs\": {\"Hypothesis\": {\"additionalProperties\": false, \"properties\": {\"evidence_id\": {\"pattern\": \"^M[1-9][0-9]*$\", \"title\": \"Evidence Id\", \"type\": \"string\"}, \"kind\": {\"enum\": [\"cpu\", \"memory\", \"latency\", \"network\", \"disk\", \"service_down\", \"unknown\"], \"title\": \"Kind\", \"type\": \"string\"}}, \"required\": [\"evidence_id\", \"kind\"], \"title\": \"Hypothesis\", \"type\": \"object\"}, \"Recommendation\": {\"additionalProperties\": false, \"properties\": {\"evidence_id\": {\"pattern\": \"^M[1-9][0-9]*$\", \"title\": \"Evidence Id\", \"type\": \"string\"}, \"step_id\": {\"pattern\": \"^R[1-9][0-9]*\\\\.[1-9][0-9]*$\", \"title\": \"Step Id\", \"type\": \"string\"}}, \"required\": [\"evidence_id\", \"step_id\"], \"title\": \"Recommendation\", \"type\": \"object\"}}, \"additionalProperties\": false, \"properties\": {\"hypotheses\": {\"items\": {\"$ref\": \"#/$defs/Hypothesis\"}, \"maxItems\": 36, \"title\": \"Hypotheses\", \"type\": \"array\"}, \"recommendations\": {\"items\": {\"$ref\": \"#/$defs/Recommendation\"}, \"maxItems\": 36, \"title\": \"Recommendations\", \"type\": \"array\"}}, \"required\": [\"hypotheses\", \"recommendations\"], \"title\": \"WriterDraft\", \"type\": \"object\"}\n\n[USER]\n{\"query\": \"payments-service 장애 원인과 CPU 런북 조건을 진단해주세요.\", \"evidence\": {\"monitoring\": [{\"id\": \"M1\", \"snapshot\": {\"system_name\": \"payments-service\", \"status\": \"degraded\", \"cpu_percent\": 89.5, \"memory_percent\": 55.0, \"last_checked\": \"2026-10-20T09:42:27.318720Z\", \"alerts\": [\"CPU high (threshold 80%)\"], \"sample_id\": \"writer-fixed-1\", \"data_source\": \"controlled-writer-fixture\"}, \"allowed_kinds\": [\"cpu\"], \"incident_types\": [\"cpu-spike\"], \"allowed_step_ids\": [\"R1.1\", \"R1.2\", \"R1.3\", \"R1.4\", \"R1.5\"]}], \"runbooks\": [{\"id\": \"R1\", \"incident_type\": \"cpu-spike\", \"steps\": [{\"id\": \"R1.1\", \"text\": \"get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\"}, {\"id\": \"R1.2\", \"text\": \"반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\"}, {\"id\": \"R1.3\", \"text\": \"CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\"}, {\"id\": \"R1.4\", \"text\": \"급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\"}, {\"id\": \"R1.5\", \"text\": \"정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\"}]}], \"unavailable\": []}, \"validation_feedback\": null}"
+          }
+        }
+      ],
+      "elapsed_seconds": 6.821086750016548
+    }
+  },
+  {
+    "repetition": 2,
+    "query": "payments-service 장애 원인과 CPU 런북 조건을 진단해주세요.",
+    "collected": [
+      {
+        "source": "monitoring",
+        "data": {
+          "system_name": "payments-service",
+          "status": "degraded",
+          "cpu_percent": 89.5,
+          "memory_percent": 55.0,
+          "alerts": [
+            "CPU high (threshold 80%)"
+          ],
+          "last_checked": "2026-10-20T09:42:59.320135+00:00",
+          "sample_id": "writer-fixed-2",
+          "data_source": "controlled-writer-fixture"
+        }
+      },
+      {
+        "source": "runbook",
+        "target": "cpu-spike",
+        "data": "# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n"
+      }
+    ],
+    "before": {
+      "reply": "1) **장애 원인 진단**: CPU 사용률 89.5%가 임계치 80%를 초과하며, 'CPU high' 알림이 발생했으므로, 반복 호출 또는 배치 작업 같은 특정 요청 패턴이 원인일 가능성이 높음.  \n2) **CPU 런북 조건 확인**: CPU 사용률이 90%를 넘고 지속될 경우 오토스케일링 그룹에서 인스턴스를 1대 추가해 부하 분산해야 함. 현재 89.5%로 임계치에 근접해 조치 필요.  \n3) **정상화 후 대응**: 서비스 정상화 후 프로파일링을 통해 핫스팟 코드를 식별하고 최적화 작업을 등록해야 함.",
+      "usage": {
+        "model": "ollama:qwen3:8b",
+        "tokens": 911,
+        "usd": 0.001822,
+        "prompt": "[SYSTEM]\n당신은 ICT 운영 보고 작성자다. 수집된 사실만 사용해 한국어로 간결한 대응 보고를 작성하라. 반드시 '1) ... 2) ... 3) ...' 형식의 번호 절차로 답하고, 수치는 수집된 값을 그대로 인용하라.\n\n[USER]\n## 사용자 요청\npayments-service 장애 원인과 CPU 런북 조건을 진단해주세요.\n\n## 수집된 사실\n- 모니터링 payments-service: 상태=degraded, CPU 89.5%, 메모리 55.0%, 알림 1건 ['CPU high (threshold 80%)']\n- runbook 발췌:\n# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다."
+      },
+      "completed": true,
+      "elapsed_seconds": 24.7912951670005
+    },
+    "after": {
+      "status": "validated",
+      "reply": "## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 89.5%, 메모리 55%, 알림 1건.\n  관측 시각 2026-10-20T09:42:59.320135Z / 관측 ID writer-fixed-2 / 자료 controlled-writer-fixture\n  모니터링 알림 원문: CPU high (threshold 80%)\n\n## 추가 확인할 원인 후보 (미확정)\n- [M1] CPU 부하 원인을 추가 확인할 필요가 있습니다. 원인은 확정되지 않았습니다.\n\n## 권장 확인·대응 절차 (미실행)\n- [M1 → R1.3] 런북 수치 조건: CPU 89.5% > 90% → 불충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R1.1] cpu-spike 런북 원문: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n- [M1 → R1.2] cpu-spike 런북 원문: 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n- [M1 → R1.3] cpu-spike 런북 원문: CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n- [M1 → R1.4] cpu-spike 런북 원문: 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n- [M1 → R1.5] cpu-spike 런북 원문: 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw": "{\n  \"hypotheses\": [\n    {\"evidence_id\": \"M1\", \"kind\": \"cpu\"}\n  ],\n  \"recommendations\": [\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.1\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.2\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.3\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.4\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.5\"}\n  ]\n}",
+          "errors": [],
+          "usage": {
+            "model": "ollama:qwen3:8b",
+            "tokens": 1073,
+            "usd": 0.002146,
+            "prompt": "[SYSTEM]\n당신은 운영 진단 제안 선택기입니다. JSON 객체만 반환하세요. 자유 문장과 수치는 쓰지 마세요. 각 monitoring의 id마다 hypotheses에 evidence_id와 allowed_kinds 중 kind를 하나 선택하세요. allowed_step_ids가 있으면 recommendations에 evidence_id와 해당 step_id를 하나 이상 선택하세요. 서비스별 허용 목록을 지키세요. 이 선택은 원인 확정이나 조치 실행을 뜻하지 않습니다. 스키마: {\"$defs\": {\"Hypothesis\": {\"additionalProperties\": false, \"properties\": {\"evidence_id\": {\"pattern\": \"^M[1-9][0-9]*$\", \"title\": \"Evidence Id\", \"type\": \"string\"}, \"kind\": {\"enum\": [\"cpu\", \"memory\", \"latency\", \"network\", \"disk\", \"service_down\", \"unknown\"], \"title\": \"Kind\", \"type\": \"string\"}}, \"required\": [\"evidence_id\", \"kind\"], \"title\": \"Hypothesis\", \"type\": \"object\"}, \"Recommendation\": {\"additionalProperties\": false, \"properties\": {\"evidence_id\": {\"pattern\": \"^M[1-9][0-9]*$\", \"title\": \"Evidence Id\", \"type\": \"string\"}, \"step_id\": {\"pattern\": \"^R[1-9][0-9]*\\\\.[1-9][0-9]*$\", \"title\": \"Step Id\", \"type\": \"string\"}}, \"required\": [\"evidence_id\", \"step_id\"], \"title\": \"Recommendation\", \"type\": \"object\"}}, \"additionalProperties\": false, \"properties\": {\"hypotheses\": {\"items\": {\"$ref\": \"#/$defs/Hypothesis\"}, \"maxItems\": 36, \"title\": \"Hypotheses\", \"type\": \"array\"}, \"recommendations\": {\"items\": {\"$ref\": \"#/$defs/Recommendation\"}, \"maxItems\": 36, \"title\": \"Recommendations\", \"type\": \"array\"}}, \"required\": [\"hypotheses\", \"recommendations\"], \"title\": \"WriterDraft\", \"type\": \"object\"}\n\n[USER]\n{\"query\": \"payments-service 장애 원인과 CPU 런북 조건을 진단해주세요.\", \"evidence\": {\"monitoring\": [{\"id\": \"M1\", \"snapshot\": {\"system_name\": \"payments-service\", \"status\": \"degraded\", \"cpu_percent\": 89.5, \"memory_percent\": 55.0, \"last_checked\": \"2026-10-20T09:42:59.320135Z\", \"alerts\": [\"CPU high (threshold 80%)\"], \"sample_id\": \"writer-fixed-2\", \"data_source\": \"controlled-writer-fixture\"}, \"allowed_kinds\": [\"cpu\"], \"incident_types\": [\"cpu-spike\"], \"allowed_step_ids\": [\"R1.1\", \"R1.2\", \"R1.3\", \"R1.4\", \"R1.5\"]}], \"runbooks\": [{\"id\": \"R1\", \"incident_type\": \"cpu-spike\", \"steps\": [{\"id\": \"R1.1\", \"text\": \"get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\"}, {\"id\": \"R1.2\", \"text\": \"반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\"}, {\"id\": \"R1.3\", \"text\": \"CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\"}, {\"id\": \"R1.4\", \"text\": \"급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\"}, {\"id\": \"R1.5\", \"text\": \"정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\"}]}], \"unavailable\": []}, \"validation_feedback\": null}"
+          }
+        }
+      ],
+      "elapsed_seconds": 6.526601791003486
+    }
+  },
+  {
+    "repetition": 3,
+    "query": "payments-service 장애 원인과 CPU 런북 조건을 진단해주세요.",
+    "collected": [
+      {
+        "source": "monitoring",
+        "data": {
+          "system_name": "payments-service",
+          "status": "degraded",
+          "cpu_percent": 89.5,
+          "memory_percent": 55.0,
+          "alerts": [
+            "CPU high (threshold 80%)"
+          ],
+          "last_checked": "2026-10-20T09:43:30.643789+00:00",
+          "sample_id": "writer-fixed-3",
+          "data_source": "controlled-writer-fixture"
+        }
+      },
+      {
+        "source": "runbook",
+        "target": "cpu-spike",
+        "data": "# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n"
+      }
+    ],
+    "before": {
+      "reply": "1) **장애 원인 진단**: CPU 사용률 89.5%가 임계치 80%를 초과하며, 'CPU high' 알림이 발생했으므로, 반복 호출 또는 배치 작업 같은 특정 요청 패턴이 원인일 가능성이 높음.  \n2) **CPU 런북 조건 확인**: CPU 사용률이 90%를 넘고 지속될 경우 오토스케일링 그룹에서 인스턴스를 1대 추가해 부하 분산해야 함. 현재 89.5%로 임계치에 근접해 조치 필요.  \n3) **정상화 후 대응**: 서비스 정상화 후 프로파일링을 통해 핫스팟 코드를 식별하고 최적화 작업을 등록해야 함.",
+      "usage": {
+        "model": "ollama:qwen3:8b",
+        "tokens": 911,
+        "usd": 0.001822,
+        "prompt": "[SYSTEM]\n당신은 ICT 운영 보고 작성자다. 수집된 사실만 사용해 한국어로 간결한 대응 보고를 작성하라. 반드시 '1) ... 2) ... 3) ...' 형식의 번호 절차로 답하고, 수치는 수집된 값을 그대로 인용하라.\n\n[USER]\n## 사용자 요청\npayments-service 장애 원인과 CPU 런북 조건을 진단해주세요.\n\n## 수집된 사실\n- 모니터링 payments-service: 상태=degraded, CPU 89.5%, 메모리 55.0%, 알림 1건 ['CPU high (threshold 80%)']\n- runbook 발췌:\n# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다."
+      },
+      "completed": true,
+      "elapsed_seconds": 24.334910042001866
+    },
+    "after": {
+      "status": "validated",
+      "reply": "## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 89.5%, 메모리 55%, 알림 1건.\n  관측 시각 2026-10-20T09:43:30.643789Z / 관측 ID writer-fixed-3 / 자료 controlled-writer-fixture\n  모니터링 알림 원문: CPU high (threshold 80%)\n\n## 추가 확인할 원인 후보 (미확정)\n- [M1] CPU 부하 원인을 추가 확인할 필요가 있습니다. 원인은 확정되지 않았습니다.\n\n## 권장 확인·대응 절차 (미실행)\n- [M1 → R1.3] 런북 수치 조건: CPU 89.5% > 90% → 불충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R1.1] cpu-spike 런북 원문: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n- [M1 → R1.2] cpu-spike 런북 원문: 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n- [M1 → R1.3] cpu-spike 런북 원문: CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n- [M1 → R1.4] cpu-spike 런북 원문: 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n- [M1 → R1.5] cpu-spike 런북 원문: 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw": "{\n  \"hypotheses\": [\n    {\"evidence_id\": \"M1\", \"kind\": \"cpu\"}\n  ],\n  \"recommendations\": [\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.1\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.2\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.3\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.4\"},\n    {\"evidence_id\": \"M1\", \"step_id\": \"R1.5\"}\n  ]\n}",
+          "errors": [],
+          "usage": {
+            "model": "ollama:qwen3:8b",
+            "tokens": 1073,
+            "usd": 0.002146,
+            "prompt": "[SYSTEM]\n당신은 운영 진단 제안 선택기입니다. JSON 객체만 반환하세요. 자유 문장과 수치는 쓰지 마세요. 각 monitoring의 id마다 hypotheses에 evidence_id와 allowed_kinds 중 kind를 하나 선택하세요. allowed_step_ids가 있으면 recommendations에 evidence_id와 해당 step_id를 하나 이상 선택하세요. 서비스별 허용 목록을 지키세요. 이 선택은 원인 확정이나 조치 실행을 뜻하지 않습니다. 스키마: {\"$defs\": {\"Hypothesis\": {\"additionalProperties\": false, \"properties\": {\"evidence_id\": {\"pattern\": \"^M[1-9][0-9]*$\", \"title\": \"Evidence Id\", \"type\": \"string\"}, \"kind\": {\"enum\": [\"cpu\", \"memory\", \"latency\", \"network\", \"disk\", \"service_down\", \"unknown\"], \"title\": \"Kind\", \"type\": \"string\"}}, \"required\": [\"evidence_id\", \"kind\"], \"title\": \"Hypothesis\", \"type\": \"object\"}, \"Recommendation\": {\"additionalProperties\": false, \"properties\": {\"evidence_id\": {\"pattern\": \"^M[1-9][0-9]*$\", \"title\": \"Evidence Id\", \"type\": \"string\"}, \"step_id\": {\"pattern\": \"^R[1-9][0-9]*\\\\.[1-9][0-9]*$\", \"title\": \"Step Id\", \"type\": \"string\"}}, \"required\": [\"evidence_id\", \"step_id\"], \"title\": \"Recommendation\", \"type\": \"object\"}}, \"additionalProperties\": false, \"properties\": {\"hypotheses\": {\"items\": {\"$ref\": \"#/$defs/Hypothesis\"}, \"maxItems\": 36, \"title\": \"Hypotheses\", \"type\": \"array\"}, \"recommendations\": {\"items\": {\"$ref\": \"#/$defs/Recommendation\"}, \"maxItems\": 36, \"title\": \"Recommendations\", \"type\": \"array\"}}, \"required\": [\"hypotheses\", \"recommendations\"], \"title\": \"WriterDraft\", \"type\": \"object\"}\n\n[USER]\n{\"query\": \"payments-service 장애 원인과 CPU 런북 조건을 진단해주세요.\", \"evidence\": {\"monitoring\": [{\"id\": \"M1\", \"snapshot\": {\"system_name\": \"payments-service\", \"status\": \"degraded\", \"cpu_percent\": 89.5, \"memory_percent\": 55.0, \"last_checked\": \"2026-10-20T09:43:30.643789Z\", \"alerts\": [\"CPU high (threshold 80%)\"], \"sample_id\": \"writer-fixed-3\", \"data_source\": \"controlled-writer-fixture\"}, \"allowed_kinds\": [\"cpu\"], \"incident_types\": [\"cpu-spike\"], \"allowed_step_ids\": [\"R1.1\", \"R1.2\", \"R1.3\", \"R1.4\", \"R1.5\"]}], \"runbooks\": [{\"id\": \"R1\", \"incident_type\": \"cpu-spike\", \"steps\": [{\"id\": \"R1.1\", \"text\": \"get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\"}, {\"id\": \"R1.2\", \"text\": \"반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\"}, {\"id\": \"R1.3\", \"text\": \"CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\"}, {\"id\": \"R1.4\", \"text\": \"급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\"}, {\"id\": \"R1.5\", \"text\": \"정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\"}]}], \"unavailable\": []}, \"validation_feedback\": null}"
+          }
+        }
+      ],
+      "elapsed_seconds": 6.684947250003461
+    }
+  }
+]

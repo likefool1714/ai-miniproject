@@ -1,0 +1,16 @@
+{
+  "scope": "same query/observation/runbook/model; writer-stage comparison only; synthetic fixed data",
+  "baseline_commit": "3bb34a9",
+  "baseline_write_ast_unchanged": true,
+  "model": "qwen3:8b",
+  "attempted_per_version": 3,
+  "before_completed": 3,
+  "after_validated": 3,
+  "after_fallback": 0,
+  "before_median_seconds": 24.7912951670005,
+  "after_median_seconds": 6.684947250003461,
+  "limits": "before prose requires manual claim review; this does not measure general diagnostic accuracy or production recovery",
+  "before_generation": "free prose; thinking=model default; evaluator timeout=60s",
+  "after_generation": "JSON schema selection; think=false; num_predict=1024; timeout=40s; rewrite<=1",
+  "status": "passed"
+}
