@@ -8,17 +8,17 @@ FastAPI 백엔드(server.py)가 lifespan에서 이 파일을 subprocess(stdio)�
 - Resource runbook://incident-response/{incident_type} : URI로 식별되는 정적 문서
 - Prompt  incident_analysis_prompt : 여러 Tool을 조합하는 표준 진단 절차를 강제
 """
-import json
-import random
-from datetime import datetime
+import os
 from pathlib import Path
 
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
+from agent.monitoring import MonitoringSource
 
 mcp = FastMCP(name="capstone-all-total-ops")
 
 DATA_DIR = Path(__file__).parent / "data"
+monitoring_source = MonitoringSource(DATA_DIR, os.environ.get("MONITORING_SCENARIO", ""))
 
 
 class SystemStatus(BaseModel):
@@ -28,29 +28,14 @@ class SystemStatus(BaseModel):
     memory_percent: float = Field(description="메모리 사용률 (%)")
     last_checked: str = Field(description="마지막 체크 시각 (ISO 8601)")
     alerts: list[str] = Field(default_factory=list, description="활성 알림 목록")
+    sample_id: str = Field(description="동일 관측 중복 집계를 막는 식별자")
+    data_source: str = Field(description="샘플 데이터 또는 합성 시나리오 출처")
 
 
 @mcp.tool()
-def get_monitoring_status(system_name: str) -> SystemStatus:
+def get_monitoring_status(system_name: str, observation_context: str = "") -> SystemStatus:
     """지정된 시스템의 현재 모니터링 상태를 조회합니다 (호출마다 값이 달라지는 동적 Tool)."""
-    monitoring_data = json.loads((DATA_DIR / "monitoring.json").read_text())
-    if system_name not in monitoring_data:
-        return SystemStatus(
-            system_name=system_name, status="unknown",
-            cpu_percent=0.0, memory_percent=0.0,
-            last_checked=datetime.now().isoformat(),
-            alerts=[f"System '{system_name}' not found in monitoring"],
-        )
-    data = monitoring_data[system_name]
-    jitter = random.uniform(-3.0, 8.0)
-    return SystemStatus(
-        system_name=system_name,
-        status=data["status"],
-        cpu_percent=round(data["cpu_base"] + jitter, 1),
-        memory_percent=round(data["memory_base"] + jitter / 2, 1),
-        last_checked=datetime.now().isoformat(timespec="microseconds"),
-        alerts=data.get("alerts", []),
-    )
+    return SystemStatus(**monitoring_source.get(system_name, observation_context))
 
 
 @mcp.resource("runbook://incident-response/{incident_type}")

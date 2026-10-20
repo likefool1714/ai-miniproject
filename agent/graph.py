@@ -21,6 +21,10 @@ from langsmith import traceable
 
 from .deps import SupervisorDeps
 from .retry import with_retry
+from .recovery_nodes import (
+    request_context_node, recovery_collect_node, recovery_assess_node,
+    recovery_answer_node, recovery_history_node, recovery_report_node, recovery_text,
+)
 
 
 def _load_known_systems() -> set[str]:
@@ -66,6 +70,11 @@ class AgentState(TypedDict, total=False):
     last_prompt: str
     cost_usd: float
     events: list[dict]
+    resolved_targets: list[str]
+    recovery_action: str
+    recovery_results: list[dict]
+    recovery_failures: list[dict]
+    report_links: list[dict]
 
 
 def _cost(state: AgentState, usage: dict) -> float:
@@ -75,7 +84,9 @@ def _cost(state: AgentState, usage: dict) -> float:
 @traceable(name="route_node")
 async def route_node(state: AgentState, deps: SupervisorDeps) -> dict:
     """Wave 5 — 모든 쿼리가 무거운 파이프라인을 탈 필요는 없다."""
-    result, usage = deps.fast_llm.route(state["query"])
+    result, usage = await asyncio.to_thread(deps.fast_llm.route, state["query"])
+    if state.get("resolved_targets"):
+        result = {"route": "incident", "needs_analysis": result.get("needs_analysis", False)}
     event = {"type": "RouteDecided", "route": result["route"]}
     return {"route": result["route"], "needs_analysis": result["needs_analysis"],
             "cost_usd": _cost(state, usage),
@@ -107,10 +118,16 @@ async def plan_node(state: AgentState, deps: SupervisorDeps) -> dict:
     prompt_server = await deps.mcp.find_prompt("incident_analysis_prompt")
     procedure = await deps.mcp.get_prompt(
         "incident_analysis_prompt",
-        {"system_name": _extract_system_name(state["query"]), "symptom": state["query"]},
+        {"system_name": (state.get("resolved_targets") or [_extract_system_name(state["query"])])[0], "symptom": state["query"]},
         server=prompt_server,
     )
-    result, usage = deps.fast_llm.plan(state["query"], procedure)
+    result, usage = await asyncio.to_thread(deps.fast_llm.plan, state["query"], procedure)
+    # 모델이 문맥 대상을 덮어쓰거나 요청한 복수 서비스를 빠뜨리지 않도록 보정한다.
+    if state.get("resolved_targets"):
+        targets = state["resolved_targets"]
+        others = [t for t in result["tasks"] if t.get("agent") != "research"]
+        result["tasks"] = [{"id": f"task-{i}", "agent": "research", "kind": "monitoring",
+                            "target": s, "status": "pending"} for i, s in enumerate(targets)] + others
     targets = [t["target"] for t in result["tasks"]
                if t["agent"] == "research" and t.get("target")]
     event = {"type": "PlanCreated", "task_count": len(result["tasks"]),
@@ -160,9 +177,14 @@ async def research_node(state: AgentState, deps: SupervisorDeps) -> dict:
         task = tasks[idx]
         await asyncio.sleep(0.35)   # 태스크당 고정 지연 — 병렬 효과를 실측하기 위함
         if task["kind"] == "monitoring":
+            arguments = {"system_name": task["target"]}
+            if deps.recovery_store is not None:
+                arguments["observation_context"] = state["thread_id"]
             data, retries = await with_retry(
                 deps.mcp.call_tool, "get_monitoring_status",
-                {"system_name": task["target"]})
+                arguments)
+            if data.get("system_name") != task["target"]:
+                raise ValueError("모니터링 응답 대상이 요청한 서비스와 다릅니다.")
             return {"idx": idx, "source": "monitoring", "data": data, "retries": retries}
         uri = runbook_uri_template.format(incident_type=task["target"])
         data = await deps.mcp.read_resource(uri, server=runbook_server)
@@ -240,7 +262,7 @@ async def analysis_node(state: AgentState, deps: SupervisorDeps) -> dict:
     if not pending:
         return {"events": state["events"] +
                 [{"type": "AnalysisSkipped", "reason": "analysis task 0개"}]}
-    summary, usage = deps.fast_llm.analyze(state.get("collected", []))
+    summary, usage = await asyncio.to_thread(deps.fast_llm.analyze, state.get("collected", []))
     new_tasks = [dict(t) for t in tasks]
     for t in new_tasks:
         if t["agent"] == "analysis" and t["status"] == "pending":
@@ -290,7 +312,8 @@ async def validate_node(state: AgentState, deps: SupervisorDeps) -> dict:
 
 @traceable(name="finalize_node")
 async def finalize_node(state: AgentState, deps: SupervisorDeps) -> dict:
-    return {"final": state["draft"],
+    recovery = "\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n" + recovery_text(state) if state.get("recovery_results") or state.get("recovery_failures") else ""
+    return {"final": state["draft"] + recovery,
             "events": state["events"] + [{"type": "Finalize", "pipeline": "incident-v2"}]}
 
 
@@ -310,6 +333,13 @@ def _after_validate(state: AgentState) -> str:
 def build_graph(deps: SupervisorDeps):
     g = StateGraph(AgentState)
     node = lambda fn: partial(fn, deps=deps)   # Wave 13 — 명시적 의존성 주입
+    g.add_node("request_context", node(request_context_node))
+    g.add_node("recovery_collect", node(recovery_collect_node))
+    g.add_node("recovery_assess", node(recovery_assess_node))
+    g.add_node("recovery_answer", node(recovery_answer_node))
+    g.add_node("recovery_history", node(recovery_history_node))
+    g.add_node("recovery_report", node(recovery_report_node))
+    g.add_node("record_observations", node(recovery_assess_node))
     g.add_node("route", node(route_node))
     g.add_node("chat_answer", node(chat_answer_node))
     g.add_node("plan", node(plan_node))
@@ -321,7 +351,15 @@ def build_graph(deps: SupervisorDeps):
     g.add_node("validate", node(validate_node))
     g.add_node("finalize", node(finalize_node))
 
-    g.set_entry_point("route")
+    g.set_entry_point("request_context")
+    g.add_conditional_edges("request_context", lambda s: s.get("recovery_action", "legacy"),
+                            {"legacy": "route", "recheck": "recovery_collect", "history": "recovery_history",
+                             "report": "recovery_report", "clarify": END})
+    g.add_edge("recovery_collect", "recovery_assess")
+    g.add_edge("recovery_assess", "recovery_answer")
+    g.add_edge("recovery_answer", END)
+    g.add_edge("recovery_history", END)
+    g.add_edge("recovery_report", END)
     g.add_conditional_edges("route", _after_route,
                             {"chat_answer": "chat_answer", "plan": "plan"})
     g.add_edge("chat_answer", END)
@@ -330,7 +368,8 @@ def build_graph(deps: SupervisorDeps):
     g.add_edge("research", "replan_check")
     g.add_conditional_edges("replan_check", _after_replan_check,
                             {"analysis": "analysis", "research": "research"})
-    g.add_edge("analysis", "write")
+    g.add_edge("analysis", "record_observations")
+    g.add_edge("record_observations", "write")
     g.add_edge("write", "validate")
     g.add_conditional_edges("validate", _after_validate,
                             {"finalize": "finalize", "write": "write"})

@@ -1,0 +1,125 @@
+import asyncio
+import json
+import os
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+import httpx
+
+import server
+
+
+class RecoveryAPITests(unittest.IsolatedAsyncioTestCase):
+    async def asyncSetUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.environment = patch.dict(os.environ, {
+            "LLM_BACKEND": "fake", "SUPERVISOR_VERSION": "v2", "MONITORING_SCENARIO": "recovery-demo",
+            "SESSION_DB_PATH": str(Path(self.temp.name) / "session.db"),
+            "LANGCHAIN_TRACING_V2": "false", "LANGSMITH_TRACING": "false",
+        })
+        self.environment.start()
+        self.started = asyncio.Event()
+        self.shutdown = asyncio.Event()
+        async def own_lifespan():
+            async with server.lifespan(server.app):
+                self.started.set()
+                await self.shutdown.wait()
+        self.lifespan_task = asyncio.create_task(own_lifespan())
+        started_wait = asyncio.create_task(self.started.wait())
+        done, _ = await asyncio.wait([self.lifespan_task, started_wait], return_when=asyncio.FIRST_COMPLETED)
+        if self.lifespan_task in done:
+            await self.lifespan_task
+        self.client = httpx.AsyncClient(transport=httpx.ASGITransport(app=server.app), base_url="http://test")
+
+    async def asyncTearDown(self):
+        await self.client.aclose()
+        self.shutdown.set()
+        await self.lifespan_task
+        self.environment.stop()
+        self.temp.cleanup()
+
+    async def chat(self, message, thread="test-a"):
+        response = await self.client.post("/chat", json={"message": message, "thread_id": thread})
+        self.assertEqual(response.status_code, 200, response.text)
+        return response.json()
+
+    async def test_real_mcp_full_lifecycle_history_and_download(self):
+        first = await self.chat("payments-service 장애를 진단해주세요")
+        self.assertIn("장애 지속", first["reply"])
+        phases = []
+        for _ in range(4):
+            result = await self.chat("복구됐어? 다시 확인해줘")
+            phases.append(result["metadata"]["recovery_results"][0]["assessment"])
+        self.assertEqual([a["phase"] for a in phases], ["partial", "partial", "recovered", "ongoing"])
+        self.assertTrue(phases[-1]["recurrence"])
+        self.assertIn("payments-service", (await self.chat("조사 이력 보여주세요"))["reply"])
+        report = await self.chat("보고서 내보내기")
+        url = report["metadata"]["reports"][0]["url"]
+        downloaded = await self.client.get(url)
+        self.assertEqual(downloaded.status_code, 200)
+        self.assertIn("attachment", downloaded.headers["content-disposition"])
+        self.assertIn("장애 재발", downloaded.text)
+        rows = (await self.client.get("/observations", params={"thread_id": "test-a", "system_name": "payments-service"})).json()["observations"]
+        self.assertEqual(len(rows), 5)
+        self.assertEqual((await self.client.get("/reports/markdown", params={"thread_id": "other", "system_name": "payments-service"})).status_code, 404)
+
+    async def test_clarification_resume_and_no_unknown_service_lookup(self):
+        result = await self.chat("복구됐어?")
+        self.assertIn("어떤 서비스", result["reply"])
+        resumed = await self.chat("payments-service")
+        self.assertEqual(resumed["metadata"]["recovery_results"][0]["snapshot"]["system_name"], "payments-service")
+        self.assertEqual(resumed["metadata"]["retry_count"], 1)
+        unknown = await self.chat("billing-service 복구됐어?")
+        self.assertIn("미등록 서비스", unknown["reply"])
+        self.assertEqual(len(server.app.state.deps.recovery_store.history("test-a", "payments-service")), 1)
+
+    async def test_multi_service_context_asks_when_reference_is_ambiguous(self):
+        first = await self.chat("payments-service와 cache-service 복구 재점검")
+        self.assertEqual(len(first["metadata"]["recovery_results"]), 2)
+        ambiguous = await self.chat("그 서비스 복구됐어?")
+        self.assertIn("어떤 서비스", ambiguous["reply"])
+        both = await self.chat("모두 다시 확인해줘")
+        self.assertEqual(len(both["metadata"]["recovery_results"]), 2)
+
+    async def test_sse_uses_same_lifecycle_and_report_links(self):
+        first = await self.client.get("/chat/stream", params={"message": "payments-service 복구 재점검", "thread_id": "stream-a"})
+        self.assertIn('"type": "RecoveryAssessed"', first.text)
+        self.assertIn('"type": "FinalAnswer"', first.text)
+        self.assertIn("[DONE]", first.text)
+        report = await self.client.get("/chat/stream", params={"message": "보고서 내보내기", "thread_id": "stream-a"})
+        events = [json.loads(line[6:]) for line in report.text.splitlines() if line.startswith("data: {")]
+        final = next(e for e in events if e["type"] == "FinalAnswer")
+        self.assertTrue(final["reports"])
+
+    async def test_history_and_report_do_not_call_monitoring(self):
+        await self.chat("payments-service 복구 재점검")
+        with patch.object(server.app.state.deps.mcp, "call_tool", side_effect=AssertionError("unexpected monitoring")):
+            await self.chat("조사 이력 보여주세요")
+            await self.chat("보고서 내보내기")
+
+    async def test_concurrent_requests_keep_one_threads_observations_in_order(self):
+        await asyncio.gather(*(self.chat("payments-service 복구 재점검") for _ in range(3)))
+        rows = server.app.state.deps.recovery_store.history("test-a", "payments-service")
+        self.assertEqual([r["snapshot"]["cpu_percent"] for r in rows], [95, 65, 55])
+        self.assertEqual([r["assessment"]["phase"] for r in rows], ["ongoing", "partial", "partial"])
+
+    async def test_bad_tool_result_and_timeout_are_not_recovery(self):
+        async def bad(*args, **kw):
+            return {"system_name": "payments-service", "status": "healthy", "cpu_percent": 999}
+        with patch.object(server.app.state.deps.mcp, "call_tool", bad):
+            result = await self.chat("payments-service 복구 재점검")
+            self.assertIn("판단 보류", result["reply"])
+            self.assertEqual(result["metadata"]["recovery_results"], [])
+        async def slow(*args, **kw):
+            await asyncio.sleep(2)
+        with patch.object(server.app.state.deps.mcp, "call_tool", slow), patch.object(server, "REQUEST_TIMEOUT_SECONDS", 0.02):
+            response = await self.client.get("/chat/stream", params={"message": "payments-service 복구 재점검", "thread_id": "timeout"})
+            self.assertIn('"type": "Error"', response.text)
+            self.assertIn("[DONE]", response.text)
+            self.assertNotIn('"phase": "recovered"', response.text)
+
+
+if __name__ == "__main__":
+    unittest.main()

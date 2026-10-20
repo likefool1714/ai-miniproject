@@ -75,6 +75,9 @@
     color: white; font-size: 14px; cursor: pointer;
   }
   button:disabled { background: #3a3a52; cursor: default; }
+  .quick-actions { display: flex; gap: 8px; padding: 8px 20px; flex-wrap: wrap; }
+  .quick-actions button { padding: 7px 12px; font-size: 12px; }
+  .report-link { color: #b7b7ff; padding: 8px 14px; }
 </style>
 </head>
 <body>
@@ -98,7 +101,14 @@
         <summary>LLM에 전달된 최종 프롬프트 보기</summary>
         <pre>{{ item.text }}</pre>
       </details>
+      <a v-else-if="item.kind === 'report'" class="report-link" :href="item.url" download>{{ item.text }}</a>
     </template>
+  </div>
+  <div class="quick-actions">
+    <button :disabled="sending" @click="newInvestigation">새 조사</button>
+    <button :disabled="sending" @click="quick('다시 확인해 주세요')">복구 재점검</button>
+    <button :disabled="sending" @click="quick('조사 이력 보여주세요')">조사 이력</button>
+    <button :disabled="sending" @click="quick('보고서 내보내기')">Markdown 보고서</button>
   </div>
   <form @submit.prevent="onSubmit">
     <input
@@ -124,6 +134,13 @@ const STEP_LABELS = {
   DraftWritten: e => `답변 초안 작성 (시도 ${e.attempt})`,
   Validation: e => e.verdict === '합격' ? '검수 통과' : '검수 반려 → 다시 작성',
   Finalize: () => '최종 답변 완성',
+  TargetsResolved: e => `조사 대상: ${e.targets.join(', ')}`,
+  RecoveryAssessed: e => `${e.target}: ${e.recurrence ? '장애 재발 / ' : ''}${e.label}`,
+  ObservationFailed: e => `${e.target}: ${e.reason}`,
+  ClarificationRequired: () => '조사 대상 확인 필요',
+  HistoryLoaded: () => '저장된 조사 이력 조회 완료',
+  ReportReady: () => '보고서 준비 완료',
+  Error: e => e.reason,
 };
 
 createApp({
@@ -133,11 +150,12 @@ createApp({
     const input = ref('');
     const sending = ref(false);
     const logEl = ref(null);
-    const thread = 't-web-' + Math.random().toString(36).slice(2, 8);
+    let thread = sessionStorage.getItem('incident-thread') || 't-web-' + crypto.randomUUID();
+    sessionStorage.setItem('incident-thread', thread);
     let nextId = 0;
 
     fetch('/health').then(r => r.json()).then(h => {
-      backendLabel.value = `${h.llm_backend} 실모델(${h.fast_llm}/${h.quality_llm}) · all_total_vue`;
+      backendLabel.value = `${h.llm_backend === 'fake' ? '모의 모델' : h.llm_backend} (${h.fast_llm}/${h.quality_llm}) · ${h.monitoring_mode === 'sample-json-jitter' ? '샘플 모니터링' : '복구 시나리오(합성)'}`;
     }).catch(() => {});
 
     async function scrollToBottom() {
@@ -147,7 +165,7 @@ createApp({
 
     function onSubmit() {
       const text = input.value.trim();
-      if (!text) return;
+      if (!text || sending.value) return;
 
       log.value.push({ id: nextId++, kind: 'user', text });
       input.value = '';
@@ -186,6 +204,9 @@ createApp({
           }
           streamItem.text = e.reply;   // 토큰 합산 결과와 서버의 최종 텍스트를 일치시킨다
           if (e.prompt) log.value.push({ id: nextId++, kind: 'prompt', text: e.prompt });
+          for (const report of e.reports || []) {
+            if (report.url.startsWith('/reports/markdown?')) log.value.push({ id: nextId++, kind: 'report', text: `${report.system_name} 보고서 다운로드 (.md)`, url: report.url });
+          }
           streamItem = null;
           streamAttempt = null;
           scrollToBottom();
@@ -200,10 +221,22 @@ createApp({
         scrollToBottom();
       };
 
-      es.onerror = () => { es.close(); sending.value = false; };
+      es.onerror = () => {
+        es.close(); sending.value = false;
+        log.value.push({ id: nextId++, kind: 'agent', text: '연결이 중단됐습니다. 복구를 확정하지 않습니다. 조사 이력을 확인하거나 다시 점검해 주세요.' });
+        scrollToBottom();
+      };
     }
 
-    return { backendLabel, log, input, sending, logEl, onSubmit };
+    function quick(text) { input.value = text; onSubmit(); }
+    function newInvestigation() {
+      if (sending.value) return;
+      thread = 't-web-' + crypto.randomUUID();
+      sessionStorage.setItem('incident-thread', thread);
+      log.value = [];
+      input.value = '';
+    }
+    return { backendLabel, log, input, sending, logEl, onSubmit, quick, newInvestigation };
   },
 }).mount('#app');
 </script>

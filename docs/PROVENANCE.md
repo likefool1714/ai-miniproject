@@ -1,10 +1,19 @@
-# 제공 코드와 작업 범위
+# 제공 코드·직접 기여
 
-- 원본 위치: 상위 `all_total_vue_student` 폴더. 해당 원본은 수정하지 않았습니다.
-- `d1043ff`: 제공 스켈레톤 47개 파일의 바이트 동일성을 확인하고 별도 기준 커밋으로 저장했습니다.
-- 과제 PDF와 배포 ZIP은 이 저장소에 넣지 않았습니다.
-- `agent/`, 서버, UI, MCP, 제공 데이터, `doc/`, `sh/`는 최초 커밋 시 제공 코드입니다.
-- 최상위 README, `docs/`, `eval/cases.jsonl`은 이번 프로젝트의 계획/평가 초안과 검증 기록입니다. 추가한 `eval/probe_*.py`, `eval/summarize_baseline.py`, `results/baseline-2026-10-20/`은 원본 감사 실행기와 실측 증거입니다. 제품 개선 기능 구현 완료를 뜻하지 않습니다.
-- `doc/image_usecase*`는 제공 매뉴얼의 예제 화면이며 이번 프로젝트의 측정 결과가 아닙니다.
-- 저장소는 `ai-miniproject`로 이름을 변경하고 과제 초안 열람을 위해 공개 전환했습니다. 교육용 제공 코드와 본인 변경분을 구분하며, 원본에 임의의 오픈소스 라이선스를 부여하지 않습니다. 과제 PDF/배포 ZIP은 포함하지 않습니다.
-- `.env`, API 키, 세션 DB, 개인 대화/추적 내용은 커밋 대상에서 제외합니다.
+원본 d1043ff, 원본 검증 e139001. doc/ 매뉴얼·예제 이미지는 제공 자료다.
+
+## 직접 구현
+
+- recovery.py: 스키마·정책·신선도·변화·연속 정상·복구·재발 판정
+- recovery_store.py: 관측·판정·대상·실패 저장과 보고서
+- recovery_nodes.py: 대상/명령 해석과 기능 노드
+- monitoring.py, data/scenarios/: 샘플/대화별 고정 시나리오
+- server.py, graph.py, deps.py: 그래프·API·주입·요청 잠금/시간 제한
+- web_chat.html, web_demo_server.py: 기능 버튼·다운로드
+- tests/, eval/compare_recovery.py: 검사·전후 비교
+
+## 재사용
+
+기존 Supervisor/Multi-Agent, MCP Tool/Resource/Prompt, 모델 백엔드, Vue/SSE, 대화 저장, 의존성 주입.
+RAG·LLM 심판·실제 로그 조회·운영 조치를 새 구현으로 기재하지 않는다.
+키·DB·과제 PDF·배포 ZIP은 커밋하지 않으며 제공 코드에 임의 라이선스를 부여하지 않는다.

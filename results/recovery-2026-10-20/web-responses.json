@@ -1,0 +1,821 @@
+[
+  {
+    "repetition": 1,
+    "step": 1,
+    "input": "payments-service 복구 재점검",
+    "elapsed_seconds": 0.44247129099676386,
+    "reply": "### payments-service: 장애 지속\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high, memory high\n- 관측 시각: 2026-10-20T06:21:26.497715Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:0\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 21,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 95.0,
+        "memory_percent": 90.0,
+        "last_checked": "2026-10-20T06:21:26.497715Z",
+        "alerts": [
+          "CPU high",
+          "memory high"
+        ],
+        "sample_id": "d988583145:payments-service:0",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "ongoing",
+        "recurrence": false,
+        "normal_streak": 0,
+        "comparison": null,
+        "reasons": [
+          "서비스 상태 degraded",
+          "CPU 95% (정상 기준 < 80%)",
+          "메모리 90% (정상 기준 < 85%)",
+          "활성 알림 2건",
+          "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:0",
+        "issues": [
+          "서비스 상태 degraded",
+          "CPU 95% (정상 기준 < 80%)",
+          "메모리 90% (정상 기준 < 85%)",
+          "활성 알림 2건",
+          "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+        ]
+      },
+      "duplicate": false
+    },
+    "retry_count": 1
+  },
+  {
+    "repetition": 1,
+    "step": 2,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.009193749996484257,
+    "reply": "### payments-service: 부분 회복\n- 관측: 상태=degraded, CPU 65%, 메모리 87%, 알림 1건\n- 활성 알림: memory high\n- 관측 시각: 2026-10-20T06:21:36.497715Z\n- 이전 대비: CPU -30%p, 메모리 -3%p (개선)\n- 새 알림: 없음\n- 해소된 알림: CPU high\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 메모리 87% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 22,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 65.0,
+        "memory_percent": 87.0,
+        "last_checked": "2026-10-20T06:21:36.497715Z",
+        "alerts": [
+          "memory high"
+        ],
+        "sample_id": "d988583145:payments-service:1",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "partial",
+        "recurrence": false,
+        "normal_streak": 0,
+        "comparison": {
+          "cpu_delta_pp": -30.0,
+          "memory_delta_pp": -3.0,
+          "alerts_added": [],
+          "alerts_cleared": [
+            "CPU high"
+          ],
+          "previous_checked": "2026-10-20T06:21:26.497715+00:00",
+          "trend": "개선"
+        },
+        "reasons": [
+          "서비스 상태 degraded",
+          "메모리 87% (정상 기준 < 85%)",
+          "활성 알림 1건"
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:1",
+        "issues": [
+          "서비스 상태 degraded",
+          "메모리 87% (정상 기준 < 85%)",
+          "활성 알림 1건"
+        ]
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 1,
+    "step": 3,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.008189750005840324,
+    "reply": "### payments-service: 부분 회복\n- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T06:21:46.497715Z\n- 이전 대비: CPU -10%p, 메모리 -27%p (개선)\n- 새 알림: 없음\n- 해소된 알림: memory high\n- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:2\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 23,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "healthy",
+        "cpu_percent": 55.0,
+        "memory_percent": 60.0,
+        "last_checked": "2026-10-20T06:21:46.497715Z",
+        "alerts": [],
+        "sample_id": "d988583145:payments-service:2",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "partial",
+        "recurrence": false,
+        "normal_streak": 1,
+        "comparison": {
+          "cpu_delta_pp": -10.0,
+          "memory_delta_pp": -27.0,
+          "alerts_added": [],
+          "alerts_cleared": [
+            "memory high"
+          ],
+          "previous_checked": "2026-10-20T06:21:36.497715+00:00",
+          "trend": "개선"
+        },
+        "reasons": [
+          "현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다."
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:2",
+        "issues": []
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 1,
+    "step": 4,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.008520666000549681,
+    "reply": "### payments-service: 복구 확인\n- 관측: 상태=healthy, CPU 54%, 메모리 58%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T06:21:56.497715Z\n- 이전 대비: CPU -1%p, 메모리 -2%p (개선)\n- 새 알림: 없음\n- 해소된 알림: 없음\n- 판단 근거: 최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:3\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 24,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "healthy",
+        "cpu_percent": 54.0,
+        "memory_percent": 58.0,
+        "last_checked": "2026-10-20T06:21:56.497715Z",
+        "alerts": [],
+        "sample_id": "d988583145:payments-service:3",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "recovered",
+        "recurrence": false,
+        "normal_streak": 2,
+        "comparison": {
+          "cpu_delta_pp": -1.0,
+          "memory_delta_pp": -2.0,
+          "alerts_added": [],
+          "alerts_cleared": [],
+          "previous_checked": "2026-10-20T06:21:46.497715+00:00",
+          "trend": "개선"
+        },
+        "reasons": [
+          "최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다."
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:3",
+        "issues": []
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 1,
+    "step": 5,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.010498667004867457,
+    "reply": "### payments-service: 장애 재발 / 장애 지속\n- 관측: 상태=degraded, CPU 94%, 메모리 60%, 알림 1건\n- 활성 알림: CPU high again\n- 관측 시각: 2026-10-20T06:22:06.497715Z\n- 이전 대비: CPU +40%p, 메모리 +2%p (악화)\n- 새 알림: CPU high again\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 94% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:4\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 25,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 94.0,
+        "memory_percent": 60.0,
+        "last_checked": "2026-10-20T06:22:06.497715Z",
+        "alerts": [
+          "CPU high again"
+        ],
+        "sample_id": "d988583145:payments-service:4",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "ongoing",
+        "recurrence": true,
+        "normal_streak": 0,
+        "comparison": {
+          "cpu_delta_pp": 40.0,
+          "memory_delta_pp": 2.0,
+          "alerts_added": [
+            "CPU high again"
+          ],
+          "alerts_cleared": [],
+          "previous_checked": "2026-10-20T06:21:56.497715+00:00",
+          "trend": "악화"
+        },
+        "reasons": [
+          "서비스 상태 degraded",
+          "CPU 94% (정상 기준 < 80%)",
+          "활성 알림 1건"
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:4",
+        "issues": [
+          "서비스 상태 degraded",
+          "CPU 94% (정상 기준 < 80%)",
+          "활성 알림 1건"
+        ]
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 2,
+    "step": 1,
+    "input": "payments-service 복구 재점검",
+    "elapsed_seconds": 0.007865709005272947,
+    "reply": "### payments-service: 장애 지속\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high, memory high\n- 관측 시각: 2026-10-20T06:21:26.568886Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:0\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 26,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 95.0,
+        "memory_percent": 90.0,
+        "last_checked": "2026-10-20T06:21:26.568886Z",
+        "alerts": [
+          "CPU high",
+          "memory high"
+        ],
+        "sample_id": "d988583145:payments-service:0",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "ongoing",
+        "recurrence": false,
+        "normal_streak": 0,
+        "comparison": null,
+        "reasons": [
+          "서비스 상태 degraded",
+          "CPU 95% (정상 기준 < 80%)",
+          "메모리 90% (정상 기준 < 85%)",
+          "활성 알림 2건",
+          "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:0",
+        "issues": [
+          "서비스 상태 degraded",
+          "CPU 95% (정상 기준 < 80%)",
+          "메모리 90% (정상 기준 < 85%)",
+          "활성 알림 2건",
+          "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+        ]
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 2,
+    "step": 2,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.007385875011095777,
+    "reply": "### payments-service: 부분 회복\n- 관측: 상태=degraded, CPU 65%, 메모리 87%, 알림 1건\n- 활성 알림: memory high\n- 관측 시각: 2026-10-20T06:21:36.568886Z\n- 이전 대비: CPU -30%p, 메모리 -3%p (개선)\n- 새 알림: 없음\n- 해소된 알림: CPU high\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 메모리 87% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 27,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 65.0,
+        "memory_percent": 87.0,
+        "last_checked": "2026-10-20T06:21:36.568886Z",
+        "alerts": [
+          "memory high"
+        ],
+        "sample_id": "d988583145:payments-service:1",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "partial",
+        "recurrence": false,
+        "normal_streak": 0,
+        "comparison": {
+          "cpu_delta_pp": -30.0,
+          "memory_delta_pp": -3.0,
+          "alerts_added": [],
+          "alerts_cleared": [
+            "CPU high"
+          ],
+          "previous_checked": "2026-10-20T06:21:26.568886+00:00",
+          "trend": "개선"
+        },
+        "reasons": [
+          "서비스 상태 degraded",
+          "메모리 87% (정상 기준 < 85%)",
+          "활성 알림 1건"
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:1",
+        "issues": [
+          "서비스 상태 degraded",
+          "메모리 87% (정상 기준 < 85%)",
+          "활성 알림 1건"
+        ]
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 2,
+    "step": 3,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.007554458003141917,
+    "reply": "### payments-service: 부분 회복\n- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T06:21:46.568886Z\n- 이전 대비: CPU -10%p, 메모리 -27%p (개선)\n- 새 알림: 없음\n- 해소된 알림: memory high\n- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:2\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 28,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "healthy",
+        "cpu_percent": 55.0,
+        "memory_percent": 60.0,
+        "last_checked": "2026-10-20T06:21:46.568886Z",
+        "alerts": [],
+        "sample_id": "d988583145:payments-service:2",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "partial",
+        "recurrence": false,
+        "normal_streak": 1,
+        "comparison": {
+          "cpu_delta_pp": -10.0,
+          "memory_delta_pp": -27.0,
+          "alerts_added": [],
+          "alerts_cleared": [
+            "memory high"
+          ],
+          "previous_checked": "2026-10-20T06:21:36.568886+00:00",
+          "trend": "개선"
+        },
+        "reasons": [
+          "현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다."
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:2",
+        "issues": []
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 2,
+    "step": 4,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.007724124996457249,
+    "reply": "### payments-service: 복구 확인\n- 관측: 상태=healthy, CPU 54%, 메모리 58%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T06:21:56.568886Z\n- 이전 대비: CPU -1%p, 메모리 -2%p (개선)\n- 새 알림: 없음\n- 해소된 알림: 없음\n- 판단 근거: 최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:3\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 29,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "healthy",
+        "cpu_percent": 54.0,
+        "memory_percent": 58.0,
+        "last_checked": "2026-10-20T06:21:56.568886Z",
+        "alerts": [],
+        "sample_id": "d988583145:payments-service:3",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "recovered",
+        "recurrence": false,
+        "normal_streak": 2,
+        "comparison": {
+          "cpu_delta_pp": -1.0,
+          "memory_delta_pp": -2.0,
+          "alerts_added": [],
+          "alerts_cleared": [],
+          "previous_checked": "2026-10-20T06:21:46.568886+00:00",
+          "trend": "개선"
+        },
+        "reasons": [
+          "최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다."
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:3",
+        "issues": []
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 2,
+    "step": 5,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.00727175000065472,
+    "reply": "### payments-service: 장애 재발 / 장애 지속\n- 관측: 상태=degraded, CPU 94%, 메모리 60%, 알림 1건\n- 활성 알림: CPU high again\n- 관측 시각: 2026-10-20T06:22:06.568886Z\n- 이전 대비: CPU +40%p, 메모리 +2%p (악화)\n- 새 알림: CPU high again\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 94% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:4\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 30,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 94.0,
+        "memory_percent": 60.0,
+        "last_checked": "2026-10-20T06:22:06.568886Z",
+        "alerts": [
+          "CPU high again"
+        ],
+        "sample_id": "d988583145:payments-service:4",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "ongoing",
+        "recurrence": true,
+        "normal_streak": 0,
+        "comparison": {
+          "cpu_delta_pp": 40.0,
+          "memory_delta_pp": 2.0,
+          "alerts_added": [
+            "CPU high again"
+          ],
+          "alerts_cleared": [],
+          "previous_checked": "2026-10-20T06:21:56.568886+00:00",
+          "trend": "악화"
+        },
+        "reasons": [
+          "서비스 상태 degraded",
+          "CPU 94% (정상 기준 < 80%)",
+          "활성 알림 1건"
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:4",
+        "issues": [
+          "서비스 상태 degraded",
+          "CPU 94% (정상 기준 < 80%)",
+          "활성 알림 1건"
+        ]
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 3,
+    "step": 1,
+    "input": "payments-service 복구 재점검",
+    "elapsed_seconds": 0.009533415999612771,
+    "reply": "### payments-service: 장애 지속\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high, memory high\n- 관측 시각: 2026-10-20T06:21:26.616894Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:0\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 31,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 95.0,
+        "memory_percent": 90.0,
+        "last_checked": "2026-10-20T06:21:26.616894Z",
+        "alerts": [
+          "CPU high",
+          "memory high"
+        ],
+        "sample_id": "d988583145:payments-service:0",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "ongoing",
+        "recurrence": false,
+        "normal_streak": 0,
+        "comparison": null,
+        "reasons": [
+          "서비스 상태 degraded",
+          "CPU 95% (정상 기준 < 80%)",
+          "메모리 90% (정상 기준 < 85%)",
+          "활성 알림 2건",
+          "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:0",
+        "issues": [
+          "서비스 상태 degraded",
+          "CPU 95% (정상 기준 < 80%)",
+          "메모리 90% (정상 기준 < 85%)",
+          "활성 알림 2건",
+          "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+        ]
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 3,
+    "step": 2,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.008520041999872774,
+    "reply": "### payments-service: 부분 회복\n- 관측: 상태=degraded, CPU 65%, 메모리 87%, 알림 1건\n- 활성 알림: memory high\n- 관측 시각: 2026-10-20T06:21:36.616894Z\n- 이전 대비: CPU -30%p, 메모리 -3%p (개선)\n- 새 알림: 없음\n- 해소된 알림: CPU high\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 메모리 87% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 32,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 65.0,
+        "memory_percent": 87.0,
+        "last_checked": "2026-10-20T06:21:36.616894Z",
+        "alerts": [
+          "memory high"
+        ],
+        "sample_id": "d988583145:payments-service:1",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "partial",
+        "recurrence": false,
+        "normal_streak": 0,
+        "comparison": {
+          "cpu_delta_pp": -30.0,
+          "memory_delta_pp": -3.0,
+          "alerts_added": [],
+          "alerts_cleared": [
+            "CPU high"
+          ],
+          "previous_checked": "2026-10-20T06:21:26.616894+00:00",
+          "trend": "개선"
+        },
+        "reasons": [
+          "서비스 상태 degraded",
+          "메모리 87% (정상 기준 < 85%)",
+          "활성 알림 1건"
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:1",
+        "issues": [
+          "서비스 상태 degraded",
+          "메모리 87% (정상 기준 < 85%)",
+          "활성 알림 1건"
+        ]
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 3,
+    "step": 3,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.007719333007116802,
+    "reply": "### payments-service: 부분 회복\n- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T06:21:46.616894Z\n- 이전 대비: CPU -10%p, 메모리 -27%p (개선)\n- 새 알림: 없음\n- 해소된 알림: memory high\n- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:2\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 33,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "healthy",
+        "cpu_percent": 55.0,
+        "memory_percent": 60.0,
+        "last_checked": "2026-10-20T06:21:46.616894Z",
+        "alerts": [],
+        "sample_id": "d988583145:payments-service:2",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "partial",
+        "recurrence": false,
+        "normal_streak": 1,
+        "comparison": {
+          "cpu_delta_pp": -10.0,
+          "memory_delta_pp": -27.0,
+          "alerts_added": [],
+          "alerts_cleared": [
+            "memory high"
+          ],
+          "previous_checked": "2026-10-20T06:21:36.616894+00:00",
+          "trend": "개선"
+        },
+        "reasons": [
+          "현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다."
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:2",
+        "issues": []
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 3,
+    "step": 4,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.007570167013909668,
+    "reply": "### payments-service: 복구 확인\n- 관측: 상태=healthy, CPU 54%, 메모리 58%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T06:21:56.616894Z\n- 이전 대비: CPU -1%p, 메모리 -2%p (개선)\n- 새 알림: 없음\n- 해소된 알림: 없음\n- 판단 근거: 최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:3\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 34,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "healthy",
+        "cpu_percent": 54.0,
+        "memory_percent": 58.0,
+        "last_checked": "2026-10-20T06:21:56.616894Z",
+        "alerts": [],
+        "sample_id": "d988583145:payments-service:3",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "recovered",
+        "recurrence": false,
+        "normal_streak": 2,
+        "comparison": {
+          "cpu_delta_pp": -1.0,
+          "memory_delta_pp": -2.0,
+          "alerts_added": [],
+          "alerts_cleared": [],
+          "previous_checked": "2026-10-20T06:21:46.616894+00:00",
+          "trend": "개선"
+        },
+        "reasons": [
+          "최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다."
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:3",
+        "issues": []
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  },
+  {
+    "repetition": 3,
+    "step": 5,
+    "input": "그 서비스 복구됐어? 다시 확인해줘",
+    "elapsed_seconds": 0.0074234160128980875,
+    "reply": "### payments-service: 장애 재발 / 장애 지속\n- 관측: 상태=degraded, CPU 94%, 메모리 60%, 알림 1건\n- 활성 알림: CPU high again\n- 관측 시각: 2026-10-20T06:22:06.616894Z\n- 이전 대비: CPU +40%p, 메모리 +2%p (악화)\n- 새 알림: CPU high again\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 94% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 d988583145:payments-service:4\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "result": {
+      "id": 35,
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 94.0,
+        "memory_percent": 60.0,
+        "last_checked": "2026-10-20T06:22:06.616894Z",
+        "alerts": [
+          "CPU high again"
+        ],
+        "sample_id": "d988583145:payments-service:4",
+        "data_source": "scenario:recovery-demo (synthetic)"
+      },
+      "assessment": {
+        "phase": "ongoing",
+        "recurrence": true,
+        "normal_streak": 0,
+        "comparison": {
+          "cpu_delta_pp": 40.0,
+          "memory_delta_pp": 2.0,
+          "alerts_added": [
+            "CPU high again"
+          ],
+          "alerts_cleared": [],
+          "previous_checked": "2026-10-20T06:21:56.616894+00:00",
+          "trend": "악화"
+        },
+        "reasons": [
+          "서비스 상태 degraded",
+          "CPU 94% (정상 기준 < 80%)",
+          "활성 알림 1건"
+        ],
+        "policy": {
+          "cpu_limit": 80.0,
+          "memory_limit": 85.0,
+          "freshness_seconds": 300,
+          "required_normal_samples": 2,
+          "minimum_interval_seconds": 5,
+          "recurrence_window_seconds": 3600,
+          "future_tolerance_seconds": 5
+        },
+        "sample_id": "d988583145:payments-service:4",
+        "issues": [
+          "서비스 상태 degraded",
+          "CPU 94% (정상 기준 < 80%)",
+          "활성 알림 1건"
+        ]
+      },
+      "duplicate": false
+    },
+    "retry_count": 0
+  }
+]

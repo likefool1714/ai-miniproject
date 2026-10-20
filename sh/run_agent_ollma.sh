@@ -20,12 +20,12 @@ FAST_MODEL="${OLLAMA_FAST_MODEL:-qwen3:0.6b}"
 QUALITY_MODEL="${OLLAMA_QUALITY_MODEL:-qwen3:8b}"
 
 # ── 0) LangSmith 환경 ──────────────────────────────────────────────────
-if [ ! -f .env ]; then
-    echo "ERROR: .env가 없습니다 — .env.example을 복사해 .env로 만들고 본인 API 키를 채워주세요."
-    echo "  cp .env.example .env"
-    exit 1
+if [ -f .env ]; then
+    set -a; source .env; set +a
+else
+    export LANGCHAIN_TRACING_V2=false
+    echo ".env 없이 로컬 Ollama를 실행합니다 (추적 비활성화)."
 fi
-set -a; source .env; set +a
 export LANGCHAIN_PROJECT="capstone-all-total-ollama"   # fake 모드와 프로젝트 분리
 echo "LangSmith: project=$LANGCHAIN_PROJECT tracing=${LANGCHAIN_TRACING_V2:-}"
 echo "모델: fast=$FAST_MODEL / quality=$QUALITY_MODEL"
@@ -58,7 +58,7 @@ done
 
 # ── 2) 이전 실행 정리 ──────────────────────────────────────────────────
 lsof -ti:8100 | xargs kill -9 2>/dev/null || true
-rm -f session.db
+# 조사 이력과 대화는 재시작 후에도 보존한다. DB를 자동 삭제하지 않는다.
 
 cleanup() {
     echo

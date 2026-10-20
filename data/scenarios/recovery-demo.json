@@ -1,0 +1,9 @@
+{
+  "payments-service": [
+    {"status": "degraded", "cpu_percent": 95, "memory_percent": 90, "alerts": ["CPU high", "memory high"]},
+    {"status": "degraded", "cpu_percent": 65, "memory_percent": 87, "alerts": ["memory high"]},
+    {"status": "healthy", "cpu_percent": 55, "memory_percent": 60, "alerts": []},
+    {"status": "healthy", "cpu_percent": 54, "memory_percent": 58, "alerts": []},
+    {"status": "degraded", "cpu_percent": 94, "memory_percent": 60, "alerts": ["CPU high again"]}
+  ]
+}

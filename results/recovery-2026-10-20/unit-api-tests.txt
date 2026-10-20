@@ -1,0 +1,25 @@
+test_alerts_memory_and_exact_threshold_prevent_recovery (test_recovery.RecoveryTests.test_alerts_memory_and_exact_threshold_prevent_recovery) ... ok
+test_changed_policy_is_not_misreported_as_recurrence (test_recovery.RecoveryTests.test_changed_policy_is_not_misreported_as_recurrence) ... ok
+test_conflicting_duplicate_and_failed_recheck_block_report_recovery (test_recovery.RecoveryTests.test_conflicting_duplicate_and_failed_recheck_block_report_recovery) ... ok
+test_duplicate_observation_does_not_increment_or_refresh_time (test_recovery.RecoveryTests.test_duplicate_observation_does_not_increment_or_refresh_time) ... ok
+test_normal_without_incident_cannot_claim_recovery (test_recovery.RecoveryTests.test_normal_without_incident_cannot_claim_recovery) ... ok
+test_recovery_requires_all_signals_and_two_separated_normal_samples (test_recovery.RecoveryTests.test_recovery_requires_all_signals_and_two_separated_normal_samples) ... ok
+test_report_reassesses_freshness_without_new_observation (test_recovery.RecoveryTests.test_report_reassesses_freshness_without_new_observation) ... ok
+test_scenario_repeats_final_observation_with_same_identifier (test_recovery.RecoveryTests.test_scenario_repeats_final_observation_with_same_identifier) ... ok
+test_stale_future_unknown_and_invalid_data (test_recovery.RecoveryTests.test_stale_future_unknown_and_invalid_data) ... ok
+test_stale_previous_snapshot_does_not_produce_delta_or_recovery (test_recovery.RecoveryTests.test_stale_previous_snapshot_does_not_produce_delta_or_recovery) ... ok
+test_temporary_normal_then_bad_is_not_recurrence_without_confirmed_recovery (test_recovery.RecoveryTests.test_temporary_normal_then_bad_is_not_recurrence_without_confirmed_recovery) ... ok
+test_thread_service_isolation_and_restart_persistence (test_recovery.RecoveryTests.test_thread_service_isolation_and_restart_persistence) ... ok
+test_too_close_normals_and_out_of_order_samples_do_not_confirm (test_recovery.RecoveryTests.test_too_close_normals_and_out_of_order_samples_do_not_confirm) ... ok
+test_bad_tool_result_and_timeout_are_not_recovery (test_recovery_api.RecoveryAPITests.test_bad_tool_result_and_timeout_are_not_recovery) ... ok
+test_clarification_resume_and_no_unknown_service_lookup (test_recovery_api.RecoveryAPITests.test_clarification_resume_and_no_unknown_service_lookup) ... ok
+test_concurrent_requests_keep_one_threads_observations_in_order (test_recovery_api.RecoveryAPITests.test_concurrent_requests_keep_one_threads_observations_in_order) ... ok
+test_history_and_report_do_not_call_monitoring (test_recovery_api.RecoveryAPITests.test_history_and_report_do_not_call_monitoring) ... ok
+test_multi_service_context_asks_when_reference_is_ambiguous (test_recovery_api.RecoveryAPITests.test_multi_service_context_asks_when_reference_is_ambiguous) ... ok
+test_real_mcp_full_lifecycle_history_and_download (test_recovery_api.RecoveryAPITests.test_real_mcp_full_lifecycle_history_and_download) ... ok
+test_sse_uses_same_lifecycle_and_report_links (test_recovery_api.RecoveryAPITests.test_sse_uses_same_lifecycle_and_report_links) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 8.013s
+
+OK

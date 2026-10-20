@@ -1,0 +1,144 @@
+{
+  "method": "저장한 Before 답변 15건 원문 대조. 구조화 출력 부재 자체를 오답으로 계산하지 않음.",
+  "scope": "이 고정 시나리오의 조기 복구 확정과 재발 명시 여부만 비교. 일반 정확도 아님.",
+  "cases": [
+    {
+      "repetition": 1,
+      "step": 1,
+      "expected_phase": "ongoing",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": null,
+      "review_note": "degraded 상태와 비정상 수치를 설명함. 이전 대비 변화는 제공하지 않음."
+    },
+    {
+      "repetition": 1,
+      "step": 2,
+      "expected_phase": "partial",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": null,
+      "review_note": "현재 메모리 이상과 조언을 제시하나 이전 대비 개선을 비교하지 않음."
+    },
+    {
+      "repetition": 1,
+      "step": 3,
+      "expected_phase": "partial",
+      "premature_recovery_claim": true,
+      "recurrence_explicitly_identified": null,
+      "review_note": "정상 관측이 한 번뿐인데 답변에 현재 상태 기준 복구 완료라고 명시함."
+    },
+    {
+      "repetition": 1,
+      "step": 4,
+      "expected_phase": "recovered",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": null,
+      "review_note": "정상 2회 시점에서 복구 완료라고 답함. 연속 관측을 근거로 제시하지는 않음."
+    },
+    {
+      "repetition": 1,
+      "step": 5,
+      "expected_phase": "ongoing",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": false,
+      "review_note": "현재 CPU 과부하 지속으로 설명하며 직전 복구 이후 재발임을 명시하지 않음."
+    },
+    {
+      "repetition": 2,
+      "step": 1,
+      "expected_phase": "ongoing",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": null,
+      "review_note": "degraded 상태와 비정상 수치를 설명함. 이전 대비 변화는 제공하지 않음."
+    },
+    {
+      "repetition": 2,
+      "step": 2,
+      "expected_phase": "partial",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": null,
+      "review_note": "현재 메모리 이상과 조언을 제시하나 이전 대비 개선을 비교하지 않음."
+    },
+    {
+      "repetition": 2,
+      "step": 3,
+      "expected_phase": "partial",
+      "premature_recovery_claim": true,
+      "recurrence_explicitly_identified": null,
+      "review_note": "정상 관측이 한 번뿐인데 답변에 현재 상태 기준 복구 완료라고 명시함."
+    },
+    {
+      "repetition": 2,
+      "step": 4,
+      "expected_phase": "recovered",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": null,
+      "review_note": "정상 2회 시점에서 복구 완료라고 답함. 연속 관측을 근거로 제시하지는 않음."
+    },
+    {
+      "repetition": 2,
+      "step": 5,
+      "expected_phase": "ongoing",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": false,
+      "review_note": "현재 CPU 과부하 지속으로 설명하며 직전 복구 이후 재발임을 명시하지 않음."
+    },
+    {
+      "repetition": 3,
+      "step": 1,
+      "expected_phase": "ongoing",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": null,
+      "review_note": "degraded 상태와 비정상 수치를 설명함. 이전 대비 변화는 제공하지 않음."
+    },
+    {
+      "repetition": 3,
+      "step": 2,
+      "expected_phase": "partial",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": null,
+      "review_note": "현재 메모리 이상과 조언을 제시하나 이전 대비 개선을 비교하지 않음."
+    },
+    {
+      "repetition": 3,
+      "step": 3,
+      "expected_phase": "partial",
+      "premature_recovery_claim": true,
+      "recurrence_explicitly_identified": null,
+      "review_note": "정상 관측이 한 번뿐인데 답변에 현재 상태 기준 복구 완료라고 명시함."
+    },
+    {
+      "repetition": 3,
+      "step": 4,
+      "expected_phase": "recovered",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": null,
+      "review_note": "정상 2회 시점에서 복구 완료라고 답함. 연속 관측을 근거로 제시하지는 않음."
+    },
+    {
+      "repetition": 3,
+      "step": 5,
+      "expected_phase": "ongoing",
+      "premature_recovery_claim": false,
+      "recurrence_explicitly_identified": false,
+      "review_note": "현재 CPU 과부하 지속으로 설명하며 직전 복구 이후 재발임을 명시하지 않음."
+    }
+  ],
+  "metrics": {
+    "before_premature_recovery": {
+      "count": 3,
+      "total": 3
+    },
+    "after_premature_recovery": {
+      "count": 0,
+      "total": 3
+    },
+    "before_recurrence_identified": {
+      "count": 0,
+      "total": 3
+    },
+    "after_recurrence_identified": {
+      "count": 3,
+      "total": 3
+    }
+  }
+}

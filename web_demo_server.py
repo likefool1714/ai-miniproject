@@ -17,7 +17,7 @@ from pathlib import Path
 import httpx
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse, Response
 
 BACKEND = "http://127.0.0.1:8100"
 HERE = Path(__file__).parent
@@ -58,6 +58,21 @@ async def proxy_stream(message: str, thread_id: str = "web-demo"):
                     yield chunk
 
     return StreamingResponse(relay(), media_type="text/event-stream")
+
+
+@app.get("/observations")
+async def proxy_observations(thread_id: str, system_name: str, limit: int = 50):
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.get(f"{BACKEND}/observations", params={"thread_id": thread_id, "system_name": system_name, "limit": limit})
+    return JSONResponse(response.json(), status_code=response.status_code)
+
+
+@app.get("/reports/markdown")
+async def proxy_report(thread_id: str, system_name: str):
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.get(f"{BACKEND}/reports/markdown", params={"thread_id": thread_id, "system_name": system_name})
+    headers = {key: response.headers[key] for key in ("content-type", "content-disposition", "cache-control") if key in response.headers}
+    return Response(response.content, status_code=response.status_code, headers=headers)
 
 
 if __name__ == "__main__":

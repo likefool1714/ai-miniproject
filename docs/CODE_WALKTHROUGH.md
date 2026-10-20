@@ -1,43 +1,44 @@
-# 코드 흐름과 변경 계획
+# 코드 흐름
 
-현재 제품 코드는 제공 원본이며, 아래 개선 후 흐름은 설계 단계이다.
+## 조립
 
-## 기존 요청 한 건의 흐름
+server.py lifespan: 모델·MCP·대화 저장소·RecoveryStore를 만들어 SupervisorDeps로 주입한다.
+같은 대화의 POST/SSE는 잠금으로 순서대로 실행하며 전체 요청에 시간 제한을 둔다.
 
-1. `web_chat.html`에서 질문을 입력한다. `web_demo_server.py`가 정적 화면과 API 프록시를 제공한다.
-2. `server.py`의 lifespan에서 LLM/MCP/SQLite 의존성과 그래프를 생성한다.
-3. `/chat` 또는 `/chat/stream`이 thread별 이력을 읽고 그래프를 실행한다.
-4. `agent/graph.py`의 route → plan → gate → research → replan_check → analysis → write → validate → finalize 순서를 따른다. 인사는 chat_answer로 바로 간다.
-5. `agent/mcp_client.py`가 stdio MCP 프로세스에 연결한다. `mcp_server.py`는 모니터링 Tool, 런북 Resource, 진단 절차 Prompt를 제공한다.
-6. `agent/deps.py`의 의존성 번들로 fake/Ollama/API 구현을 교체할 수 있다.
-7. 답변과 대화를 SQLite에 저장한다. SSE에서는 단계 이벤트/토큰/최종 답변을 웹에 전달한다.
+## 요청 해석
 
-모니터링은 `data/monitoring.json` 샘플과 난수이다. 실제 인프라 조회나 운영 조치를 수행하지 않는다.
+recovery_nodes.request_context_node가 서비스와 명령을 해석하고 같은 thread의 대상을 복원한다.
+누락·미등록·여러 대상 중 단수 참조는 확인 질문으로 종료한다.
+확인 대기 요청을 저장해 서비스 이름만 답해도 원래 요청을 이어간다.
 
-## 변경 위치
+## 기존 진단
 
-| 위치 | 현재 약점 | 개선 계획 |
-|---|---|---|
-| `graph.py::_extract_system_name` 및 백엔드 `_guess_target(s)` | 누락/미등록 대상의 기본값 대체 | 공통 대상 판별, 확인 분기 |
-| `ollama_llm.py` / `openai_llm.py`의 plan 정규화 | 작업이 일부만 있으면 누락 대상 미보충 | 명시 대상과 계획 대상의 집합 대조 |
-| `server.py` 및 `session_store.py` | 장애 계획에 대화 문맥 미전달 | 확인 대기 상태/원래 증상/대상 보존 |
-| `graph.py::write_node`, 백엔드 writer | 관측과 권고 혼재, 미수집 출처 주장 | 관측/추정/조치/추가 확인의 구조화 |
-| `graph.py::validate_node` | 길이·번호만 검사, 3회째 강제 통과 | 수치/출처 검사, 제한된 재작성과 실패 상태 |
-| 모델 호출 / API / 웹 SSE | 전체 요청 예산·중단 안내 부족 | 생성량/시간 예산, 오류/중단 이벤트 |
+route → plan → gate → research → replan_check → analysis → record_observations → write → validate → finalize.
+계획에서 명시한 대상이 누락/대체되면 보정한다.
+기존 LLM Writer 검증을 전면 교체하지 않았고 정책 기반 상태 판정을 별도로 덧붙인다.
 
-## 개선 후 흐름 (미구현)
+## 복구 재점검
 
-입력 → 확인 대기 상태와 문맥 확인 → 대상 검증 → 불명확하면 질문하고 대기 → 대상 확정 → 조사 계획 대상 대조 → MCP 조회 → 관측 사실 정리 → 분석/권고 생성 → 수치/출처 검증 → 제한된 재작성 또는 실패/부분 답변 → 근거와 상태를 포함해 반환.
+request_context → recovery_collect → recovery_assess → recovery_answer.
+MCP get_monitoring_status의 대상·스키마를 확인한 후 저장한다.
+RecoveryStore.record는 최근 이력과 정책·시계를 순수 함수 assess에 전달한다.
+변화량·신선도·정상 횟수·최소 간격·과거 장애·재발 기간을 검사한다.
+새 복구 판정 경로는 LLM을 호출하지 않는다.
 
-`payments-service`처럼 서비스명만 답한 확인 후속 입력은 일반 대화로 분류하기 전에 원래 증상을 복원한다. “그 서비스” 참조는 thread의 명시된 조사 대상을 사용하되, 모호하면 다시 확인한다.
+## 저장
 
-## 5분 설명 연습
+(thread_id, system_name, sample_id)로 중복을 막고 관측과 당시 판정을 함께 저장한다.
+정책 판정은 최근 최대 500건을 읽는다. 새 관측/실패는 보고서에도 반영된다.
+SQLite 대상 상태와 이력은 재개방 후 유지된다.
 
-- 30초: 원본에서 재현한 대상/근거 문제.
-- 1분: 웹 → API → 그래프 → MCP → 답변의 흐름.
-- 1분: 대상 검사와 확인 상태를 코드에 둔 이유.
-- 1분: 관측 사실과 모델 권고의 구분, 검증 범위.
-- 1분: 같은 입력의 실측 결과와 실패 사례.
-- 30초: 추가 확인 턴, 검증 한계, 후속 개선.
+## 이력·보고서
 
-제공 LangGraph/MCP/UI를 직접 새로 만들었다고 설명하지 않는다. Git 차이와 실행 증거로 직접 바꾼 부분을 제시한다.
+이력은 당시 판정을 표시한다. 보고서는 현재 시각으로 신선도를 재검사한다.
+최근 재점검이 실패했으면 예전 복구 판정을 최신으로 제공하지 않는다.
+이력/보고서는 모니터링을 추가 호출하지 않는다.
+
+## 시나리오
+
+기본은 샘플 JSON+난수다. MONITORING_SCENARIO는 대화·서비스별 고정 관측을 재생한다.
+합성 시각은 최초 조회 이전에 배치하고 ID·출처를 표시한다.
+마지막 관측은 같은 ID로 반환해 클릭 횟수가 정상 횟수로 바뀌지 않게 한다.

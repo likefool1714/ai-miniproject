@@ -1,0 +1,17 @@
+{
+  "mode": {
+    "status": "ok",
+    "instance_id": 4528072672,
+    "creation_count": 1,
+    "supervisor_version": "v2",
+    "llm_backend": "ollama",
+    "fast_llm": "ollama:qwen3:0.6b",
+    "quality_llm": "ollama:qwen3:8b",
+    "recovery_enabled": true,
+    "monitoring_mode": "recovery-demo"
+  },
+  "correct": 15,
+  "total": 15,
+  "median_seconds": 0.007865709005272947,
+  "scope": "actual HTTP proxy + FastAPI + stdio MCP, synthetic recovery-demo observations, recovery route performs no LLM call"
+}

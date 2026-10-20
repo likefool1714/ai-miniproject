@@ -1,0 +1,26 @@
+{
+  "baseline_commit": "d1043ff",
+  "backend": "ollama",
+  "repetitions": 3,
+  "fixed_clock": "2026-10-20T06:03:15.380109+00:00",
+  "io": "injected fixed MCP fixture; no network MCP in this comparison",
+  "query": "payments-service의 복구 여부를 진단해 주세요",
+  "notes": [
+    "Before 자연어의 의미 판정은 manual_review 항목으로 별도 검토하며 구조화 판정 부재를 오답으로 계산하지 않습니다.",
+    "cost_usd is a virtual-price estimate, not an API bill.",
+    "After recovery route uses deterministic policy without LLM calls."
+  ],
+  "before": {
+    "completed": 15,
+    "total": 15,
+    "median_seconds": 28.790498667003703,
+    "structured_verdicts": 0
+  },
+  "after": {
+    "completed": 15,
+    "total": 15,
+    "median_seconds": 0.0029080419917590916,
+    "structured_verdicts": 15,
+    "correct": 15
+  }
+}

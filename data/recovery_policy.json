@@ -1,0 +1,9 @@
+{
+  "cpu_limit": 80.0,
+  "memory_limit": 85.0,
+  "freshness_seconds": 300,
+  "required_normal_samples": 2,
+  "minimum_interval_seconds": 5,
+  "recurrence_window_seconds": 3600,
+  "future_tolerance_seconds": 5
+}
