@@ -1,0 +1,1757 @@
+[
+  {
+    "repetition": 1,
+    "thread": "grounding-web-ddaf61e5f4db",
+    "turns": [
+      {
+        "input": "payments-service 장애를 진단해주세요",
+        "elapsed_seconds": 16.178560332977213,
+        "body": {
+          "reply": "## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 95%, 메모리 90%, 알림 2건.\n  관측 시각 2026-10-20T10:20:19.342447Z / 관측 ID 998bf6285f:payments-service:0 / 자료 scenario:recovery-demo (synthetic)\n  모니터링 알림 원문: CPU high; memory high\n\n## 추가 확인할 원인 후보 (미확정)\n- [M1] CPU 부하 원인을 추가 확인할 필요가 있습니다. 원인은 확정되지 않았습니다.\n- [M1] 메모리 압박이 의심됩니다. 누수 여부는 추세·힙 자료로 추가 확인해야 합니다.\n\n## 권장 확인·대응 절차 (미실행)\n- [R1] 조회한 런북: cpu-spike / runbook://incident-response/cpu-spike\n- [R2] 조회한 런북: memory-leak / runbook://incident-response/memory-leak\n- [M1 → R1.3] 런북 수치 조건: CPU 95% > 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R2.2] 런북 수치 조건: 메모리 90% ≥ 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R1.1] cpu-spike 런북 원문: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n- [M1 → R1.2] cpu-spike 런북 원문: 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n- [M1 → R1.3] cpu-spike 런북 원문: CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n- [M1 → R1.4] cpu-spike 런북 원문: 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n- [M1 → R1.5] cpu-spike 런북 원문: 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n- [M1 → R2.1] memory-leak 런북 원문: get_monitoring_status로 메모리 사용률 추세(시간에 따라 꾸준히 증가하는지)를 확인한다.\n- [M1 → R2.2] memory-leak 런북 원문: OOM 직전(90% 이상)이면 해당 프로세스를 즉시 재시작해 서비스 중단을 막는다 — 재시작은 임시 조치일 뿐임을 기록해둔다.\n- [M1 → R2.3] memory-leak 런북 원문: 힙 덤프 또는 프로파일링 도구로 어떤 객체가 계속 쌓이는지 확인한다.\n- [M1 → R2.4] memory-leak 런북 원문: 캐시 무제한 증가, 커넥션 미반환, 이벤트 리스너 중복 등록 같은 패턴이 최근 배포에 있었는지 점검한다.\n- [M1 → R2.5] memory-leak 런북 원문: 원인이 된 배포가 있으면 롤백하고, 컨테이너 메모리 상한선을 재확인해 재발 시 더 빨리 감지되도록 조정한다.\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### payments-service: 장애 지속\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high, memory high\n- 관측 시각: 2026-10-20T10:20:19.342447Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:0\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "incident"
+            },
+            {
+              "type": "PlanCreated",
+              "task_count": 2,
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "GateApplied",
+              "removed_analysis_tasks": 0
+            },
+            {
+              "type": "TaskCompleted",
+              "id": "task-0",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "ReplanCheck",
+              "round": 0,
+              "is_sufficient": false,
+              "target": "cpu-spike, memory-leak"
+            },
+            {
+              "type": "TaskCompleted",
+              "id": "task-gap-cpu-spike",
+              "source": "runbook",
+              "target": "cpu-spike",
+              "retries": 0
+            },
+            {
+              "type": "TaskCompleted",
+              "id": "task-gap-memory-leak",
+              "source": "runbook",
+              "target": "memory-leak",
+              "retries": 0
+            },
+            {
+              "type": "ReplanCheck",
+              "round": 1,
+              "is_sufficient": true,
+              "stop": true,
+              "missing_runbooks": []
+            },
+            {
+              "type": "AnalysisCompleted",
+              "length": 9
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "ongoing",
+              "label": "장애 지속",
+              "recurrence": false,
+              "observation_id": 127
+            },
+            {
+              "type": "DraftWritten",
+              "attempt": 1,
+              "length": 598
+            },
+            {
+              "type": "Validation",
+              "attempt": 1,
+              "verdict": "합격",
+              "errors": []
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "incident-v2"
+            }
+          ],
+          "metadata": {
+            "route": "incident",
+            "task_count": 4,
+            "gate_removed": 0,
+            "replan_rounds": 1,
+            "retry_count": 0,
+            "parallel_elapsed": 0.37,
+            "validation_attempts": 1,
+            "validation_status": "validated",
+            "validation_errors": [],
+            "cost_usd": 0.007837,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "legacy",
+            "recovery_results": [
+              {
+                "id": 127,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "degraded",
+                  "cpu_percent": 95.0,
+                  "memory_percent": 90.0,
+                  "last_checked": "2026-10-20T10:20:19.342447Z",
+                  "alerts": [
+                    "CPU high",
+                    "memory high"
+                  ],
+                  "sample_id": "998bf6285f:payments-service:0",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "ongoing",
+                  "recurrence": false,
+                  "normal_streak": 0,
+                  "comparison": null,
+                  "reasons": [
+                    "서비스 상태 degraded",
+                    "CPU 95% (정상 기준 < 80%)",
+                    "메모리 90% (정상 기준 < 85%)",
+                    "활성 알림 2건",
+                    "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:0",
+                  "issues": [
+                    "서비스 상태 degraded",
+                    "CPU 95% (정상 기준 < 80%)",
+                    "메모리 90% (정상 기준 < 85%)",
+                    "활성 알림 2건",
+                    "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                  ],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.029448707995470613,
+        "body": {
+          "reply": "### payments-service: 부분 회복\n- 관측: 상태=degraded, CPU 65%, 메모리 87%, 알림 1건\n- 활성 알림: memory high\n- 관측 시각: 2026-10-20T10:20:29.342447Z\n- 이전 대비: CPU -30%p, 메모리 -3%p (개선)\n- 새 알림: 없음\n- 해소된 알림: CPU high\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 메모리 87% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "partial",
+              "label": "부분 회복",
+              "recurrence": false,
+              "observation_id": 128
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 128,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "degraded",
+                  "cpu_percent": 65.0,
+                  "memory_percent": 87.0,
+                  "last_checked": "2026-10-20T10:20:29.342447Z",
+                  "alerts": [
+                    "memory high"
+                  ],
+                  "sample_id": "998bf6285f:payments-service:1",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "partial",
+                  "recurrence": false,
+                  "normal_streak": 0,
+                  "comparison": {
+                    "cpu_delta_pp": -30.0,
+                    "memory_delta_pp": -3.0,
+                    "alerts_added": [],
+                    "alerts_cleared": [
+                      "CPU high"
+                    ],
+                    "previous_checked": "2026-10-20T10:20:19.342447+00:00",
+                    "trend": "개선"
+                  },
+                  "reasons": [
+                    "서비스 상태 degraded",
+                    "메모리 87% (정상 기준 < 85%)",
+                    "활성 알림 1건"
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:1",
+                  "issues": [
+                    "서비스 상태 degraded",
+                    "메모리 87% (정상 기준 < 85%)",
+                    "활성 알림 1건"
+                  ],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.017199709021952003,
+        "body": {
+          "reply": "### payments-service: 부분 회복\n- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T10:20:39.342447Z\n- 이전 대비: CPU -10%p, 메모리 -27%p (개선)\n- 새 알림: 없음\n- 해소된 알림: memory high\n- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:2\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "partial",
+              "label": "부분 회복",
+              "recurrence": false,
+              "observation_id": 129
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 129,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "healthy",
+                  "cpu_percent": 55.0,
+                  "memory_percent": 60.0,
+                  "last_checked": "2026-10-20T10:20:39.342447Z",
+                  "alerts": [],
+                  "sample_id": "998bf6285f:payments-service:2",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "partial",
+                  "recurrence": false,
+                  "normal_streak": 1,
+                  "comparison": {
+                    "cpu_delta_pp": -10.0,
+                    "memory_delta_pp": -27.0,
+                    "alerts_added": [],
+                    "alerts_cleared": [
+                      "memory high"
+                    ],
+                    "previous_checked": "2026-10-20T10:20:29.342447+00:00",
+                    "trend": "개선"
+                  },
+                  "reasons": [
+                    "현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다."
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:2",
+                  "issues": [],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.018804915976943448,
+        "body": {
+          "reply": "### payments-service: 복구 확인\n- 관측: 상태=healthy, CPU 54%, 메모리 58%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T10:20:49.342447Z\n- 이전 대비: CPU -1%p, 메모리 -2%p (개선)\n- 새 알림: 없음\n- 해소된 알림: 없음\n- 판단 근거: 최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:3\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "recovered",
+              "label": "복구 확인",
+              "recurrence": false,
+              "observation_id": 130
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 130,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "healthy",
+                  "cpu_percent": 54.0,
+                  "memory_percent": 58.0,
+                  "last_checked": "2026-10-20T10:20:49.342447Z",
+                  "alerts": [],
+                  "sample_id": "998bf6285f:payments-service:3",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "recovered",
+                  "recurrence": false,
+                  "normal_streak": 2,
+                  "comparison": {
+                    "cpu_delta_pp": -1.0,
+                    "memory_delta_pp": -2.0,
+                    "alerts_added": [],
+                    "alerts_cleared": [],
+                    "previous_checked": "2026-10-20T10:20:39.342447+00:00",
+                    "trend": "개선"
+                  },
+                  "reasons": [
+                    "최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다."
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:3",
+                  "issues": [],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.013360665994696319,
+        "body": {
+          "reply": "### payments-service: 장애 재발 / 장애 지속\n- 관측: 상태=degraded, CPU 94%, 메모리 60%, 알림 1건\n- 활성 알림: CPU high again\n- 관측 시각: 2026-10-20T10:20:59.342447Z\n- 이전 대비: CPU +40%p, 메모리 +2%p (악화)\n- 새 알림: CPU high again\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 94% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:4\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "ongoing",
+              "label": "장애 지속",
+              "recurrence": true,
+              "observation_id": 131
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 131,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "degraded",
+                  "cpu_percent": 94.0,
+                  "memory_percent": 60.0,
+                  "last_checked": "2026-10-20T10:20:59.342447Z",
+                  "alerts": [
+                    "CPU high again"
+                  ],
+                  "sample_id": "998bf6285f:payments-service:4",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "ongoing",
+                  "recurrence": true,
+                  "normal_streak": 0,
+                  "comparison": {
+                    "cpu_delta_pp": 40.0,
+                    "memory_delta_pp": 2.0,
+                    "alerts_added": [
+                      "CPU high again"
+                    ],
+                    "alerts_cleared": [],
+                    "previous_checked": "2026-10-20T10:20:49.342447+00:00",
+                    "trend": "악화"
+                  },
+                  "reasons": [
+                    "서비스 상태 degraded",
+                    "CPU 94% (정상 기준 < 80%)",
+                    "활성 알림 1건"
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:4",
+                  "issues": [
+                    "서비스 상태 degraded",
+                    "CPU 94% (정상 기준 < 80%)",
+                    "활성 알림 1건"
+                  ],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      }
+    ],
+    "history_reply": "### payments-service 조사 이력 (최근 5건)\n- 2026-10-20T10:20:19.342447Z: 상태 degraded, CPU 95%, 메모리 90%, 알림 2건 → 당시 판정 장애 지속\n- 2026-10-20T10:20:29.342447Z: 상태 degraded, CPU 65%, 메모리 87%, 알림 1건 → 당시 판정 부분 회복\n- 2026-10-20T10:20:39.342447Z: 상태 healthy, CPU 55%, 메모리 60%, 알림 0건 → 당시 판정 부분 회복\n- 2026-10-20T10:20:49.342447Z: 상태 healthy, CPU 54%, 메모리 58%, 알림 0건 → 당시 판정 복구 확인\n- 2026-10-20T10:20:59.342447Z: 상태 degraded, CPU 94%, 메모리 60%, 알림 1건 → 당시 판정 장애 지속 / 재발\n\n이력 조회는 새 모니터링을 실행하지 않습니다. 당시 판정은 현재 복구 상태를 뜻하지 않습니다.",
+    "report": "# payments-service 장애 조사·복구 보고서\n\n샘플 모니터링 기반 데모입니다. 실제 서비스 복구나 원인 확정을 증명하지 않습니다.\n\n- 생성 시각: 2026-10-20T10:21:14.375722+00:00\n- 대화 ID: grounding-web-ddaf61e5f4db\n- 최근 기록: 최대 100건 (현재 5건)\n\n### payments-service: 장애 재발 / 장애 지속\n- 관측: 상태=degraded, CPU 94%, 메모리 60%, 알림 1건\n- 활성 알림: CPU high again\n- 관측 시각: 2026-10-20T10:20:59.342447Z\n- 이전 대비: CPU +40%p, 메모리 +2%p (악화)\n- 새 알림: CPU high again\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 94% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:4\n\n## 조사 이력\n\n| 관측 시각 | 상태 | CPU (%) | 메모리 (%) | 알림 수 | 당시 판정 |\n|---|---|---:|---:|---:|---|\n| 2026-10-20T10:20:19.342447Z | degraded | 95 | 90 | 2 | 장애 지속 |\n| 2026-10-20T10:20:29.342447Z | degraded | 65 | 87 | 1 | 부분 회복 |\n| 2026-10-20T10:20:39.342447Z | healthy | 55 | 60 | 0 | 부분 회복 |\n| 2026-10-20T10:20:49.342447Z | healthy | 54 | 58 | 0 | 복구 확인 |\n| 2026-10-20T10:20:59.342447Z | degraded | 94 | 60 | 1 | 장애 지속 / 재발 |\n\n## 판정 정책과 한계\n\n- 정상 조건: status=healthy, CPU < 80%, 메모리 < 85%, 활성 알림 0건.\n- 최근 장애 기록 이후 5초 이상 간격으로 정상 2회 필요.\n- 조회 실패가 끼면 이후의 신규 관측부터 정상 횟수를 다시 셉니다. 동일·과거 관측은 최근 실패를 해소하지 않습니다.\n- 현재 판정은 최근 최대 500건, 아래 이력 표는 최근 최대 100건을 사용합니다.\n- 비교 자료 유효시간 300초, 재발 연관 기간 3600초.\n- 임계값과 2회 정상 기준은 교육용 정책이며 실제 SLO나 운영 복구 기준이 아닙니다.\n- 보고서 열람은 새 모니터링 조회를 수행하지 않습니다. 오래된 자료는 판단 보류합니다.\n- 관측 사이의 상태, 실제 사용자 트랜잭션, 로그 및 장애 원인은 검증하지 않습니다.\n- 조사 이력은 대화·서비스별로 분리합니다. 서비스 재시작·롤백을 실행하지 않습니다.\n",
+    "history_count": 5
+  },
+  {
+    "repetition": 2,
+    "thread": "grounding-web-9c13e4ad511c",
+    "turns": [
+      {
+        "input": "payments-service 장애를 진단해주세요",
+        "elapsed_seconds": 15.329739249980776,
+        "body": {
+          "reply": "## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 95%, 메모리 90%, 알림 2건.\n  관측 시각 2026-10-20T10:20:35.544752Z / 관측 ID 998bf6285f:payments-service:0 / 자료 scenario:recovery-demo (synthetic)\n  모니터링 알림 원문: CPU high; memory high\n\n## 추가 확인할 원인 후보 (미확정)\n- [M1] CPU 부하 원인을 추가 확인할 필요가 있습니다. 원인은 확정되지 않았습니다.\n- [M1] 메모리 압박이 의심됩니다. 누수 여부는 추세·힙 자료로 추가 확인해야 합니다.\n\n## 권장 확인·대응 절차 (미실행)\n- [R1] 조회한 런북: cpu-spike / runbook://incident-response/cpu-spike\n- [R2] 조회한 런북: memory-leak / runbook://incident-response/memory-leak\n- [M1 → R1.3] 런북 수치 조건: CPU 95% > 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R2.2] 런북 수치 조건: 메모리 90% ≥ 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R1.1] cpu-spike 런북 원문: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n- [M1 → R1.2] cpu-spike 런북 원문: 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n- [M1 → R1.3] cpu-spike 런북 원문: CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n- [M1 → R1.4] cpu-spike 런북 원문: 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n- [M1 → R1.5] cpu-spike 런북 원문: 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n- [M1 → R2.1] memory-leak 런북 원문: get_monitoring_status로 메모리 사용률 추세(시간에 따라 꾸준히 증가하는지)를 확인한다.\n- [M1 → R2.2] memory-leak 런북 원문: OOM 직전(90% 이상)이면 해당 프로세스를 즉시 재시작해 서비스 중단을 막는다 — 재시작은 임시 조치일 뿐임을 기록해둔다.\n- [M1 → R2.3] memory-leak 런북 원문: 힙 덤프 또는 프로파일링 도구로 어떤 객체가 계속 쌓이는지 확인한다.\n- [M1 → R2.4] memory-leak 런북 원문: 캐시 무제한 증가, 커넥션 미반환, 이벤트 리스너 중복 등록 같은 패턴이 최근 배포에 있었는지 점검한다.\n- [M1 → R2.5] memory-leak 런북 원문: 원인이 된 배포가 있으면 롤백하고, 컨테이너 메모리 상한선을 재확인해 재발 시 더 빨리 감지되도록 조정한다.\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### payments-service: 장애 지속\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high, memory high\n- 관측 시각: 2026-10-20T10:20:35.544752Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:0\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "incident"
+            },
+            {
+              "type": "PlanCreated",
+              "task_count": 2,
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "GateApplied",
+              "removed_analysis_tasks": 0
+            },
+            {
+              "type": "TaskCompleted",
+              "id": "task-0",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "ReplanCheck",
+              "round": 0,
+              "is_sufficient": false,
+              "target": "cpu-spike, memory-leak"
+            },
+            {
+              "type": "TaskCompleted",
+              "id": "task-gap-cpu-spike",
+              "source": "runbook",
+              "target": "cpu-spike",
+              "retries": 0
+            },
+            {
+              "type": "TaskCompleted",
+              "id": "task-gap-memory-leak",
+              "source": "runbook",
+              "target": "memory-leak",
+              "retries": 0
+            },
+            {
+              "type": "ReplanCheck",
+              "round": 1,
+              "is_sufficient": true,
+              "stop": true,
+              "missing_runbooks": []
+            },
+            {
+              "type": "AnalysisCompleted",
+              "length": 9
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "ongoing",
+              "label": "장애 지속",
+              "recurrence": false,
+              "observation_id": 132
+            },
+            {
+              "type": "DraftWritten",
+              "attempt": 1,
+              "length": 598
+            },
+            {
+              "type": "Validation",
+              "attempt": 1,
+              "verdict": "합격",
+              "errors": []
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "incident-v2"
+            }
+          ],
+          "metadata": {
+            "route": "incident",
+            "task_count": 4,
+            "gate_removed": 0,
+            "replan_rounds": 1,
+            "retry_count": 0,
+            "parallel_elapsed": 0.36,
+            "validation_attempts": 1,
+            "validation_status": "validated",
+            "validation_errors": [],
+            "cost_usd": 0.007837,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "legacy",
+            "recovery_results": [
+              {
+                "id": 132,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "degraded",
+                  "cpu_percent": 95.0,
+                  "memory_percent": 90.0,
+                  "last_checked": "2026-10-20T10:20:35.544752Z",
+                  "alerts": [
+                    "CPU high",
+                    "memory high"
+                  ],
+                  "sample_id": "998bf6285f:payments-service:0",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "ongoing",
+                  "recurrence": false,
+                  "normal_streak": 0,
+                  "comparison": null,
+                  "reasons": [
+                    "서비스 상태 degraded",
+                    "CPU 95% (정상 기준 < 80%)",
+                    "메모리 90% (정상 기준 < 85%)",
+                    "활성 알림 2건",
+                    "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:0",
+                  "issues": [
+                    "서비스 상태 degraded",
+                    "CPU 95% (정상 기준 < 80%)",
+                    "메모리 90% (정상 기준 < 85%)",
+                    "활성 알림 2건",
+                    "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                  ],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.03184758298448287,
+        "body": {
+          "reply": "### payments-service: 부분 회복\n- 관측: 상태=degraded, CPU 65%, 메모리 87%, 알림 1건\n- 활성 알림: memory high\n- 관측 시각: 2026-10-20T10:20:45.544752Z\n- 이전 대비: CPU -30%p, 메모리 -3%p (개선)\n- 새 알림: 없음\n- 해소된 알림: CPU high\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 메모리 87% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "partial",
+              "label": "부분 회복",
+              "recurrence": false,
+              "observation_id": 133
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 133,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "degraded",
+                  "cpu_percent": 65.0,
+                  "memory_percent": 87.0,
+                  "last_checked": "2026-10-20T10:20:45.544752Z",
+                  "alerts": [
+                    "memory high"
+                  ],
+                  "sample_id": "998bf6285f:payments-service:1",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "partial",
+                  "recurrence": false,
+                  "normal_streak": 0,
+                  "comparison": {
+                    "cpu_delta_pp": -30.0,
+                    "memory_delta_pp": -3.0,
+                    "alerts_added": [],
+                    "alerts_cleared": [
+                      "CPU high"
+                    ],
+                    "previous_checked": "2026-10-20T10:20:35.544752+00:00",
+                    "trend": "개선"
+                  },
+                  "reasons": [
+                    "서비스 상태 degraded",
+                    "메모리 87% (정상 기준 < 85%)",
+                    "활성 알림 1건"
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:1",
+                  "issues": [
+                    "서비스 상태 degraded",
+                    "메모리 87% (정상 기준 < 85%)",
+                    "활성 알림 1건"
+                  ],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.012254875007783994,
+        "body": {
+          "reply": "### payments-service: 부분 회복\n- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T10:20:55.544752Z\n- 이전 대비: CPU -10%p, 메모리 -27%p (개선)\n- 새 알림: 없음\n- 해소된 알림: memory high\n- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:2\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "partial",
+              "label": "부분 회복",
+              "recurrence": false,
+              "observation_id": 134
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 134,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "healthy",
+                  "cpu_percent": 55.0,
+                  "memory_percent": 60.0,
+                  "last_checked": "2026-10-20T10:20:55.544752Z",
+                  "alerts": [],
+                  "sample_id": "998bf6285f:payments-service:2",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "partial",
+                  "recurrence": false,
+                  "normal_streak": 1,
+                  "comparison": {
+                    "cpu_delta_pp": -10.0,
+                    "memory_delta_pp": -27.0,
+                    "alerts_added": [],
+                    "alerts_cleared": [
+                      "memory high"
+                    ],
+                    "previous_checked": "2026-10-20T10:20:45.544752+00:00",
+                    "trend": "개선"
+                  },
+                  "reasons": [
+                    "현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다."
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:2",
+                  "issues": [],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.011504791997140273,
+        "body": {
+          "reply": "### payments-service: 복구 확인\n- 관측: 상태=healthy, CPU 54%, 메모리 58%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T10:21:05.544752Z\n- 이전 대비: CPU -1%p, 메모리 -2%p (개선)\n- 새 알림: 없음\n- 해소된 알림: 없음\n- 판단 근거: 최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:3\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "recovered",
+              "label": "복구 확인",
+              "recurrence": false,
+              "observation_id": 135
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 135,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "healthy",
+                  "cpu_percent": 54.0,
+                  "memory_percent": 58.0,
+                  "last_checked": "2026-10-20T10:21:05.544752Z",
+                  "alerts": [],
+                  "sample_id": "998bf6285f:payments-service:3",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "recovered",
+                  "recurrence": false,
+                  "normal_streak": 2,
+                  "comparison": {
+                    "cpu_delta_pp": -1.0,
+                    "memory_delta_pp": -2.0,
+                    "alerts_added": [],
+                    "alerts_cleared": [],
+                    "previous_checked": "2026-10-20T10:20:55.544752+00:00",
+                    "trend": "개선"
+                  },
+                  "reasons": [
+                    "최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다."
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:3",
+                  "issues": [],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.010372334014391527,
+        "body": {
+          "reply": "### payments-service: 장애 재발 / 장애 지속\n- 관측: 상태=degraded, CPU 94%, 메모리 60%, 알림 1건\n- 활성 알림: CPU high again\n- 관측 시각: 2026-10-20T10:21:15.544752Z\n- 이전 대비: CPU +40%p, 메모리 +2%p (악화)\n- 새 알림: CPU high again\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 94% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:4\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "ongoing",
+              "label": "장애 지속",
+              "recurrence": true,
+              "observation_id": 136
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 136,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "degraded",
+                  "cpu_percent": 94.0,
+                  "memory_percent": 60.0,
+                  "last_checked": "2026-10-20T10:21:15.544752Z",
+                  "alerts": [
+                    "CPU high again"
+                  ],
+                  "sample_id": "998bf6285f:payments-service:4",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "ongoing",
+                  "recurrence": true,
+                  "normal_streak": 0,
+                  "comparison": {
+                    "cpu_delta_pp": 40.0,
+                    "memory_delta_pp": 2.0,
+                    "alerts_added": [
+                      "CPU high again"
+                    ],
+                    "alerts_cleared": [],
+                    "previous_checked": "2026-10-20T10:21:05.544752+00:00",
+                    "trend": "악화"
+                  },
+                  "reasons": [
+                    "서비스 상태 degraded",
+                    "CPU 94% (정상 기준 < 80%)",
+                    "활성 알림 1건"
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:4",
+                  "issues": [
+                    "서비스 상태 degraded",
+                    "CPU 94% (정상 기준 < 80%)",
+                    "활성 알림 1건"
+                  ],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      }
+    ],
+    "history_reply": "### payments-service 조사 이력 (최근 5건)\n- 2026-10-20T10:20:35.544752Z: 상태 degraded, CPU 95%, 메모리 90%, 알림 2건 → 당시 판정 장애 지속\n- 2026-10-20T10:20:45.544752Z: 상태 degraded, CPU 65%, 메모리 87%, 알림 1건 → 당시 판정 부분 회복\n- 2026-10-20T10:20:55.544752Z: 상태 healthy, CPU 55%, 메모리 60%, 알림 0건 → 당시 판정 부분 회복\n- 2026-10-20T10:21:05.544752Z: 상태 healthy, CPU 54%, 메모리 58%, 알림 0건 → 당시 판정 복구 확인\n- 2026-10-20T10:21:15.544752Z: 상태 degraded, CPU 94%, 메모리 60%, 알림 1건 → 당시 판정 장애 지속 / 재발\n\n이력 조회는 새 모니터링을 실행하지 않습니다. 당시 판정은 현재 복구 상태를 뜻하지 않습니다.",
+    "report": "# payments-service 장애 조사·복구 보고서\n\n샘플 모니터링 기반 데모입니다. 실제 서비스 복구나 원인 확정을 증명하지 않습니다.\n\n- 생성 시각: 2026-10-20T10:21:29.799550+00:00\n- 대화 ID: grounding-web-9c13e4ad511c\n- 최근 기록: 최대 100건 (현재 5건)\n\n### payments-service: 장애 재발 / 장애 지속\n- 관측: 상태=degraded, CPU 94%, 메모리 60%, 알림 1건\n- 활성 알림: CPU high again\n- 관측 시각: 2026-10-20T10:21:15.544752Z\n- 이전 대비: CPU +40%p, 메모리 +2%p (악화)\n- 새 알림: CPU high again\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 94% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:4\n\n## 조사 이력\n\n| 관측 시각 | 상태 | CPU (%) | 메모리 (%) | 알림 수 | 당시 판정 |\n|---|---|---:|---:|---:|---|\n| 2026-10-20T10:20:35.544752Z | degraded | 95 | 90 | 2 | 장애 지속 |\n| 2026-10-20T10:20:45.544752Z | degraded | 65 | 87 | 1 | 부분 회복 |\n| 2026-10-20T10:20:55.544752Z | healthy | 55 | 60 | 0 | 부분 회복 |\n| 2026-10-20T10:21:05.544752Z | healthy | 54 | 58 | 0 | 복구 확인 |\n| 2026-10-20T10:21:15.544752Z | degraded | 94 | 60 | 1 | 장애 지속 / 재발 |\n\n## 판정 정책과 한계\n\n- 정상 조건: status=healthy, CPU < 80%, 메모리 < 85%, 활성 알림 0건.\n- 최근 장애 기록 이후 5초 이상 간격으로 정상 2회 필요.\n- 조회 실패가 끼면 이후의 신규 관측부터 정상 횟수를 다시 셉니다. 동일·과거 관측은 최근 실패를 해소하지 않습니다.\n- 현재 판정은 최근 최대 500건, 아래 이력 표는 최근 최대 100건을 사용합니다.\n- 비교 자료 유효시간 300초, 재발 연관 기간 3600초.\n- 임계값과 2회 정상 기준은 교육용 정책이며 실제 SLO나 운영 복구 기준이 아닙니다.\n- 보고서 열람은 새 모니터링 조회를 수행하지 않습니다. 오래된 자료는 판단 보류합니다.\n- 관측 사이의 상태, 실제 사용자 트랜잭션, 로그 및 장애 원인은 검증하지 않습니다.\n- 조사 이력은 대화·서비스별로 분리합니다. 서비스 재시작·롤백을 실행하지 않습니다.\n",
+    "history_count": 5
+  },
+  {
+    "repetition": 3,
+    "thread": "grounding-web-1affebb40b17",
+    "turns": [
+      {
+        "input": "payments-service 장애를 진단해주세요",
+        "elapsed_seconds": 15.278191833000164,
+        "body": {
+          "reply": "## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 95%, 메모리 90%, 알림 2건.\n  관측 시각 2026-10-20T10:20:50.908598Z / 관측 ID 998bf6285f:payments-service:0 / 자료 scenario:recovery-demo (synthetic)\n  모니터링 알림 원문: CPU high; memory high\n\n## 추가 확인할 원인 후보 (미확정)\n- [M1] CPU 부하 원인을 추가 확인할 필요가 있습니다. 원인은 확정되지 않았습니다.\n- [M1] 메모리 압박이 의심됩니다. 누수 여부는 추세·힙 자료로 추가 확인해야 합니다.\n\n## 권장 확인·대응 절차 (미실행)\n- [R1] 조회한 런북: cpu-spike / runbook://incident-response/cpu-spike\n- [R2] 조회한 런북: memory-leak / runbook://incident-response/memory-leak\n- [M1 → R1.3] 런북 수치 조건: CPU 95% > 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R2.2] 런북 수치 조건: 메모리 90% ≥ 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R1.1] cpu-spike 런북 원문: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n- [M1 → R1.2] cpu-spike 런북 원문: 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n- [M1 → R1.3] cpu-spike 런북 원문: CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n- [M1 → R1.4] cpu-spike 런북 원문: 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n- [M1 → R1.5] cpu-spike 런북 원문: 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n- [M1 → R2.1] memory-leak 런북 원문: get_monitoring_status로 메모리 사용률 추세(시간에 따라 꾸준히 증가하는지)를 확인한다.\n- [M1 → R2.2] memory-leak 런북 원문: OOM 직전(90% 이상)이면 해당 프로세스를 즉시 재시작해 서비스 중단을 막는다 — 재시작은 임시 조치일 뿐임을 기록해둔다.\n- [M1 → R2.3] memory-leak 런북 원문: 힙 덤프 또는 프로파일링 도구로 어떤 객체가 계속 쌓이는지 확인한다.\n- [M1 → R2.4] memory-leak 런북 원문: 캐시 무제한 증가, 커넥션 미반환, 이벤트 리스너 중복 등록 같은 패턴이 최근 배포에 있었는지 점검한다.\n- [M1 → R2.5] memory-leak 런북 원문: 원인이 된 배포가 있으면 롤백하고, 컨테이너 메모리 상한선을 재확인해 재발 시 더 빨리 감지되도록 조정한다.\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### payments-service: 장애 지속\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high, memory high\n- 관측 시각: 2026-10-20T10:20:50.908598Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:0\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "incident"
+            },
+            {
+              "type": "PlanCreated",
+              "task_count": 2,
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "GateApplied",
+              "removed_analysis_tasks": 0
+            },
+            {
+              "type": "TaskCompleted",
+              "id": "task-0",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "ReplanCheck",
+              "round": 0,
+              "is_sufficient": false,
+              "target": "cpu-spike, memory-leak"
+            },
+            {
+              "type": "TaskCompleted",
+              "id": "task-gap-cpu-spike",
+              "source": "runbook",
+              "target": "cpu-spike",
+              "retries": 0
+            },
+            {
+              "type": "TaskCompleted",
+              "id": "task-gap-memory-leak",
+              "source": "runbook",
+              "target": "memory-leak",
+              "retries": 0
+            },
+            {
+              "type": "ReplanCheck",
+              "round": 1,
+              "is_sufficient": true,
+              "stop": true,
+              "missing_runbooks": []
+            },
+            {
+              "type": "AnalysisCompleted",
+              "length": 9
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "ongoing",
+              "label": "장애 지속",
+              "recurrence": false,
+              "observation_id": 137
+            },
+            {
+              "type": "DraftWritten",
+              "attempt": 1,
+              "length": 598
+            },
+            {
+              "type": "Validation",
+              "attempt": 1,
+              "verdict": "합격",
+              "errors": []
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "incident-v2"
+            }
+          ],
+          "metadata": {
+            "route": "incident",
+            "task_count": 4,
+            "gate_removed": 0,
+            "replan_rounds": 1,
+            "retry_count": 0,
+            "parallel_elapsed": 0.36,
+            "validation_attempts": 1,
+            "validation_status": "validated",
+            "validation_errors": [],
+            "cost_usd": 0.007837,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "legacy",
+            "recovery_results": [
+              {
+                "id": 137,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "degraded",
+                  "cpu_percent": 95.0,
+                  "memory_percent": 90.0,
+                  "last_checked": "2026-10-20T10:20:50.908598Z",
+                  "alerts": [
+                    "CPU high",
+                    "memory high"
+                  ],
+                  "sample_id": "998bf6285f:payments-service:0",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "ongoing",
+                  "recurrence": false,
+                  "normal_streak": 0,
+                  "comparison": null,
+                  "reasons": [
+                    "서비스 상태 degraded",
+                    "CPU 95% (정상 기준 < 80%)",
+                    "메모리 90% (정상 기준 < 85%)",
+                    "활성 알림 2건",
+                    "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:0",
+                  "issues": [
+                    "서비스 상태 degraded",
+                    "CPU 95% (정상 기준 < 80%)",
+                    "메모리 90% (정상 기준 < 85%)",
+                    "활성 알림 2건",
+                    "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                  ],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.028868916997453198,
+        "body": {
+          "reply": "### payments-service: 부분 회복\n- 관측: 상태=degraded, CPU 65%, 메모리 87%, 알림 1건\n- 활성 알림: memory high\n- 관측 시각: 2026-10-20T10:21:00.908598Z\n- 이전 대비: CPU -30%p, 메모리 -3%p (개선)\n- 새 알림: 없음\n- 해소된 알림: CPU high\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 메모리 87% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "partial",
+              "label": "부분 회복",
+              "recurrence": false,
+              "observation_id": 138
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 138,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "degraded",
+                  "cpu_percent": 65.0,
+                  "memory_percent": 87.0,
+                  "last_checked": "2026-10-20T10:21:00.908598Z",
+                  "alerts": [
+                    "memory high"
+                  ],
+                  "sample_id": "998bf6285f:payments-service:1",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "partial",
+                  "recurrence": false,
+                  "normal_streak": 0,
+                  "comparison": {
+                    "cpu_delta_pp": -30.0,
+                    "memory_delta_pp": -3.0,
+                    "alerts_added": [],
+                    "alerts_cleared": [
+                      "CPU high"
+                    ],
+                    "previous_checked": "2026-10-20T10:20:50.908598+00:00",
+                    "trend": "개선"
+                  },
+                  "reasons": [
+                    "서비스 상태 degraded",
+                    "메모리 87% (정상 기준 < 85%)",
+                    "활성 알림 1건"
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:1",
+                  "issues": [
+                    "서비스 상태 degraded",
+                    "메모리 87% (정상 기준 < 85%)",
+                    "활성 알림 1건"
+                  ],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.01552758298930712,
+        "body": {
+          "reply": "### payments-service: 부분 회복\n- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T10:21:10.908598Z\n- 이전 대비: CPU -10%p, 메모리 -27%p (개선)\n- 새 알림: 없음\n- 해소된 알림: memory high\n- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:2\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "partial",
+              "label": "부분 회복",
+              "recurrence": false,
+              "observation_id": 139
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 139,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "healthy",
+                  "cpu_percent": 55.0,
+                  "memory_percent": 60.0,
+                  "last_checked": "2026-10-20T10:21:10.908598Z",
+                  "alerts": [],
+                  "sample_id": "998bf6285f:payments-service:2",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "partial",
+                  "recurrence": false,
+                  "normal_streak": 1,
+                  "comparison": {
+                    "cpu_delta_pp": -10.0,
+                    "memory_delta_pp": -27.0,
+                    "alerts_added": [],
+                    "alerts_cleared": [
+                      "memory high"
+                    ],
+                    "previous_checked": "2026-10-20T10:21:00.908598+00:00",
+                    "trend": "개선"
+                  },
+                  "reasons": [
+                    "현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다."
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:2",
+                  "issues": [],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.009569042013026774,
+        "body": {
+          "reply": "### payments-service: 복구 확인\n- 관측: 상태=healthy, CPU 54%, 메모리 58%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-20T10:21:20.908598Z\n- 이전 대비: CPU -1%p, 메모리 -2%p (개선)\n- 새 알림: 없음\n- 해소된 알림: 없음\n- 판단 근거: 최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:3\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "recovered",
+              "label": "복구 확인",
+              "recurrence": false,
+              "observation_id": 140
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 140,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "healthy",
+                  "cpu_percent": 54.0,
+                  "memory_percent": 58.0,
+                  "last_checked": "2026-10-20T10:21:20.908598Z",
+                  "alerts": [],
+                  "sample_id": "998bf6285f:payments-service:3",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "recovered",
+                  "recurrence": false,
+                  "normal_streak": 2,
+                  "comparison": {
+                    "cpu_delta_pp": -1.0,
+                    "memory_delta_pp": -2.0,
+                    "alerts_added": [],
+                    "alerts_cleared": [],
+                    "previous_checked": "2026-10-20T10:21:10.908598+00:00",
+                    "trend": "개선"
+                  },
+                  "reasons": [
+                    "최근 장애 이후 5초 이상 간격의 정상 관측 2회가 확인됐습니다."
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:3",
+                  "issues": [],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      },
+      {
+        "input": "그 서비스 복구됐어? 다시 확인해줘",
+        "elapsed_seconds": 0.008858541987137869,
+        "body": {
+          "reply": "### payments-service: 장애 재발 / 장애 지속\n- 관측: 상태=degraded, CPU 94%, 메모리 60%, 알림 1건\n- 활성 알림: CPU high again\n- 관측 시각: 2026-10-20T10:21:30.908598Z\n- 이전 대비: CPU +40%p, 메모리 +2%p (악화)\n- 새 알림: CPU high again\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 94% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:4\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+          "events": [
+            {
+              "type": "RouteDecided",
+              "route": "recheck"
+            },
+            {
+              "type": "TargetsResolved",
+              "targets": [
+                "payments-service"
+              ]
+            },
+            {
+              "type": "TaskCompleted",
+              "source": "monitoring",
+              "target": "payments-service",
+              "retries": 0
+            },
+            {
+              "type": "RecoveryAssessed",
+              "target": "payments-service",
+              "phase": "ongoing",
+              "label": "장애 지속",
+              "recurrence": true,
+              "observation_id": 141
+            },
+            {
+              "type": "Finalize",
+              "pipeline": "recovery"
+            }
+          ],
+          "metadata": {
+            "route": null,
+            "task_count": 0,
+            "gate_removed": 0,
+            "replan_rounds": 0,
+            "retry_count": 0,
+            "parallel_elapsed": null,
+            "validation_attempts": 0,
+            "validation_status": null,
+            "validation_errors": [],
+            "cost_usd": 0.0,
+            "llm_backend": "ollama",
+            "supervisor_version": "v2",
+            "instance_id": 4490409408,
+            "langsmith_run_id": null,
+            "recovery_action": "recheck",
+            "recovery_results": [
+              {
+                "id": 141,
+                "snapshot": {
+                  "system_name": "payments-service",
+                  "status": "degraded",
+                  "cpu_percent": 94.0,
+                  "memory_percent": 60.0,
+                  "last_checked": "2026-10-20T10:21:30.908598Z",
+                  "alerts": [
+                    "CPU high again"
+                  ],
+                  "sample_id": "998bf6285f:payments-service:4",
+                  "data_source": "scenario:recovery-demo (synthetic)"
+                },
+                "assessment": {
+                  "phase": "ongoing",
+                  "recurrence": true,
+                  "normal_streak": 0,
+                  "comparison": {
+                    "cpu_delta_pp": 40.0,
+                    "memory_delta_pp": 2.0,
+                    "alerts_added": [
+                      "CPU high again"
+                    ],
+                    "alerts_cleared": [],
+                    "previous_checked": "2026-10-20T10:21:20.908598+00:00",
+                    "trend": "악화"
+                  },
+                  "reasons": [
+                    "서비스 상태 degraded",
+                    "CPU 94% (정상 기준 < 80%)",
+                    "활성 알림 1건"
+                  ],
+                  "policy": {
+                    "cpu_limit": 80.0,
+                    "memory_limit": 85.0,
+                    "freshness_seconds": 300,
+                    "required_normal_samples": 2,
+                    "minimum_interval_seconds": 5,
+                    "recurrence_window_seconds": 3600,
+                    "future_tolerance_seconds": 5
+                  },
+                  "sample_id": "998bf6285f:payments-service:4",
+                  "issues": [
+                    "서비스 상태 degraded",
+                    "CPU 94% (정상 기준 < 80%)",
+                    "활성 알림 1건"
+                  ],
+                  "observation_usable": true
+                },
+                "duplicate": false,
+                "usable": true
+              }
+            ],
+            "reports": []
+          }
+        }
+      }
+    ],
+    "history_reply": "### payments-service 조사 이력 (최근 5건)\n- 2026-10-20T10:20:50.908598Z: 상태 degraded, CPU 95%, 메모리 90%, 알림 2건 → 당시 판정 장애 지속\n- 2026-10-20T10:21:00.908598Z: 상태 degraded, CPU 65%, 메모리 87%, 알림 1건 → 당시 판정 부분 회복\n- 2026-10-20T10:21:10.908598Z: 상태 healthy, CPU 55%, 메모리 60%, 알림 0건 → 당시 판정 부분 회복\n- 2026-10-20T10:21:20.908598Z: 상태 healthy, CPU 54%, 메모리 58%, 알림 0건 → 당시 판정 복구 확인\n- 2026-10-20T10:21:30.908598Z: 상태 degraded, CPU 94%, 메모리 60%, 알림 1건 → 당시 판정 장애 지속 / 재발\n\n이력 조회는 새 모니터링을 실행하지 않습니다. 당시 판정은 현재 복구 상태를 뜻하지 않습니다.",
+    "report": "# payments-service 장애 조사·복구 보고서\n\n샘플 모니터링 기반 데모입니다. 실제 서비스 복구나 원인 확정을 증명하지 않습니다.\n\n- 생성 시각: 2026-10-20T10:21:45.166238+00:00\n- 대화 ID: grounding-web-1affebb40b17\n- 최근 기록: 최대 100건 (현재 5건)\n\n### payments-service: 장애 재발 / 장애 지속\n- 관측: 상태=degraded, CPU 94%, 메모리 60%, 알림 1건\n- 활성 알림: CPU high again\n- 관측 시각: 2026-10-20T10:21:30.908598Z\n- 이전 대비: CPU +40%p, 메모리 +2%p (악화)\n- 새 알림: CPU high again\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 94% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 출처: scenario:recovery-demo (synthetic) / 관측 998bf6285f:payments-service:4\n\n## 조사 이력\n\n| 관측 시각 | 상태 | CPU (%) | 메모리 (%) | 알림 수 | 당시 판정 |\n|---|---|---:|---:|---:|---|\n| 2026-10-20T10:20:50.908598Z | degraded | 95 | 90 | 2 | 장애 지속 |\n| 2026-10-20T10:21:00.908598Z | degraded | 65 | 87 | 1 | 부분 회복 |\n| 2026-10-20T10:21:10.908598Z | healthy | 55 | 60 | 0 | 부분 회복 |\n| 2026-10-20T10:21:20.908598Z | healthy | 54 | 58 | 0 | 복구 확인 |\n| 2026-10-20T10:21:30.908598Z | degraded | 94 | 60 | 1 | 장애 지속 / 재발 |\n\n## 판정 정책과 한계\n\n- 정상 조건: status=healthy, CPU < 80%, 메모리 < 85%, 활성 알림 0건.\n- 최근 장애 기록 이후 5초 이상 간격으로 정상 2회 필요.\n- 조회 실패가 끼면 이후의 신규 관측부터 정상 횟수를 다시 셉니다. 동일·과거 관측은 최근 실패를 해소하지 않습니다.\n- 현재 판정은 최근 최대 500건, 아래 이력 표는 최근 최대 100건을 사용합니다.\n- 비교 자료 유효시간 300초, 재발 연관 기간 3600초.\n- 임계값과 2회 정상 기준은 교육용 정책이며 실제 SLO나 운영 복구 기준이 아닙니다.\n- 보고서 열람은 새 모니터링 조회를 수행하지 않습니다. 오래된 자료는 판단 보류합니다.\n- 관측 사이의 상태, 실제 사용자 트랜잭션, 로그 및 장애 원인은 검증하지 않습니다.\n- 조사 이력은 대화·서비스별로 분리합니다. 서비스 재시작·롤백을 실행하지 않습니다.\n",
+    "history_count": 5
+  }
+]

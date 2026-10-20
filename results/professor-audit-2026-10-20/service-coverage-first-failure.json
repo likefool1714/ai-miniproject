@@ -1,0 +1,159 @@
+{
+  "scope": "auth-service model selection rejected safely before dynamic generation schema",
+  "body": {
+    "reply": "## 확인된 모니터링 근거\n검증 보류: 모델 제안을 채택하지 않고 확인된 근거와 참고 절차만 제공합니다.\n- [M1] auth-service: 상태 degraded, CPU 77.6%, 메모리 60.8%, 알림 2건.\n  관측 시각 2026-10-20T10:17:03.528663Z / 관측 ID 2f629f7ac8744510b11f21a73429d5bd / 자료 sample-json-jitter (synthetic)\n  모니터링 알림 원문: p95 latency 2.4s (threshold 1.0s); connection pool 92% used\n\n## 권장 확인·대응 절차 (미실행)\n- [R1] 조회한 런북: high-latency / runbook://incident-response/high-latency\n- [M1 → R1.1] high-latency 런북 원문: get_monitoring_status로 p95 지연시간과 커넥션 풀 사용률을 확인한다.\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### auth-service: 장애 지속\n- 관측: 상태=degraded, CPU 77.6%, 메모리 60.8%, 알림 2건\n- 활성 알림: p95 latency 2.4s (threshold 1.0s), connection pool 92% used\n- 관측 시각: 2026-10-20T10:17:03.528663Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: sample-json-jitter (synthetic) / 관측 2f629f7ac8744510b11f21a73429d5bd\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+    "events": [
+      {
+        "type": "RouteDecided",
+        "route": "incident"
+      },
+      {
+        "type": "PlanCreated",
+        "task_count": 2,
+        "targets": [
+          "auth-service"
+        ]
+      },
+      {
+        "type": "GateApplied",
+        "removed_analysis_tasks": 0
+      },
+      {
+        "type": "TaskCompleted",
+        "id": "task-0",
+        "source": "monitoring",
+        "target": "auth-service",
+        "retries": 0
+      },
+      {
+        "type": "ReplanCheck",
+        "round": 0,
+        "is_sufficient": false,
+        "target": "high-latency"
+      },
+      {
+        "type": "TaskCompleted",
+        "id": "task-gap-high-latency",
+        "source": "runbook",
+        "target": "high-latency",
+        "retries": 0
+      },
+      {
+        "type": "ReplanCheck",
+        "round": 1,
+        "is_sufficient": true,
+        "stop": true,
+        "missing_runbooks": []
+      },
+      {
+        "type": "AnalysisCompleted",
+        "length": 9
+      },
+      {
+        "type": "RecoveryAssessed",
+        "target": "auth-service",
+        "phase": "ongoing",
+        "label": "장애 지속",
+        "recurrence": false,
+        "observation_id": 120
+      },
+      {
+        "type": "DraftWritten",
+        "attempt": 1,
+        "length": 416
+      },
+      {
+        "type": "Validation",
+        "attempt": 1,
+        "verdict": "불합격",
+        "errors": [
+          "unsupported_hypothesis"
+        ]
+      },
+      {
+        "type": "DraftWritten",
+        "attempt": 2,
+        "length": 416
+      },
+      {
+        "type": "Validation",
+        "attempt": 2,
+        "verdict": "보류",
+        "errors": [
+          "unsupported_hypothesis"
+        ]
+      },
+      {
+        "type": "Finalize",
+        "pipeline": "incident-v2"
+      }
+    ],
+    "metadata": {
+      "route": "incident",
+      "task_count": 3,
+      "gate_removed": 0,
+      "replan_rounds": 1,
+      "retry_count": 0,
+      "parallel_elapsed": 0.35,
+      "validation_attempts": 2,
+      "validation_status": "fallback",
+      "validation_errors": [
+        "unsupported_hypothesis"
+      ],
+      "cost_usd": 0.012041,
+      "llm_backend": "ollama",
+      "supervisor_version": "v2",
+      "instance_id": 4501599968,
+      "langsmith_run_id": null,
+      "recovery_action": "legacy",
+      "recovery_results": [
+        {
+          "id": 120,
+          "snapshot": {
+            "system_name": "auth-service",
+            "status": "degraded",
+            "cpu_percent": 77.6,
+            "memory_percent": 60.8,
+            "last_checked": "2026-10-20T10:17:03.528663Z",
+            "alerts": [
+              "p95 latency 2.4s (threshold 1.0s)",
+              "connection pool 92% used"
+            ],
+            "sample_id": "2f629f7ac8744510b11f21a73429d5bd",
+            "data_source": "sample-json-jitter (synthetic)"
+          },
+          "assessment": {
+            "phase": "ongoing",
+            "recurrence": false,
+            "normal_streak": 0,
+            "comparison": null,
+            "reasons": [
+              "서비스 상태 degraded",
+              "활성 알림 2건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "policy": {
+              "cpu_limit": 80.0,
+              "memory_limit": 85.0,
+              "freshness_seconds": 300,
+              "required_normal_samples": 2,
+              "minimum_interval_seconds": 5,
+              "recurrence_window_seconds": 3600,
+              "future_tolerance_seconds": 5
+            },
+            "sample_id": "2f629f7ac8744510b11f21a73429d5bd",
+            "issues": [
+              "서비스 상태 degraded",
+              "활성 알림 2건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "observation_usable": true
+          },
+          "duplicate": false,
+          "usable": true
+        }
+      ],
+      "reports": []
+    }
+  }
+}

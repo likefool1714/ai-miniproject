@@ -89,7 +89,8 @@ def freshness_problem(sample: Observation, now: datetime, policy: RecoveryPolicy
     return None
 
 
-def assess(rows: list[dict], policy: RecoveryPolicy, now: datetime) -> dict:
+def assess(rows: list[dict], policy: RecoveryPolicy, now: datetime,
+           continuity_after_id: int | None = None) -> dict:
     """rows는 오래된 순서의 {snapshot, assessment?}. 같은 관측은 한 번만 센다.
 
     정상 2회는 실제 복구 증명이 아니라 이 데모의 운영 정책이다. 정상 관측 사이에
@@ -107,14 +108,20 @@ def assess(rows: list[dict], policy: RecoveryPolicy, now: datetime) -> dict:
     if problem:
         result["reasons"] = [problem]
         return result
-    if len(samples) > 1 and current.last_checked <= samples[-2].last_checked:
+    if rows[-1].get("assessment", {}).get("observation_usable") is False:
+        result["reasons"] = ["최근 관측의 검증에 실패했습니다. 새 관측이 필요합니다."]
+        return result
+    last_usable = next((s for r, s in reversed(list(zip(rows[:-1], samples[:-1])))
+                        if r.get("assessment", {}).get("observation_usable", True)
+                        and not freshness_problem(s, now, policy)), None)
+    if last_usable and current.last_checked <= last_usable.last_checked:
         result["reasons"] = ["관측 시각이 이전 기록보다 늦지 않아 순서대로 비교할 수 없습니다."]
         return result
 
     current_issues = issues(current, policy)
     result["issues"] = current_issues
     previous = samples[-2] if len(samples) > 1 else None
-    if previous and not freshness_problem(previous, now, policy):
+    if previous and rows[-2].get("assessment", {}).get("observation_usable", True) and not freshness_problem(previous, now, policy):
         cpu = round(current.cpu_percent - previous.cpu_percent, 2)
         memory = round(current.memory_percent - previous.memory_percent, 2)
         added = sorted(set(current.alerts) - set(previous.alerts))
@@ -134,27 +141,37 @@ def assess(rows: list[dict], policy: RecoveryPolicy, now: datetime) -> dict:
     recent = []
     seen_ids = set()
     last_time = None
-    for sample in reversed(samples):
+    for row, sample in reversed(list(zip(rows, samples))):
         if sample.system_name != current.system_name or freshness_problem(sample, now, policy):
+            break
+        if row.get("assessment", {}).get("observation_usable") is False:
             break
         if last_time is not None and sample.last_checked >= last_time:
             break
         if sample.sample_id in seen_ids:
             continue
-        recent.append(sample)
+        recent.append((sample, row.get("id")))
         seen_ids.add(sample.sample_id)
         last_time = sample.last_checked
 
     normal_streak = 0
     last_counted = None
-    for sample in recent:
+    for sample, row_id in recent:
+        if continuity_after_id is not None and row_id is not None and row_id <= continuity_after_id:
+            break
         if issues(sample, policy):
             break
         if last_counted is None or (last_counted - sample.last_checked).total_seconds() >= policy.minimum_interval_seconds:
             normal_streak += 1
             last_counted = sample.last_checked
     result["normal_streak"] = normal_streak
-    had_incident = any(issues(s, policy) for s in recent[1:])
+    # 자료 공백 이전의 유효한 장애 이력은 보존하되 정상 횟수는 공백 뒤부터 다시 센다.
+    had_incident = any(
+        s.system_name == current.system_name and s.last_checked < current.last_checked
+        and not freshness_problem(s, now, policy)
+        and r.get("assessment", {}).get("observation_usable", True)
+        and issues(s, policy)
+        for r, s in zip(rows[:-1], samples[:-1]))
     if not current_issues:
         if not had_incident:
             result["reasons"] = ["현재 정상 기준은 충족하지만 최근 장애 기록이 없어 복구 여부를 확정하지 않습니다."]
@@ -177,6 +194,8 @@ def assess(rows: list[dict], policy: RecoveryPolicy, now: datetime) -> dict:
         result["reasons"].append("이전 조사 기록이 없어 변화량을 비교할 수 없습니다.")
     elif result["comparison"] is None:
         result["reasons"].append("이전 자료가 오래됐거나 미확인 상태여서 변화량 비교를 보류합니다.")
+    if continuity_after_id is not None:
+        result["reasons"].append("마지막 조회 실패 이전의 정상 관측은 연속 횟수에 포함하지 않습니다.")
     return result
 
 

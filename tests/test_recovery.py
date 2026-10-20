@@ -11,6 +11,70 @@ from agent.recovery_store import RecoveryStore
 
 
 class RecoveryTests(unittest.TestCase):
+    def test_failed_lookup_breaks_normal_streak_and_survives_restart(self):
+        self.record(status="degraded", cpu=95)
+        self.record()
+        self.store.failed("thread-a", "payments-service", "connection failed")
+        self.store.close()
+        self.store = RecoveryStore(self.path, self.policy, clock=lambda: self.now)
+        first = self.record()["assessment"]
+        self.assertEqual(first["phase"], "partial")
+        self.assertEqual(first["normal_streak"], 1)
+        self.assertEqual(self.record()["assessment"]["phase"], "recovered")
+
+    def test_duplicate_after_failed_recheck_cannot_clear_failure(self):
+        self.record(status="degraded", cpu=95)
+        self.record()
+        recovered = self.record()
+        self.store.failed("thread-a", "payments-service", "connection failed")
+        duplicate = self.store.record("thread-a", recovered["snapshot"])
+        self.assertEqual(duplicate["assessment"]["phase"], "hold")
+        self.assertFalse(duplicate["usable"])
+        self.assertIn("최근 재점검 실패", self.store.report("thread-a", "payments-service"))
+        self.assertEqual(self.record()["assessment"]["phase"], "partial")
+        self.assertEqual(self.record()["assessment"]["phase"], "recovered")
+
+    def test_replaying_original_after_id_conflict_does_not_resolve_conflict(self):
+        self.record(status="degraded", cpu=95)
+        self.record()
+        recovered = self.record()
+        self.store.record("thread-a", {**recovered["snapshot"], "cpu_percent": 99})
+        original = self.store.record("thread-a", recovered["snapshot"])
+        self.assertEqual(original["assessment"]["phase"], "hold")
+        self.assertIn("판단 보류", self.store.report("thread-a", "payments-service"))
+
+    def test_older_known_id_does_not_masquerade_as_a_current_success(self):
+        bad = self.record(status="degraded", cpu=95)
+        self.record()
+        self.record()
+        replay = self.store.record("thread-a", bad["snapshot"])
+        self.assertEqual(replay["assessment"]["phase"], "hold")
+        self.assertFalse(replay["usable"])
+        self.assertIn("과거 관측 ID", " ".join(replay["assessment"]["reasons"]))
+
+    def test_report_uses_same_500_record_verdict_window_as_live_assessment(self):
+        self.record(status="degraded", cpu=95)
+        for _ in range(130):
+            self.now += timedelta(seconds=1)
+            current = self.store.record("thread-a", self.payload())
+        self.assertEqual(current["assessment"]["phase"], "recovered")
+        report = self.store.report("thread-a", "payments-service")
+        self.assertIn("### payments-service: 복구 확인", report)
+        self.assertIn("현재 100건", report)
+        # 저장 직전 500건에 새 관측을 더해 501건을 판정하는 실수도 방지한다.
+        for _ in range(371):
+            self.now += timedelta(seconds=0.1)
+            current = self.store.record("thread-a", self.payload())
+        self.assertEqual(current["assessment"]["phase"], "hold")
+        self.assertIn("### payments-service: 판단 보류", self.store.report("thread-a", "payments-service"))
+
+    def test_invalid_future_sample_does_not_poison_subsequent_new_observations(self):
+        self.record(status="degraded", cpu=95)
+        invalid = self.store.record("thread-a", self.payload(last_checked=(self.now + timedelta(days=1)).isoformat()))
+        self.assertEqual(invalid["assessment"]["phase"], "hold")
+        self.assertEqual(self.record()["assessment"]["phase"], "partial")
+        self.assertEqual(self.record()["assessment"]["phase"], "recovered")
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.now = datetime(2026, 10, 20, 6, 0, tzinfo=timezone.utc)

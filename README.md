@@ -5,7 +5,7 @@
 - 선택 과제: **1번 — 제공 Base AI Agent 기능 개선/추가**
 - 저장소: https://github.com/likefool1714/ai-miniproject (Public)
 - 진행 계획 초안 제출: **2026-10-20 17:00 KST**
-- 현재: 등록한 개선·추가 기능 구현, 근거 검증 보완, 단위·로컬 MCP/HTTP 검사 48개 통과. 복구 비교와 일반 진단 재검증 기록 공개.
+- 현재: 등록한 개선·추가 기능 구현, 근거·조회 실패 이후 연속성 보완, 단위·로컬 MCP/HTTP 검사 57개 통과. 별도 정상 조건 조합 392개 일치.
 - PDF·PPT: 이전 PPT 초안을 보존하고, 전체 검증이 끝난 뒤 최종본을 한 번 갱신합니다.
 - 제공 API / LangSmith: 로컬 키가 없어 실제 연결은 미검증.
 
@@ -31,6 +31,8 @@ CPU가 95%에서 55%로 내려가도 메모리·알림이 남아 있거나 정�
 
 같은 관측 ID는 정상 횟수에 다시 추가하지 않습니다. 같은 ID의 내용 충돌·최근 재점검 실패는 보고서에서도 판단 보류합니다.
 이력과 보고서 조회는 새 모니터링을 실행하지 않습니다.
+조회 실패가 끼면 이후의 새 관측부터 정상 횟수를 다시 셉니다. 예전 ID의 재전송으로 최근 실패를 해소하지 않습니다.
+실시간·보고서 현재 판정은 모두 최근 최대 500건을 사용하고, 보고서 이력 표는 최근 100건만 표시합니다.
 
 ## 처리 흐름
 
@@ -109,7 +111,8 @@ MONITORING_SCENARIO=recovery-demo SESSION_DB_PATH=recovery-demo.db \
 
 ## 검사·전후 비교
 
-- **48개 검사 통과**: 기존 복구 검사와 근거 없는 초안 차단, 다른 서비스 근거 혼용, 재작성 상한, 부분 조회 실패, 생성 중 자료 만료, null 모델 응답·잘못된 분석 입력, JSON 요청 계약 검사.
+- **57개 검사 통과**: 기존 복구·근거 검사와 실패 뒤 정상 횟수 재시작, 과거 ID 재전송·내용 충돌, 재시작 후 실패 경계 유지, 보고서 100/500건 경계 검사.
+- 공개 정상 조건과 CPU·메모리·상태·알림을 바꾼 **392개 조합이 일치**했습니다. 실제 장애 정답률이 아닙니다.
 - 제공 API 요청 계약 검사는 모의 HTTP이며, 유효 키를 사용하는 실제 API 호출과 구분합니다.
 - 실제 브라우저에서 5단계 변화·이력·보고서 다운로드 확인.
 - 원본 `d1043ff`와 현재 그래프에 같은 질문·고정 관측·고정 시계를 주입해 비교.
@@ -130,7 +133,7 @@ MONITORING_SCENARIO=recovery-demo SESSION_DB_PATH=recovery-demo.db \
 
 일반 진단도 별도로 재검증했습니다. 같은 CPU 89.5% 입력의 작성 단계 비교에서는 개선 후 3/3건이 근거 검증을 통과하고 `>90%` 조건 불충족을 표시했습니다.
 실제 웹·Ollama의 첫 일반 진단과 후속 복구 흐름을 세 번 실행해 15개 상태 판정을 확인했습니다.
-첫 일반 진단 중앙값은 약 15.64초이며, 빠른 후속 복구 경로 시간과 구분합니다.
+최신 재검증의 첫 일반 진단 중앙값은 약 15.33초이며, 빠른 후속 복구 경로 시간과 구분합니다.
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
@@ -140,7 +143,7 @@ MONITORING_SCENARIO=recovery-demo SESSION_DB_PATH=recovery-demo.db \
 .venv/bin/python -m eval.probe_grounding web --repeat 3
 ```
 
-[일반 진단·근거 검증 재점검](docs/GROUNDING_VALIDATION.md) · [복구 기능 검증](docs/RECOVERY_VALIDATION.md) · [원본 검증](docs/BASELINE_VALIDATION.md)
+[발표 대비 최신 재검증](docs/PROFESSOR_AUDIT.md) · [쉬운 코드 설명·예상 질문](docs/DEFENSE_GUIDE.md) · [일반 진단·근거 검증](docs/GROUNDING_VALIDATION.md) · [복구 기능 검증](docs/RECOVERY_VALIDATION.md) · [원본 검증](docs/BASELINE_VALIDATION.md)
 
 [기존 PPT 초안 — 최종 검증 후 갱신 예정](output/presentation/AI-Mini-Project_G028_최민석.pptx)
 

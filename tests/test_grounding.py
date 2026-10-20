@@ -7,13 +7,22 @@ from unittest.mock import patch
 import httpx
 
 from agent.grounding import (build_bundle, default_draft, fallback_draft, incident_types,
-                             render_answer, validate_draft)
+                             render_answer, validate_draft, writer_schema)
 from agent.openai_llm import OpenAIQualityLLM
 from agent.ollama_llm import OllamaQualityLLM, OllamaFastLLM
 from agent.recovery import Observation, RecoveryPolicy
 
 
 class GroundingTests(unittest.TestCase):
+    def test_writer_schema_limits_generation_to_current_evidence(self):
+        bundle = self.bundle([self.payload(cpu_percent=40, alerts=["p95 latency high"])])
+        schema = writer_schema(bundle)
+        hypothesis = schema["$defs"]["Hypothesis"]["properties"]
+        recommendation = schema["$defs"]["Recommendation"]["properties"]
+        self.assertEqual(hypothesis["kind"]["enum"], ["latency"])
+        self.assertEqual(hypothesis["evidence_id"]["enum"], ["M1"])
+        self.assertEqual(set(recommendation["step_id"]["enum"]), set(bundle["monitoring"][0]["allowed_step_ids"]))
+
     def setUp(self):
         self.now = datetime(2026, 10, 20, 6, 0, tzinfo=timezone.utc)
         self.policy = RecoveryPolicy()

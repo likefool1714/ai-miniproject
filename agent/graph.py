@@ -242,8 +242,14 @@ async def research_node(state: AgentState, deps: SupervisorDeps) -> dict:
 
 def _bundle(state: AgentState, deps: SupervisorDeps) -> dict:
     store = deps.recovery_store
-    return build_bundle(state.get("collected", []), state.get("resolved_targets", []),
-                        store.policy if store else None, store.clock() if store else None)
+    bundle = build_bundle(state.get("collected", []), state.get("resolved_targets", []),
+                          store.policy if store else None, store.clock() if store else None)
+    rejected = {r["snapshot"]["system_name"]: r["assessment"]["reasons"][0]
+                for r in state.get("recovery_results", []) if r.get("usable") is False}
+    bundle["monitoring"] = [m for m in bundle["monitoring"] if m["snapshot"]["system_name"] not in rejected]
+    already_missing = {m["system_name"] for m in bundle["unavailable"]}
+    bundle["unavailable"] += [{"system_name": s, "reason": reason} for s, reason in rejected.items() if s not in already_missing]
+    return bundle
 
 
 @traceable(name="replan_check_node")

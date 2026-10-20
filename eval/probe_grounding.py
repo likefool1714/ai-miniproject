@@ -163,7 +163,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=["writer", "web"])
     parser.add_argument("--repeat", type=int, default=3)
+    parser.add_argument("--output", default="results/grounding-2026-10-20")
     args = parser.parse_args()
+    OUT = ROOT / args.output
     assert 1 <= args.repeat <= 10
     save(f"{args.mode}-summary.json", {"status": "running", "started_at": datetime.now(timezone.utc).isoformat()})
     try:

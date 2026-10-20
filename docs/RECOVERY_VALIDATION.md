@@ -2,7 +2,7 @@
 
 검증일: 2026-10-20 KST. 등록 범위는 상태 비교·복구 확인·이력·재발·Markdown 보고서다.
 기존 원본 18회 검증은 BASELINE_VALIDATION.md에 별도로 보존한다.
-아래는 복구 기능 구현 당시의 검사 기록이다. 최신 48개 검사와 일반 진단 보완 결과는 [근거 검증 재점검](GROUNDING_VALIDATION.md)을 참고한다.
+아래는 복구 기능 구현 당시 기록이다. 일반 진단 보완은 [근거 검증](GROUNDING_VALIDATION.md), 최신 경계 검사는 [발표 대비 재검증](PROFESSOR_AUDIT.md)을 참고한다.
 
 ## 1. 단위·API 검사
 

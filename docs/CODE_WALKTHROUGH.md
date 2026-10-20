@@ -22,6 +22,7 @@ route → plan → gate → research → replan_check → analysis → record_ob
 grounding.build_bundle은 유효한 모니터링과 실제 읽은 런북을 M1/R1/R1.1 등의 ID로 정리한다.
 모델이 생성한 analysis는 일차 근거로 사용하지 않는다.
 quality_llm.write_grounded는 Pydantic 구조의 분류·근거 ID·런북 단계 ID를 제안한다.
+입력별 writer_schema가 실제 존재하는 ID와 허용 분류로 생성 범위를 좁힌다. 서비스 간 연결 오류는 Validator가 추가로 검사한다.
 validate_draft는 스키마, 실제 출처, 서비스별 증상·런북 적용 가능성, 누락·중복을 검사한다.
 실패하면 한 번만 재작성한다. 다시 실패하면 원인 가설을 채택하지 않고 검증 보류로 전환한다.
 일부 서비스 자료·런북이 없으면 부분 검증으로 표시한다.
@@ -45,6 +46,8 @@ RecoveryStore.record는 최근 이력과 정책·시계를 순수 함수 assess�
 
 (thread_id, system_name, sample_id)로 중복을 막고 관측과 당시 판정을 함께 저장한다.
 정책 판정은 최근 최대 500건을 읽는다. 새 관측/실패는 보고서에도 반영된다.
+조회 실패 시 관측 ID의 경계를 저장하고 이후의 새 정상 관측부터 횟수를 다시 센다. 예전 ID 재전송은 최근 실패를 해소하지 않는다.
+실시간과 보고서의 판정 범위는 모두 500건이며, 보고서 표만 100건으로 제한한다.
 SQLite 대상 상태와 이력은 재개방 후 유지된다.
 
 ## 이력·보고서

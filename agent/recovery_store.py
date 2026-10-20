@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from threading import RLock
 
-from .recovery import Observation, RecoveryPolicy, assess, render_assessment, utc_now
+from .recovery import Observation, RecoveryPolicy, assess, freshness_problem, render_assessment, utc_now
 
 
 class RecoveryStore:
@@ -34,6 +34,15 @@ class RecoveryStore:
                 thread_id TEXT, system_name TEXT, reason TEXT, checked_at TEXT,
                 PRIMARY KEY(thread_id, system_name)
             );
+            CREATE TABLE IF NOT EXISTS recovery_continuity (
+                thread_id TEXT, system_name TEXT, after_id INTEGER NOT NULL, reason TEXT,
+                PRIMARY KEY(thread_id, system_name)
+            );
+            INSERT OR IGNORE INTO recovery_continuity
+            SELECT f.thread_id, f.system_name, COALESCE(MAX(o.id), 0), f.reason
+            FROM recovery_failures f LEFT JOIN recovery_observations o
+              ON o.thread_id=f.thread_id AND o.system_name=f.system_name
+            GROUP BY f.thread_id, f.system_name;
         """)
         self.conn.commit()
 
@@ -75,37 +84,70 @@ class RecoveryStore:
             if duplicate:
                 if json.loads(duplicate["snapshot"]) != snapshot:
                     reason = "동일 관측 ID의 내용이 달라 복구 판단을 보류합니다."
-                    self.failed(thread_id, sample.system_name, reason)
+                    self._mark_failed(thread_id, sample.system_name, reason)
                     return {"id": duplicate["id"], "snapshot": snapshot,
                             "assessment": {"phase": "hold", "recurrence": False, "normal_streak": 0,
                                            "comparison": None, "reasons": [reason], "policy": self.policy.model_dump()},
-                            "duplicate": True}
+                            "duplicate": True, "usable": False}
                 # 동일 관측은 횟수를 늘리지 않고 최신 이력의 신선도만 재평가한다.
-                result = assess(rows, self.policy, now)
+                if duplicate["id"] != rows[-1]["id"]:
+                    self._mark_failed(thread_id, sample.system_name,
+                                      "과거 관측 ID가 다시 반환되어 최신 상태를 확인하지 못했습니다.")
+                result = self._assess(thread_id, sample.system_name, rows, now)
                 result["reasons"].append("동일 관측 재조회는 정상 관측 횟수에 추가하지 않습니다.")
-                self.conn.execute("DELETE FROM recovery_failures WHERE thread_id=? AND system_name=?", (thread_id, sample.system_name))
-                return {"id": rows[-1]["id"], "snapshot": rows[-1]["snapshot"], "assessment": result, "duplicate": True}
-            result = assess(rows + [{"snapshot": snapshot}], self.policy, now)
+                failure = self.conn.execute("SELECT reason FROM recovery_failures WHERE thread_id=? AND system_name=?",
+                                            (thread_id, sample.system_name)).fetchone()
+                if failure:
+                    result.update(phase="hold", recurrence=False,
+                                  reasons=[failure[0], "동일·과거 관측 재조회로 최근 실패를 해소하지 않습니다. 새 관측이 필요합니다."])
+                usable = not failure and not freshness_problem(Observation.from_payload(rows[-1]["snapshot"]), now, self.policy)
+                return {"id": rows[-1]["id"], "snapshot": rows[-1]["snapshot"], "assessment": result,
+                        "duplicate": True, "usable": bool(usable)}
+            problem = freshness_problem(sample, now, self.policy)
+            last_usable = next((r for r in reversed(rows) if r["assessment"].get("observation_usable", True)
+                                and not freshness_problem(Observation.from_payload(r["snapshot"]), now, self.policy)), None)
+            if last_usable and sample.last_checked <= Observation.from_payload(last_usable["snapshot"]).last_checked:
+                problem = "관측 시각이 이전 기록보다 늦지 않아 최신 상태를 확인하지 못했습니다."
+            result = self._assess(thread_id, sample.system_name, (rows + [{"snapshot": snapshot}])[-500:], now)
+            result["observation_usable"] = not bool(problem)
             cursor = self.conn.execute(
                 "INSERT INTO recovery_observations(thread_id,system_name,sample_id,snapshot,assessment,recorded_at) VALUES (?,?,?,?,?,?)",
                 (thread_id, sample.system_name, sample.sample_id,
                  json.dumps(snapshot, ensure_ascii=False), json.dumps(result, ensure_ascii=False), now.isoformat()),
             )
-            self.conn.execute("DELETE FROM recovery_failures WHERE thread_id=? AND system_name=?", (thread_id, sample.system_name))
-            return {"id": cursor.lastrowid, "snapshot": snapshot, "assessment": result, "duplicate": False}
+            if problem:
+                self._mark_failed(thread_id, sample.system_name, problem)
+            else:
+                self.conn.execute("DELETE FROM recovery_failures WHERE thread_id=? AND system_name=?", (thread_id, sample.system_name))
+            return {"id": cursor.lastrowid, "snapshot": snapshot, "assessment": result,
+                    "duplicate": False, "usable": not bool(problem)}
+
+    def _assess(self, thread_id, system_name, rows, now):
+        boundary = self.conn.execute("SELECT after_id FROM recovery_continuity WHERE thread_id=? AND system_name=?",
+                                     (thread_id, system_name)).fetchone()
+        return assess(rows, self.policy, now, continuity_after_id=boundary[0] if boundary else None)
+
+    def _mark_failed(self, thread_id, system_name, reason):
+        # 호출자는 잠금과 트랜잭션을 소유한다. 실패 시점의 마지막 관측 ID를 경계로 보존한다.
+        self.conn.execute("INSERT INTO recovery_failures VALUES (?,?,?,?) ON CONFLICT(thread_id,system_name) DO UPDATE SET reason=excluded.reason, checked_at=excluded.checked_at",
+                          (thread_id, system_name, reason, self.clock().isoformat()))
+        boundary = self.conn.execute("SELECT COALESCE(MAX(id),0) FROM recovery_observations WHERE thread_id=? AND system_name=?",
+                                     (thread_id, system_name)).fetchone()[0]
+        self.conn.execute("INSERT INTO recovery_continuity VALUES (?,?,?,?) ON CONFLICT(thread_id,system_name) DO UPDATE SET after_id=excluded.after_id, reason=excluded.reason",
+                          (thread_id, system_name, boundary, reason))
 
     def failed(self, thread_id: str, system_name: str, reason: str):
         with self._lock, self.conn:
-            self.conn.execute("INSERT INTO recovery_failures VALUES (?,?,?,?) ON CONFLICT(thread_id,system_name) DO UPDATE SET reason=excluded.reason, checked_at=excluded.checked_at",
-                              (thread_id, system_name, reason, self.clock().isoformat()))
+            self._mark_failed(thread_id, system_name, reason)
 
     def report(self, thread_id: str, system_name: str) -> str | None:
-        rows = self.history(thread_id, system_name, 100)
-        if not rows:
-            return None
-        latest = rows[-1]
-        current_assessment = assess(rows, self.policy, self.clock())
         with self._lock:
+            full_history = self.history(thread_id, system_name, 500)
+            if not full_history:
+                return None
+            rows = full_history[-100:]
+            latest = rows[-1]
+            current_assessment = self._assess(thread_id, system_name, full_history, self.clock())
             failure = self.conn.execute("SELECT reason,checked_at FROM recovery_failures WHERE thread_id=? AND system_name=?", (thread_id, system_name)).fetchone()
         if failure:
             current_assessment.update(phase="hold", recurrence=False, reasons=[f"최근 재점검 실패 ({failure['checked_at']}): {failure['reason']}", "아래 관측은 마지막 성공 조회의 참고 자료입니다."])
@@ -125,8 +167,10 @@ class RecoveryStore:
         lines += ["", "## 판정 정책과 한계", "",
                   f"- 정상 조건: status=healthy, CPU < {policy.cpu_limit:g}%, 메모리 < {policy.memory_limit:g}%, 활성 알림 0건.",
                   f"- 최근 장애 기록 이후 {policy.minimum_interval_seconds}초 이상 간격으로 정상 {policy.required_normal_samples}회 필요.",
+                  "- 조회 실패가 끼면 이후의 신규 관측부터 정상 횟수를 다시 셉니다. 동일·과거 관측은 최근 실패를 해소하지 않습니다.",
+                  "- 현재 판정은 최근 최대 500건, 아래 이력 표는 최근 최대 100건을 사용합니다.",
                   f"- 비교 자료 유효시간 {policy.freshness_seconds}초, 재발 연관 기간 {policy.recurrence_window_seconds}초.",
-                  "- 임계값과 2회 정상 기준은 교육용 정책이며 실제 SLO나 운영 복구 기준이 아닙니다.",
+                  f"- 임계값과 {policy.required_normal_samples}회 정상 기준은 교육용 정책이며 실제 SLO나 운영 복구 기준이 아닙니다.",
                   "- 보고서 열람은 새 모니터링 조회를 수행하지 않습니다. 오래된 자료는 판단 보류합니다.",
                   "- 관측 사이의 상태, 실제 사용자 트랜잭션, 로그 및 장애 원인은 검증하지 않습니다.",
                   "- 조사 이력은 대화·서비스별로 분리합니다. 서비스 재시작·롤백을 실행하지 않습니다."]

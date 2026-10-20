@@ -1,0 +1,17 @@
+{
+  "failure_between_normal_samples": {
+    "expected": "not recovered until two successful samples after failure",
+    "actual": "recovered",
+    "normal_streak": 2
+  },
+  "failed_recheck_then_duplicate_old_normal": {
+    "expected": "hold; old duplicate cannot resolve failed recheck",
+    "actual": "recovered",
+    "report_contains_failure": false
+  },
+  "more_than_100_fresh_observations": {
+    "api_phase": "recovered",
+    "report_current_heading": "### payments-service: 판단 보류",
+    "expected": "same current verdict with the same policy/clock"
+  }
+}

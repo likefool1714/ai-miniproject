@@ -263,6 +263,42 @@ class RecoveryAPITests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["metadata"]["validation_status"], "validated")
         self.assertTrue([e for e in result["events"] if e["type"] == "AnalysisSkipped" and "모델 분석 실패" in e["reason"]])
 
+    async def test_failure_then_duplicate_stays_held_until_two_new_normal_observations(self):
+        for _ in range(4):
+            recovered = await self.chat("payments-service 복구 재점검")
+        self.assertEqual(recovered["metadata"]["recovery_results"][0]["assessment"]["phase"], "recovered")
+        deps = server.app.state.deps
+        snapshot = recovered["metadata"]["recovery_results"][0]["snapshot"]
+        with patch.object(deps.mcp, "call_tool", side_effect=ValueError("injected lookup failure")):
+            self.assertIn("판단 보류", (await self.chat("다시 확인해줘"))["reply"])
+        async def duplicate(*args, **kw):
+            return snapshot
+        with patch.object(deps.mcp, "call_tool", duplicate):
+            replay = await self.chat("다시 확인해줘")
+        self.assertEqual(replay["metadata"]["recovery_results"][0]["assessment"]["phase"], "hold")
+        report = await self.chat("보고서 내보내기")
+        self.assertIn("최근 재점검 실패", report["reply"])
+        now = deps.recovery_store.clock()
+        for index, expected in [(1, "partial"), (2, "recovered")]:
+            moment = now + timedelta(seconds=index * 10)
+            deps.recovery_store.clock = lambda: moment
+            async def fresh(*args, **kw):
+                return {**snapshot, "sample_id": f"fresh-after-failure-{index}", "last_checked": moment.isoformat()}
+            with patch.object(deps.mcp, "call_tool", fresh):
+                result = await self.chat("다시 확인해줘")
+            self.assertEqual(result["metadata"]["recovery_results"][0]["assessment"]["phase"], expected)
+
+    async def test_id_conflict_is_not_used_as_grounded_diagnosis_evidence(self):
+        initial = await self.chat("payments-service 복구 재점검")
+        snapshot = initial["metadata"]["recovery_results"][0]["snapshot"]
+        async def conflict(*args, **kw):
+            return {**snapshot, "cpu_percent": 12.345}
+        with patch.object(server.app.state.deps.mcp, "call_tool", conflict):
+            result = await self.chat("payments-service 장애 진단")
+        self.assertEqual(result["metadata"]["validation_status"], "fallback")
+        self.assertNotIn("CPU 12.345%", result["reply"])
+        self.assertIn("동일 관측 ID", result["reply"])
+
 
 if __name__ == "__main__":
     unittest.main()

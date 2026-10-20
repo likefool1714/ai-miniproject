@@ -1,0 +1,6 @@
+{
+  "status": "failed",
+  "scope": "actual Ollama + HTTP + MCP; synthetic sample-json-jitter data",
+  "records": [],
+  "error": "AssertionError: {'reply': '## 확인된 모니터링 근거\\n검증 보류: 모델 제안을 채택하지 않고 확인된 근거와 참고 절차만 제공합니다.\\n- [M1] auth-service: 상태 degraded, CPU 77.6%, 메모리 60.8%, 알림 2건.\\n  관측 시각 2026-10-20T10:17:03.528663Z / 관측 ID 2f629f7ac8744510b11f21a73429d5bd / 자료 sample-json-jitter (synthetic)\\n  모니터링 알림 원문: p95 latency 2.4s (threshold 1.0s); c"
+}

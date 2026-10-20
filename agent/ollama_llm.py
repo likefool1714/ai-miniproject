@@ -245,10 +245,10 @@ class OllamaQualityLLM(OllamaLLM):
 
     @traceable(run_type="llm", name="ollama_quality.write_grounded")
     async def write_grounded(self, query: str, bundle: dict, feedback=None):
-        from .grounding import WriterDraft, writer_prompt
+        from .grounding import writer_schema, writer_prompt
         system, user = writer_prompt(query, bundle, feedback)
         # 검증 전 토큰은 사용자에게 전달하지 않는다.
-        return await self._chat_stream(system, user, schema=WriterDraft.model_json_schema())
+        return await self._chat_stream(system, user, schema=writer_schema(bundle))
 
     @traceable(run_type="llm", name="ollama_quality.write")
     async def write(self, query: str, collected: list[dict], attempt: int,

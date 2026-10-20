@@ -161,13 +161,33 @@ def default_draft(bundle: dict) -> WriterDraft:
                        recommendations=fallback_draft(bundle).recommendations)
 
 
+def writer_schema(bundle: dict) -> dict:
+    """입력마다 실제 존재하는 ID·분류로 생성 범위를 좁힌다. 서비스별 연결은 별도 검증한다."""
+    schema = WriterDraft.model_json_schema()
+    if not bundle["monitoring"]:
+        return schema
+    sources = sorted({m["id"] for m in bundle["monitoring"]})
+    kinds = sorted({kind for m in bundle["monitoring"] for kind in m["allowed_kinds"]})
+    steps = sorted({step for m in bundle["monitoring"] for step in m["allowed_step_ids"]})
+    hypotheses = schema["$defs"]["Hypothesis"]["properties"]
+    recommendations = schema["$defs"]["Recommendation"]["properties"]
+    hypotheses["kind"]["enum"] = kinds
+    for field in (hypotheses["evidence_id"], recommendations["evidence_id"]):
+        field.pop("pattern", None)
+        field["enum"] = sources
+    if steps:
+        recommendations["step_id"].pop("pattern", None)
+        recommendations["step_id"]["enum"] = steps
+    return schema
+
+
 def writer_prompt(query: str, bundle: dict, feedback=None) -> tuple[str, str]:
     system = (
         "당신은 운영 진단 제안 선택기입니다. JSON 객체만 반환하세요. 자유 문장과 수치는 쓰지 마세요. "
         "각 monitoring의 id마다 hypotheses에 evidence_id와 allowed_kinds 중 kind를 하나 선택하세요. "
         "allowed_step_ids가 있으면 recommendations에 evidence_id와 해당 step_id를 하나 이상 선택하세요. "
         "서비스별 허용 목록을 지키세요. 이 선택은 원인 확정이나 조치 실행을 뜻하지 않습니다. "
-        "스키마: " + json.dumps(WriterDraft.model_json_schema(), ensure_ascii=False))
+        "스키마: " + json.dumps(writer_schema(bundle), ensure_ascii=False))
     user = json.dumps({"query": query, "evidence": bundle, "validation_feedback": feedback}, ensure_ascii=False)
     return system, user
 
