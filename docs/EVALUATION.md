@@ -1,6 +1,6 @@
 # Before/After 평가 설계
 
-현재 평가 실행기와 개선 기능은 미구현이며, 아래 수치는 아직 측정하지 않았습니다.
+개선 기능과 Before/After 비교 실행기는 미구현입니다. 원본 감사용 `eval/probe_*.py` 및 `eval/summarize_baseline.py`를 추가했으며, 실제 원본 검증 결과는 [별도 보고서](BASELINE_VALIDATION.md)에 기록합니다. 아래 Before/After 수치는 아직 측정하지 않았습니다.
 
 ## 기준 고정
 

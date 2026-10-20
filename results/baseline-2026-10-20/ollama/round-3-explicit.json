@@ -1,0 +1,119 @@
+{
+  "case_id": "explicit",
+  "round": 3,
+  "message": "payments-service 결제 응답이 느려지고 CPU가 치솟았어요, 원인 확인해주세요",
+  "timestamp": "2026-10-20T02:10:41.897203+00:00",
+  "expected": {
+    "route": "incident",
+    "targets": [
+      "payments-service"
+    ],
+    "runbook": "cpu-spike"
+  },
+  "thread_id": "baseline-020350-3-explicit",
+  "events": [
+    {
+      "type": "RouteDecided",
+      "route": "incident",
+      "node": "route",
+      "received_after_s": 1.66
+    },
+    {
+      "type": "PlanCreated",
+      "task_count": 2,
+      "targets": [
+        "payments-service"
+      ],
+      "node": "plan",
+      "received_after_s": 3.744
+    },
+    {
+      "type": "GateApplied",
+      "removed_analysis_tasks": 0,
+      "node": "gate",
+      "received_after_s": 3.745
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-0",
+      "source": "monitoring",
+      "target": "payments-service",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 4.108
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 0,
+      "is_sufficient": false,
+      "gap_task": "task-gap-runbook",
+      "target": "cpu-spike",
+      "node": "replan_check",
+      "received_after_s": 4.109
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-gap-runbook",
+      "source": "runbook",
+      "target": "cpu-spike",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 4.47
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 1,
+      "is_sufficient": true,
+      "node": "replan_check",
+      "received_after_s": 4.471
+    },
+    {
+      "type": "AnalysisCompleted",
+      "length": 9,
+      "node": "analysis",
+      "received_after_s": 5.998
+    },
+    {
+      "type": "DraftWritten",
+      "attempt": 1,
+      "length": 278,
+      "node": "write",
+      "received_after_s": 35.413
+    },
+    {
+      "type": "Validation",
+      "attempt": 1,
+      "verdict": "합격",
+      "node": "validate",
+      "received_after_s": 35.421
+    },
+    {
+      "type": "Finalize",
+      "pipeline": "incident-v2",
+      "node": "finalize",
+      "received_after_s": 35.422
+    }
+  ],
+  "completed": true,
+  "http_status": 200,
+  "reply": "1) 모니터링 상태 확인: payments-service CPU 사용률 96.5% (경계 80% 초과), 메모리 57.8% 사용 중. 알림 2건 발생('CPU 91% 경계 초과', 'payments-service-3 인스턴스 응답 지연').  \n2) 특정 요청 패턴 확인: 로그 분석 결과 특이 패턴 없음.  \n3) 인스턴스 확장 및 분산: CPU 90% 이상 지속 시 오토스케일링 그룹에 추가 인스턴스 1대 배치하여 부하 분산. 정상화 후 프로파일링 통해 핫스팟 코드 식별 및 최적화 작업 등록.",
+  "final_prompt": "[SYSTEM]\n당신은 ICT 운영 보고 작성자다. 수집된 사실만 사용해 한국어로 간결한 대응 보고를 작성하라. 반드시 '1) ... 2) ... 3) ...' 형식의 번호 절차로 답하고, 수치는 수집된 값을 그대로 인용하라.\n\n[USER]\n## 사용자 요청\npayments-service 결제 응답이 느려지고 CPU가 치솟았어요, 원인 확인해주세요\n\n## 수집된 사실\n- 모니터링 payments-service: 상태=degraded, CPU 96.5%, 메모리 57.8%, 알림 2건 ['CPU 91% (threshold 80%)', 'payments-service-3 instance responding slow']\n- runbook 발췌:\n# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n- 패턴 분석: 특이 패턴 없음.",
+  "elapsed_s": 35.426,
+  "first_answer_token_s": 26.561,
+  "answer_token_events": 164,
+  "observed": {
+    "route": "incident",
+    "targets": [
+      "payments-service"
+    ],
+    "runbooks": [
+      "cpu-spike"
+    ]
+  },
+  "checks": {
+    "stream_completed": true,
+    "expected_route": true,
+    "expected_target_set": true,
+    "expected_runbook": true
+  }
+}

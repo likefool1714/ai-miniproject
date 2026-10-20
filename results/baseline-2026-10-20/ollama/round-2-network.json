@@ -1,0 +1,119 @@
+{
+  "case_id": "network",
+  "round": 2,
+  "message": "gateway-service 요청이 타임아웃 나고 있어요. 원인 진단해주세요",
+  "timestamp": "2026-10-20T02:10:05.207884+00:00",
+  "expected": {
+    "route": "incident",
+    "targets": [
+      "gateway-service"
+    ],
+    "runbook": "network-timeout"
+  },
+  "thread_id": "baseline-020350-2-network",
+  "events": [
+    {
+      "type": "RouteDecided",
+      "route": "incident",
+      "node": "route",
+      "received_after_s": 3.377
+    },
+    {
+      "type": "PlanCreated",
+      "task_count": 2,
+      "targets": [
+        "gateway-service"
+      ],
+      "node": "plan",
+      "received_after_s": 4.697
+    },
+    {
+      "type": "GateApplied",
+      "removed_analysis_tasks": 0,
+      "node": "gate",
+      "received_after_s": 4.697
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-0",
+      "source": "monitoring",
+      "target": "gateway-service",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 5.056
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 0,
+      "is_sufficient": false,
+      "gap_task": "task-gap-runbook",
+      "target": "network-timeout",
+      "node": "replan_check",
+      "received_after_s": 5.057
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-gap-runbook",
+      "source": "runbook",
+      "target": "network-timeout",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 5.42
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 1,
+      "is_sufficient": true,
+      "node": "replan_check",
+      "received_after_s": 5.421
+    },
+    {
+      "type": "AnalysisCompleted",
+      "length": 9,
+      "node": "analysis",
+      "received_after_s": 6.919
+    },
+    {
+      "type": "DraftWritten",
+      "attempt": 1,
+      "length": 416,
+      "node": "write",
+      "received_after_s": 35.407
+    },
+    {
+      "type": "Validation",
+      "attempt": 1,
+      "verdict": "합격",
+      "node": "validate",
+      "received_after_s": 35.411
+    },
+    {
+      "type": "Finalize",
+      "pipeline": "incident-v2",
+      "node": "finalize",
+      "received_after_s": 35.411
+    }
+  ],
+  "completed": true,
+  "http_status": 200,
+  "reply": "1) **상태 점검**: gateway-service 상태가 degraded로 확인됨. CPU 30.4%, 메모리 45.2% 사용 중. 알림 2건 발생: 'upstream timeout to payments-service (504)' 및 'network packet loss 3%'.  \n2) **네트워크/호스팅 점검**: upstream timeout은 payments-service와의 통신 문제로 추정됨. 방화벽/보안그룹 변경, 로드밸런서 헬스체크 실패 등 최근 변경 사항 확인 필요.  \n3) **임시 대응 및 재검토**: network packet loss 3%로 추정되는 네트워크 경로 문제 시, 해당 리전/가용영역 우회 라우팅으로 전환. 타임아웃 임계값 상향 조정(504 에러 발생 시) 후, 헬스체크 주기 및 재시도 정책 재검토.",
+  "final_prompt": "[SYSTEM]\n당신은 ICT 운영 보고 작성자다. 수집된 사실만 사용해 한국어로 간결한 대응 보고를 작성하라. 반드시 '1) ... 2) ... 3) ...' 형식의 번호 절차로 답하고, 수치는 수집된 값을 그대로 인용하라.\n\n[USER]\n## 사용자 요청\ngateway-service 요청이 타임아웃 나고 있어요. 원인 진단해주세요\n\n## 수집된 사실\n- 모니터링 gateway-service: 상태=degraded, CPU 30.4%, 메모리 45.2%, 알림 2건 ['upstream timeout to payments-service (504)', 'network packet loss 3%']\n- runbook 발췌:\n# Runbook: 네트워크 타임아웃 대응 절차\n\n1. get_monitoring_status로 어떤 시스템 간 호출에서 타임아웃이 발생하는지 확인한다.\n2. DNS 해석 실패, 방화벽/보안그룹 변경, 로드밸런서 헬스체크 실패 중 최근 변경 사항이 있었는지 점검한다.\n3. 특정 리전/가용영역에서만 발생하면 해당 구간을 우회하는 라우팅으로 임시 전환한다.\n4. 타임아웃 값이 너무 짧아 정상 응답도 실패로 처리되는 경우라면 임계값을 임시 상향해 2차 피해를 줄인다.\n5. 정상화 후 네트워크 경로 기록을 남기고, 재발 방지를 위해 헬스체크 주기와 재시도 정책을 재검토한다.\n- 패턴 분석: 특이 패턴 없음.",
+  "elapsed_s": 35.414,
+  "first_answer_token_s": 24.621,
+  "answer_token_events": 209,
+  "observed": {
+    "route": "incident",
+    "targets": [
+      "gateway-service"
+    ],
+    "runbooks": [
+      "network-timeout"
+    ]
+  },
+  "checks": {
+    "stream_completed": true,
+    "expected_route": true,
+    "expected_target_set": true,
+    "expected_runbook": true
+  }
+}

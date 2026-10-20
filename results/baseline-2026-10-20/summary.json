@@ -1,0 +1,176 @@
+{
+  "explicit": {
+    "requests": 3,
+    "completed": 3,
+    "expected_route_matches": 3,
+    "expected_target_matches": 3,
+    "observed_targets": [
+      [
+        "payments-service"
+      ],
+      [
+        "payments-service"
+      ],
+      [
+        "payments-service"
+      ]
+    ],
+    "observed_runbooks": [
+      [
+        "cpu-spike"
+      ],
+      [
+        "cpu-spike"
+      ],
+      [
+        "cpu-spike"
+      ]
+    ],
+    "median_s": 32.711,
+    "min_s": 32.506,
+    "max_s": 35.426
+  },
+  "greeting": {
+    "requests": 3,
+    "completed": 3,
+    "expected_route_matches": 3,
+    "expected_target_matches": 3,
+    "observed_targets": [
+      [],
+      [],
+      []
+    ],
+    "observed_runbooks": [
+      [],
+      [],
+      []
+    ],
+    "median_s": 1.273,
+    "min_s": 1.23,
+    "max_s": 8.902
+  },
+  "missing": {
+    "requests": 3,
+    "completed": 3,
+    "expected_route_matches": 3,
+    "expected_target_matches": 0,
+    "observed_targets": [
+      [
+        "auth-service"
+      ],
+      [
+        "auth-service"
+      ],
+      [
+        "auth-service"
+      ]
+    ],
+    "observed_runbooks": [
+      [
+        "high-latency"
+      ],
+      [
+        "high-latency"
+      ],
+      [
+        "high-latency"
+      ]
+    ],
+    "median_s": 32.816,
+    "min_s": 31.814,
+    "max_s": 44.766
+  },
+  "multi": {
+    "requests": 3,
+    "completed": 3,
+    "expected_route_matches": 3,
+    "expected_target_matches": 0,
+    "observed_targets": [
+      [
+        "payments-service"
+      ],
+      [
+        "payments-service"
+      ],
+      [
+        "payments-service"
+      ]
+    ],
+    "observed_runbooks": [
+      [
+        "cpu-spike"
+      ],
+      [
+        "cpu-spike"
+      ],
+      [
+        "cpu-spike"
+      ]
+    ],
+    "median_s": 54.015,
+    "min_s": 50.25,
+    "max_s": 60.16
+  },
+  "network": {
+    "requests": 3,
+    "completed": 3,
+    "expected_route_matches": 3,
+    "expected_target_matches": 3,
+    "observed_targets": [
+      [
+        "gateway-service"
+      ],
+      [
+        "gateway-service"
+      ],
+      [
+        "gateway-service"
+      ]
+    ],
+    "observed_runbooks": [
+      [
+        "network-timeout"
+      ],
+      [
+        "network-timeout"
+      ],
+      [
+        "network-timeout"
+      ]
+    ],
+    "median_s": 36.895,
+    "min_s": 35.414,
+    "max_s": 37.789
+  },
+  "unknown": {
+    "requests": 3,
+    "completed": 3,
+    "expected_route_matches": 3,
+    "expected_target_matches": 0,
+    "observed_targets": [
+      [
+        "auth-service"
+      ],
+      [
+        "auth-service"
+      ],
+      [
+        "auth-service"
+      ]
+    ],
+    "observed_runbooks": [
+      [
+        "high-latency"
+      ],
+      [
+        "high-latency"
+      ],
+      [
+        "high-latency"
+      ]
+    ],
+    "median_s": 39.69,
+    "min_s": 34.815,
+    "max_s": 41.111
+  }
+}

@@ -1,0 +1,83 @@
+[
+  {
+    "round": 1,
+    "single_cpu": "cpu-spike",
+    "single_memory": "memory-leak",
+    "single_network": "network-timeout",
+    "mixed_cpu_memory": "cpu-spike",
+    "healthy_no_alerts": "db-down",
+    "korean_cpu": "db-down",
+    "unknown_normalized_targets": [
+      "auth-service"
+    ],
+    "incomplete_plan_targets": [
+      "payments-service"
+    ],
+    "invented_facts_validation": {
+      "type": "Validation",
+      "attempt": 1,
+      "verdict": "합격"
+    },
+    "third_short_draft_validation": {
+      "type": "Validation",
+      "attempt": 3,
+      "verdict": "합격(최대 시도 도달 — 통과 처리)"
+    },
+    "retry_recovered": true,
+    "sqlite_reopen_persisted": true
+  },
+  {
+    "round": 2,
+    "single_cpu": "cpu-spike",
+    "single_memory": "memory-leak",
+    "single_network": "network-timeout",
+    "mixed_cpu_memory": "cpu-spike",
+    "healthy_no_alerts": "db-down",
+    "korean_cpu": "db-down",
+    "unknown_normalized_targets": [
+      "auth-service"
+    ],
+    "incomplete_plan_targets": [
+      "payments-service"
+    ],
+    "invented_facts_validation": {
+      "type": "Validation",
+      "attempt": 1,
+      "verdict": "합격"
+    },
+    "third_short_draft_validation": {
+      "type": "Validation",
+      "attempt": 3,
+      "verdict": "합격(최대 시도 도달 — 통과 처리)"
+    },
+    "retry_recovered": true,
+    "sqlite_reopen_persisted": true
+  },
+  {
+    "round": 3,
+    "single_cpu": "cpu-spike",
+    "single_memory": "memory-leak",
+    "single_network": "network-timeout",
+    "mixed_cpu_memory": "cpu-spike",
+    "healthy_no_alerts": "db-down",
+    "korean_cpu": "db-down",
+    "unknown_normalized_targets": [
+      "auth-service"
+    ],
+    "incomplete_plan_targets": [
+      "payments-service"
+    ],
+    "invented_facts_validation": {
+      "type": "Validation",
+      "attempt": 1,
+      "verdict": "합격"
+    },
+    "third_short_draft_validation": {
+      "type": "Validation",
+      "attempt": 3,
+      "verdict": "합격(최대 시도 도달 — 통과 처리)"
+    },
+    "retry_recovered": true,
+    "sqlite_reopen_persisted": true
+  }
+]

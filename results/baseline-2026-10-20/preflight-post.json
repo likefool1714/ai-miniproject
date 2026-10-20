@@ -1,0 +1,82 @@
+{
+  "elapsed_s": 40.135,
+  "status": 200,
+  "response": {
+    "reply": "1) 모니터링 상태 확인: payments-service CPU 사용률 90.1% (경고 기준 80% 초과), 메모리 54.5% 사용 중. 알림 내용에 따라 payments-service-3 인스턴스가 응답 지연 중임을 확인.  \n2) 특정 요청 패턴 확인: 최근 로그 및 패턴 분석 결과 특이 패턴 없음. 반복 호출 또는 배치 작업 중복 실행 원인 배제.  \n3) 인스턴스 확장 및 분산: CPU 90.1% 지속 시 payments-service-3 인스턴스에 추가 인스턴스 배치하여 부하 분산. 정상화 후 프로파일링 수행해 핫스팟 코드 식별 및 최적화 작업 등록.",
+    "events": [
+      {
+        "type": "RouteDecided",
+        "route": "incident"
+      },
+      {
+        "type": "PlanCreated",
+        "task_count": 2,
+        "targets": [
+          "payments-service"
+        ]
+      },
+      {
+        "type": "GateApplied",
+        "removed_analysis_tasks": 0
+      },
+      {
+        "type": "TaskCompleted",
+        "id": "task-0",
+        "source": "monitoring",
+        "target": "payments-service",
+        "retries": 1
+      },
+      {
+        "type": "ReplanCheck",
+        "round": 0,
+        "is_sufficient": false,
+        "gap_task": "task-gap-runbook",
+        "target": "cpu-spike"
+      },
+      {
+        "type": "TaskCompleted",
+        "id": "task-gap-runbook",
+        "source": "runbook",
+        "target": "cpu-spike",
+        "retries": 0
+      },
+      {
+        "type": "ReplanCheck",
+        "round": 1,
+        "is_sufficient": true
+      },
+      {
+        "type": "AnalysisCompleted",
+        "length": 9
+      },
+      {
+        "type": "DraftWritten",
+        "attempt": 1,
+        "length": 317
+      },
+      {
+        "type": "Validation",
+        "attempt": 1,
+        "verdict": "합격"
+      },
+      {
+        "type": "Finalize",
+        "pipeline": "incident-v2"
+      }
+    ],
+    "metadata": {
+      "route": "incident",
+      "task_count": 3,
+      "gate_removed": 0,
+      "replan_rounds": 1,
+      "retry_count": 1,
+      "parallel_elapsed": 0.36,
+      "validation_attempts": 1,
+      "cost_usd": 0.005114,
+      "llm_backend": "ollama",
+      "supervisor_version": "v2",
+      "instance_id": 4528638480,
+      "langsmith_run_id": null
+    }
+  }
+}

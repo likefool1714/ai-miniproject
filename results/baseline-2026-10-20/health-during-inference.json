@@ -1,0 +1,42 @@
+[
+  {
+    "sample": 1,
+    "elapsed_s": 0.025,
+    "status": 200
+  },
+  {
+    "sample": 2,
+    "elapsed_s": 0.004,
+    "status": 200
+  },
+  {
+    "sample": 3,
+    "elapsed_s": 0.004,
+    "status": 200
+  },
+  {
+    "sample": 4,
+    "elapsed_s": 0.004,
+    "status": 200
+  },
+  {
+    "sample": 5,
+    "elapsed_s": 0.004,
+    "status": 200
+  },
+  {
+    "sample": 6,
+    "elapsed_s": 0.004,
+    "status": 200
+  },
+  {
+    "sample": 7,
+    "elapsed_s": 0.011,
+    "status": 200
+  },
+  {
+    "sample": 8,
+    "elapsed_s": 0.004,
+    "status": 200
+  }
+]

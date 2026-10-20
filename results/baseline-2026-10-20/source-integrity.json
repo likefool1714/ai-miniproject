@@ -1,0 +1,151 @@
+{
+  "baseline_commit": "d1043ff",
+  "checked_files": 29,
+  "files": [
+    {
+      "path": "agent/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "agent/deps.py",
+      "sha256": "05e2a41c5a4af655e2544292c015047bd9447d7d47bd2f067515f50042ad4d69",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "agent/fake_llm.py",
+      "sha256": "8af6ae5c4c804053c6365ff1e54a7e549077a393e4803325cb3021fc2fe977c7",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "agent/graph.py",
+      "sha256": "a28da5c2a9e24b84b4e23b721a9a2421e16125430c8b80afbdf404bc92b3e3dd",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "agent/mcp_client.py",
+      "sha256": "eadff6c7bf2c5c69834b78d064b4a059934cc8aac14253da578edbf8e0b27542",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "agent/ollama_llm.py",
+      "sha256": "5358994cde09c7f337bc11c1713995ab701f91175437238103b86dd1b5de46bb",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "agent/openai_llm.py",
+      "sha256": "1f7b41e6a71df516f152cee1f371dd6a9b9ea9c02b82aee09ed9644db538f647",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "agent/retry.py",
+      "sha256": "d2524552348c9faa08b5ce446434bf593677c7028fb38c9e11b03de8839d2a3a",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "agent/session_store.py",
+      "sha256": "cd1f61396ccd815d940be5a3d8929199648273c360c82fbd722163644b7356a6",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "agent/supervisor_v1.py",
+      "sha256": "6080b4b8c3a6bd56c617a560a64d644d5f1e5e2721ad65324a09886a2df6cab8",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "data/monitoring.json",
+      "sha256": "44cf849b6ea4c64bb2ff6911fd99add291cc7a7bb94f56dc1ce562e527be8224",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "data/runbooks/cpu-spike.md",
+      "sha256": "30796f7b5c1d0bc09acfb2518b240e3a07b04136e84fe41397802a3bf2bff22d",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "data/runbooks/db-down.md",
+      "sha256": "a2d4f4d3bc89984348976e9012518ceba32f389a35bf5ee7da4c19f7e1de9be5",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "data/runbooks/disk-full.md",
+      "sha256": "72b9d4f006490887ccba981531129e5a42c0d7b8c789208db391fdc5acc566c7",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "data/runbooks/high-latency.md",
+      "sha256": "0df4846e66993b0b9312327a3f51fe6de663d701c64c2c7c10a9e2c35e9e63a3",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "data/runbooks/memory-leak.md",
+      "sha256": "085f00e9bba5effbb54e97a82d5f0b7032e027dac29816021729932a5e9a9ee1",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "data/runbooks/network-timeout.md",
+      "sha256": "ed68d1bc775138e7e66cfb50698949856bf27d5e11afefff6e5826223e063596",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "mcp_server.py",
+      "sha256": "a0ebe98254b12a8732be104094c2ddf91c182a69d9a3ff6ce3f49fb858d2369f",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "mcp_server_docs.py",
+      "sha256": "cdf5211f4273c035f4143e8d32b27498f7932528c987358ec30a2e26185514bc",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "9bad2c000146ac435ef3a3876f0e23d169de4521c1ccb86237f532eb4e25c59e",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "server.py",
+      "sha256": "8d2868a145e034b6444a4203b3fe2ed1cceb2581fa02a17cd30aa3a81491a5f5",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "sh/make_student_zip.sh",
+      "sha256": "b03144ed801a5534851cdf3a85a7f1a053f1d6711c89ea2224b09ded5df1e45c",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "sh/run_agent_ollma.sh",
+      "sha256": "8e9233c5ee814de8c36e88d12b0c95dc6f9d63cb1901689ea886699ec667b10b",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "sh/run_agent_openai.sh",
+      "sha256": "15d8fecb75c94251a4864a7e9d5b70a9b6774a2e4924dba22b0420d8fbe6734f",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "sh/run_frontend.sh",
+      "sha256": "7d9c748c4f7747fb6cdb852e274bfd45b6235a6deaa3162d39e9e6b1a4a6d9b0",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "sh/setup_ollama.sh",
+      "sha256": "80ca5807a75217f4e4adccc2052b53b99b05f3a877ed66028053937f31cebc67",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "sh/setup_venv.sh",
+      "sha256": "63237827de7b0b29f43b43d108878abb006d73d15677f9328c8211f7d593387e",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "web_chat.html",
+      "sha256": "188f844d55a2dbac24eb1a30f92f062bd4ff94332f1a8fe0ec8f8e78a0ccc023",
+      "matches_provided_commit": true
+    },
+    {
+      "path": "web_demo_server.py",
+      "sha256": "6b002df3cd1ba0b7cb6ae6d0a34d3ea5b173654755c9e9c8626f40463ce28b91",
+      "matches_provided_commit": true
+    }
+  ]
+}

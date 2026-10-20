@@ -1,0 +1,44 @@
+{
+  "case_id": "greeting",
+  "round": 3,
+  "message": "안녕하세요",
+  "timestamp": "2026-10-20T02:10:40.624359+00:00",
+  "expected": {
+    "route": "chat",
+    "targets": [],
+    "runbook": null
+  },
+  "thread_id": "baseline-020350-3-greeting",
+  "events": [
+    {
+      "type": "RouteDecided",
+      "route": "chat",
+      "node": "route",
+      "received_after_s": 0.661
+    },
+    {
+      "type": "Finalize",
+      "pipeline": "chat-direct",
+      "node": "chat_answer",
+      "received_after_s": 1.271
+    }
+  ],
+  "completed": true,
+  "http_status": 200,
+  "reply": "안녕하세요! 무엇을 하시나요?",
+  "final_prompt": "[SYSTEM]\n당신은 간결한 한국어 비서다. 한두 문장으로 답하라. 대화 이력에서 사용자가 밝힌 이름이 있으면 정확히 기억해 답하라.\n\n[USER]\n## 지금까지의 대화\n(없음)\n\n## 사용자의 새 메시지\n안녕하세요",
+  "elapsed_s": 1.273,
+  "first_answer_token_s": 1.212,
+  "answer_token_events": 11,
+  "observed": {
+    "route": "chat",
+    "targets": [],
+    "runbooks": []
+  },
+  "checks": {
+    "stream_completed": true,
+    "expected_route": true,
+    "expected_target_set": true,
+    "expected_runbook": null
+  }
+}

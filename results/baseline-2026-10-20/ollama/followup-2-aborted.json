@@ -1,0 +1,10 @@
+{
+  "round": 2,
+  "status": "manually_aborted_due_to_supplementary_test_budget",
+  "elapsed_since_previous_record_s": 280.376,
+  "note": "Not a natural server timeout. Main 18-case repeated validation had completed; supplemental request kept generating with context shift. No completed reply available.",
+  "observed_generation_tokens_at_least": 4267,
+  "context_shift_observed": true,
+  "observation_source": "Ollama process console, not final usage metadata",
+  "client_timeout_s_at_execution": 480
+}

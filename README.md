@@ -2,7 +2,7 @@
 
 운영 장애 대응 에이전트의 **대상 서비스 확인**과 **런북 검색**을 개선하는 개인 미니프로젝트입니다.
 
-> 현재 단계: 제공 스켈레톤 보존 및 개발 계획 정리. 아래 개선 기능과 평가 실행기는 아직 구현 전입니다. 원본 예제의 실행 화면은 이번 프로젝트의 실험 결과가 아닙니다.
+> 현재 단계: 원본 기동 및 18회 반복 검증 완료. 제품 기능은 아직 수정하지 않았습니다. 아래는 최초 개선안이며, 검증 결과에 따른 우선순위는 [원본 검증 보고서](docs/BASELINE_VALIDATION.md)에서 구분합니다. 제공 doc의 예제 화면은 이번 프로젝트의 실험 결과가 아닙니다.
 
 ## 선택안
 
@@ -28,7 +28,8 @@
 
 ## 문서
 
-- [선택 이유와 개발 일정](docs/PROJECT_PLAN.md)
+- [원본 반복 검증 결과와 개선 우선순위](docs/BASELINE_VALIDATION.md)
+- [최초 선택 이유와 개발 일정](docs/PROJECT_PLAN.md)
 - [등록용 진행 계획 초안](docs/REGISTRATION_DRAFT.md)
 - [코드 흐름과 변경 위치](docs/CODE_WALKTHROUGH.md)
 - [평가 방법과 기록 양식](docs/EVALUATION.md)
@@ -59,4 +60,4 @@ bash sh/run_frontend.sh
 
 기준 커밋: `d1043ff` (`chore: import provided project skeleton`). 원본의 v1/v2는 이미 서로 다른 예제이므로, 이번 개선 비교는 **동일한 v2에서 선택 기능만 변경**하여 진행합니다.
 
-실험 결과는 아직 없습니다. `results/`에 실제 측정 후 기록합니다.
+원본 검증 증거는 `results/baseline-2026-10-20/`에 기록합니다. 개선 후 Before/After 비교 결과는 아직 없습니다.

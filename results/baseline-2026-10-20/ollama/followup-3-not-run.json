@@ -1,0 +1,5 @@
+{
+  "round": 3,
+  "status": "not_run",
+  "reason": "Supplementary long-running generation stopped; main matrix already repeated 3 times."
+}

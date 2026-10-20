@@ -1,0 +1,9 @@
+{
+  "status": "ok",
+  "instance_id": 4528638480,
+  "creation_count": 1,
+  "supervisor_version": "v2",
+  "llm_backend": "ollama",
+  "fast_llm": "ollama:qwen3:0.6b",
+  "quality_llm": "ollama:qwen3:8b"
+}

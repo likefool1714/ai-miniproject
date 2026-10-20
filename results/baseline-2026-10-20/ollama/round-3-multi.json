@@ -1,0 +1,120 @@
+{
+  "case_id": "multi",
+  "round": 3,
+  "message": "payments-service랑 cache-service 둘 다 저하됐는데 공통 원인이 있는지 분석해줘",
+  "timestamp": "2026-10-20T02:12:24.960833+00:00",
+  "expected": {
+    "route": "incident",
+    "targets": [
+      "payments-service",
+      "cache-service"
+    ],
+    "runbook": null
+  },
+  "thread_id": "baseline-020350-3-multi",
+  "events": [
+    {
+      "type": "RouteDecided",
+      "route": "incident",
+      "node": "route",
+      "received_after_s": 5.066
+    },
+    {
+      "type": "PlanCreated",
+      "task_count": 2,
+      "targets": [
+        "payments-service"
+      ],
+      "node": "plan",
+      "received_after_s": 7.499
+    },
+    {
+      "type": "GateApplied",
+      "removed_analysis_tasks": 0,
+      "node": "gate",
+      "received_after_s": 7.5
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-0",
+      "source": "monitoring",
+      "target": "payments-service",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 7.867
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 0,
+      "is_sufficient": false,
+      "gap_task": "task-gap-runbook",
+      "target": "cpu-spike",
+      "node": "replan_check",
+      "received_after_s": 7.868
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-gap-runbook",
+      "source": "runbook",
+      "target": "cpu-spike",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 8.228
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 1,
+      "is_sufficient": true,
+      "node": "replan_check",
+      "received_after_s": 8.229
+    },
+    {
+      "type": "AnalysisCompleted",
+      "length": 9,
+      "node": "analysis",
+      "received_after_s": 9.907
+    },
+    {
+      "type": "DraftWritten",
+      "attempt": 1,
+      "length": 694,
+      "node": "write",
+      "received_after_s": 60.15
+    },
+    {
+      "type": "Validation",
+      "attempt": 1,
+      "verdict": "합격",
+      "node": "validate",
+      "received_after_s": 60.155
+    },
+    {
+      "type": "Finalize",
+      "pipeline": "incident-v2",
+      "node": "finalize",
+      "received_after_s": 60.156
+    }
+  ],
+  "completed": true,
+  "http_status": 200,
+  "reply": "1) **공통 원인 추정**: payments-service의 CPU 과부하(89.5%)와 메모리 사용률(54.3%)은 **CPU 급증 대응 절차**에 해당하며, 알림 내용('CPU 91% (threshold 80%)', 'payments-service-3 instance responding slow')에서 **특정 인스턴스의 성능 저하**가 관찰됨. cache-service도 동일한 원인(예: 공유 DB, API, 네트워크)으로 인해 저하되었을 가능성이 있음.  \n2) **패턴 분석 결과**: 수집된 데이터에 **특이 패턴 없음**으로, 요청 패턴 또는 배포 변화로 인한 급증 가능성 낮음. **공통 원인**으로는 **공유 리소스(예: DB, API 게이트웨이, 네트워크)** 또는 **시스템적 부하 증가**를 고려해야 함.  \n3) **대응 절차**:  \n   - **1단계**: get_monitoring_status로 **공통 리소스 사용률** 및 **트래픽 변화 시점** 확인.  \n   - **2단계**: payments-service-3 인스턴스의 **로그 분석** 및 **오토스케일링 확장** 수행(현재 CPU 89.5%로 90% 기준 충족).  \n   - **3단계**: cache-service의 **모니터링 상태** 및 **공유 리소스 상태** 점검 후, **시스템적 부하 분산** 또는 **리소스 최적화** 조치.",
+  "final_prompt": "[SYSTEM]\n당신은 ICT 운영 보고 작성자다. 수집된 사실만 사용해 한국어로 간결한 대응 보고를 작성하라. 반드시 '1) ... 2) ... 3) ...' 형식의 번호 절차로 답하고, 수치는 수집된 값을 그대로 인용하라.\n\n[USER]\n## 사용자 요청\npayments-service랑 cache-service 둘 다 저하됐는데 공통 원인이 있는지 분석해줘\n\n## 수집된 사실\n- 모니터링 payments-service: 상태=degraded, CPU 89.5%, 메모리 54.3%, 알림 2건 ['CPU 91% (threshold 80%)', 'payments-service-3 instance responding slow']\n- runbook 발췌:\n# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n- 패턴 분석: 특이 패턴 없음.",
+  "elapsed_s": 60.16,
+  "first_answer_token_s": 40.627,
+  "answer_token_events": 358,
+  "observed": {
+    "route": "incident",
+    "targets": [
+      "payments-service"
+    ],
+    "runbooks": [
+      "cpu-spike"
+    ]
+  },
+  "checks": {
+    "stream_completed": true,
+    "expected_route": true,
+    "expected_target_set": false,
+    "expected_runbook": null
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "case_id": "multi",
+  "round": 1,
+  "message": "payments-service랑 cache-service 둘 다 저하됐는데 공통 원인이 있는지 분석해줘",
+  "timestamp": "2026-10-20T02:05:44.743993+00:00",
+  "expected": {
+    "route": "incident",
+    "targets": [
+      "payments-service",
+      "cache-service"
+    ],
+    "runbook": null
+  },
+  "thread_id": "baseline-020350-1-multi",
+  "events": [
+    {
+      "type": "RouteDecided",
+      "route": "incident",
+      "node": "route",
+      "received_after_s": 4.109
+    },
+    {
+      "type": "PlanCreated",
+      "task_count": 2,
+      "targets": [
+        "payments-service"
+      ],
+      "node": "plan",
+      "received_after_s": 6.496
+    },
+    {
+      "type": "GateApplied",
+      "removed_analysis_tasks": 0,
+      "node": "gate",
+      "received_after_s": 6.497
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-0",
+      "source": "monitoring",
+      "target": "payments-service",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 6.873
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 0,
+      "is_sufficient": false,
+      "gap_task": "task-gap-runbook",
+      "target": "cpu-spike",
+      "node": "replan_check",
+      "received_after_s": 6.875
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-gap-runbook",
+      "source": "runbook",
+      "target": "cpu-spike",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 7.235
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 1,
+      "is_sufficient": true,
+      "node": "replan_check",
+      "received_after_s": 7.236
+    },
+    {
+      "type": "AnalysisCompleted",
+      "length": 9,
+      "node": "analysis",
+      "received_after_s": 9.12
+    },
+    {
+      "type": "DraftWritten",
+      "attempt": 1,
+      "length": 407,
+      "node": "write",
+      "received_after_s": 50.242
+    },
+    {
+      "type": "Validation",
+      "attempt": 1,
+      "verdict": "합격",
+      "node": "validate",
+      "received_after_s": 50.245
+    },
+    {
+      "type": "Finalize",
+      "pipeline": "incident-v2",
+      "node": "finalize",
+      "received_after_s": 50.245
+    }
+  ],
+  "completed": true,
+  "http_status": 200,
+  "reply": "1) **CPU 사용률 과부하 확인**: payments-service의 CPU 사용률 94.5%는 경계값(80%)을 초과하며, 알림 'CPU 91% (threshold 80%)'와 'payments-service-3 instance responding slow'가 발생함.  \n2) **요청 패턴 분석**: 패턴 분석에서 특이 패턴 없음으로, 반복 호출 또는 배치 작업 중복 실행 등 특정 요청 패턴으로 인한 과부하 가능성 낮음.  \n3) **오토스케일링 및 원인 분석**: CPU 90% 이상 지속 시 인스턴스 확장 필요. payments-service-3 인스턴스의 느린 응답은 해당 인스턴스의 코드 핫스팟 또는 메모리 부족 가능성 있음. cache-service의 상태 및 메트릭 데이터 미제공으로 공통 원인 추정 불가.",
+  "final_prompt": "[SYSTEM]\n당신은 ICT 운영 보고 작성자다. 수집된 사실만 사용해 한국어로 간결한 대응 보고를 작성하라. 반드시 '1) ... 2) ... 3) ...' 형식의 번호 절차로 답하고, 수치는 수집된 값을 그대로 인용하라.\n\n[USER]\n## 사용자 요청\npayments-service랑 cache-service 둘 다 저하됐는데 공통 원인이 있는지 분석해줘\n\n## 수집된 사실\n- 모니터링 payments-service: 상태=degraded, CPU 94.5%, 메모리 56.7%, 알림 2건 ['CPU 91% (threshold 80%)', 'payments-service-3 instance responding slow']\n- runbook 발췌:\n# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n- 패턴 분석: 특이 패턴 없음.",
+  "elapsed_s": 50.25,
+  "first_answer_token_s": 40.063,
+  "answer_token_events": 202,
+  "observed": {
+    "route": "incident",
+    "targets": [
+      "payments-service"
+    ],
+    "runbooks": [
+      "cpu-spike"
+    ]
+  },
+  "checks": {
+    "stream_completed": true,
+    "expected_route": true,
+    "expected_target_set": false,
+    "expected_runbook": null
+  }
+}

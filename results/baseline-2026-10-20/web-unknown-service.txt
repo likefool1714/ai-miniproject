@@ -1,0 +1,32 @@
+Browser tab: 1076615683, Title: "운영 에이전트 채팅 (Vue)", URL: "http://127.0.0.1:8600/".
+0 AXWebArea 운영 에이전트 채팅 (Vue), URL: 127.0.0.1:8600/
+	1 container app
+		2 container
+			3 text 운영 인시던트 대응 에이전트  ollama 실모델(ollama:qwen3:0.6b/ollama:qwen3:8b) · all_total_vue
+		7 container log
+			8 text billing-service 응답이 느려요. 원인 진단해주세요
+			9 container
+				10 text ⏳  계획 수립: 할 일 2가지 (시스템: auth-service)
+			11 container
+				12 text ⏳  모니터링 지표 확인 (시스템: auth-service) (재시도 성공)
+			13 container
+				14 text ⏳  정보 부족 → 장애유형 "high-latency"로 추가 조사
+			15 container
+				16 text ⏳  대응 매뉴얼(runbook) 조회 (장애유형: high-latency)
+			17 container
+				18 text ⏳  답변 초안 작성 (시도 1)
+			19 container
+				20 text ⏳  검수 통과
+			21 container
+				22 text ⏳  최종 답변 완성
+			23 text 1) **현재 상태 확인**: auth-service의 p95 지연시간 2.4s (임계치 1.0s 초과), 커넥션 풀 사용률 92%로 응답 지연 원인 추정 중.
+2) **커넥션 풀 대응**: 풀 사용률 92%로 90% 초과 기준에 해당하므로 풀 크기 확장 또는 느린 쿼리/외부 호출 타임아웃 적용.
+3) **지연 분산 대응**: 5분 내 p95가 1.0s 이하로 회복되지 않으면 캐시 계층 또는 읽기 복제본을 통한 트래픽 분산 절차 실행.
+			24 button (collapsed) 🔍 LLM에 전달된 최종 프롬프트 보기, Secondary Actions: Expand
+				25 text 🔍
+				26 text LLM에 전달된 최종 프롬프트 보기
+		4 container
+			5 text field (settable)
+			6 button 보내기
+
+The focused UI element is 0 AXWebArea 운영 에이전트 채팅 (Vue), URL: 127.0.0.1:8600/

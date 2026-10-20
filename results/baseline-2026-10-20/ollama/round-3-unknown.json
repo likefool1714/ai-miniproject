@@ -1,0 +1,117 @@
+{
+  "case_id": "unknown",
+  "round": 3,
+  "message": "billing-service 응답이 느려요. 원인 진단해주세요",
+  "timestamp": "2026-10-20T02:11:50.144086+00:00",
+  "expected": {
+    "route": "incident",
+    "targets": [],
+    "runbook": null
+  },
+  "thread_id": "baseline-020350-3-unknown",
+  "events": [
+    {
+      "type": "RouteDecided",
+      "route": "incident",
+      "node": "route",
+      "received_after_s": 1.235
+    },
+    {
+      "type": "PlanCreated",
+      "task_count": 2,
+      "targets": [
+        "auth-service"
+      ],
+      "node": "plan",
+      "received_after_s": 3.899
+    },
+    {
+      "type": "GateApplied",
+      "removed_analysis_tasks": 0,
+      "node": "gate",
+      "received_after_s": 3.903
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-0",
+      "source": "monitoring",
+      "target": "auth-service",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 4.267
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 0,
+      "is_sufficient": false,
+      "gap_task": "task-gap-runbook",
+      "target": "high-latency",
+      "node": "replan_check",
+      "received_after_s": 4.268
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-gap-runbook",
+      "source": "runbook",
+      "target": "high-latency",
+      "retries": 0,
+      "node": "research",
+      "received_after_s": 4.628
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 1,
+      "is_sufficient": true,
+      "node": "replan_check",
+      "received_after_s": 4.63
+    },
+    {
+      "type": "AnalysisCompleted",
+      "length": 9,
+      "node": "analysis",
+      "received_after_s": 6.033
+    },
+    {
+      "type": "DraftWritten",
+      "attempt": 1,
+      "length": 249,
+      "node": "write",
+      "received_after_s": 34.806
+    },
+    {
+      "type": "Validation",
+      "attempt": 1,
+      "verdict": "합격",
+      "node": "validate",
+      "received_after_s": 34.81
+    },
+    {
+      "type": "Finalize",
+      "pipeline": "incident-v2",
+      "node": "finalize",
+      "received_after_s": 34.811
+    }
+  ],
+  "completed": true,
+  "http_status": 200,
+  "reply": "1) **현재 상태 확인**: auth-service의 p95 지연시간 2.4s (임계치 1.0s 초과), 커넥션 풀 사용률 92%로 응답 지연 원인 추정 중.  \n2) **커넥션 풀 대응**: 풀 사용률 92%로 90% 초과 기준에 해당하므로 풀 크기 확장 또는 느린 쿼리/외부 호출 타임아웃 적용.  \n3) **지연 분산 대응**: 5분 내 p95가 1.0s 이하로 회복되지 않으면 캐시 계층 또는 읽기 복제본을 통한 트래픽 분산 절차 실행.",
+  "final_prompt": "[SYSTEM]\n당신은 ICT 운영 보고 작성자다. 수집된 사실만 사용해 한국어로 간결한 대응 보고를 작성하라. 반드시 '1) ... 2) ... 3) ...' 형식의 번호 절차로 답하고, 수치는 수집된 값을 그대로 인용하라.\n\n[USER]\n## 사용자 요청\nbilling-service 응답이 느려요. 원인 진단해주세요\n\n## 수집된 사실\n- 모니터링 auth-service: 상태=degraded, CPU 76.0%, 메모리 60.0%, 알림 2건 ['p95 latency 2.4s (threshold 1.0s)', 'connection pool 92% used']\n- runbook 발췌:\n# Runbook: 응답 지연(High Latency) 대응 절차\n\n1. get_monitoring_status로 p95 지연시간과 커넥션 풀 사용률을 확인한다.\n2. 커넥션 풀 사용률이 90%를 넘으면 풀 크기를 늘리거나 느린 쿼리/외부 호출에 타임아웃을 건다.\n3. 지연이 특정 리전/인스턴스에 몰려 있으면 해당 인스턴스를 로드밸런서에서 일시 제외한다.\n4. 5분 내 p95가 임계치(1.0s) 아래로 내려오지 않으면 캐시 계층 또는 읽기 복제본으로 트래픽을 분산한다.\n5. 정상화 후 느린 쿼리 로그를 분석해 근본 원인을 문서화하고 후속 최적화 티켓을 등록한다.\n- 패턴 분석: 특이 패턴 없음.",
+  "elapsed_s": 34.815,
+  "first_answer_token_s": 26.082,
+  "answer_token_events": 159,
+  "observed": {
+    "route": "incident",
+    "targets": [
+      "auth-service"
+    ],
+    "runbooks": [
+      "high-latency"
+    ]
+  },
+  "checks": {
+    "stream_completed": true,
+    "expected_route": true,
+    "expected_target_set": false,
+    "expected_runbook": null
+  }
+}
