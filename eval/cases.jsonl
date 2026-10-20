@@ -1,0 +1,20 @@
+{"id": "target-01", "kind": "target", "query": "payments-service 결제 응답이 느려졌어요", "expected_targets": ["payments-service"], "expected_action": "investigate"}
+{"id": "target-02", "kind": "target", "query": "payments-service와 cache-service 공통 원인을 확인해주세요", "expected_targets": ["payments-service", "cache-service"], "expected_action": "investigate"}
+{"id": "target-03", "kind": "target", "query": "로그인 응답이 느려요", "expected_targets": [], "expected_action": "clarify"}
+{"id": "target-04", "kind": "target", "query": "billing-service 응답이 느려요", "expected_targets": [], "expected_action": "clarify"}
+{"id": "target-05", "kind": "target", "query": "안녕하세요", "expected_targets": [], "expected_action": "chat"}
+{"id": "target-06", "kind": "conversation", "messages": ["결제 처리가 느려요", "payments-service"], "expected_targets": ["payments-service"], "expected_action": "investigate_after_confirmation"}
+{"id": "target-07", "kind": "conversation", "messages": ["응답이 느려요", "취소할게요"], "expected_targets": [], "expected_action": "cancel"}
+{"id": "target-08", "kind": "conversation", "messages": ["응답이 느려요", "잘 모르겠어요"], "expected_targets": [], "expected_action": "clarify_without_tool_call"}
+{"id": "retrieval-01", "kind": "retrieval", "query": "payments-service CPU가 치솟고 있어요", "alerts": ["CPU 91% (threshold 80%)"], "expected_incident_type": "cpu-spike"}
+{"id": "retrieval-02", "kind": "retrieval", "query": "계산 작업이 밀려 프로세서가 거의 꽉 찼어요", "alerts": ["processor saturation"], "expected_incident_type": "cpu-spike"}
+{"id": "retrieval-03", "kind": "retrieval", "query": "cache-service 메모리가 계속 늘어요", "alerts": ["memory usage climbing steadily over 6h", "heap near limit"], "expected_incident_type": "memory-leak"}
+{"id": "retrieval-04", "kind": "retrieval", "query": "시간이 지날수록 사용하던 공간이 반환되지 않아요", "alerts": ["메모리 회수 후에도 점유율 증가"], "expected_incident_type": "memory-leak"}
+{"id": "retrieval-05", "kind": "retrieval", "query": "log-service 디스크 사용률이 95%입니다", "alerts": ["disk usage 95% on /var/log"], "expected_incident_type": "disk-full"}
+{"id": "retrieval-06", "kind": "retrieval", "query": "로그가 쌓여 저장할 공간이 없어요", "alerts": ["저장 공간 부족으로 파일 기록 실패"], "expected_incident_type": "disk-full"}
+{"id": "retrieval-07", "kind": "retrieval", "query": "auth-service의 응답이 느리고 연결 풀이 찼어요", "alerts": ["p95 latency 2.4s", "connection pool 92% used"], "expected_incident_type": "high-latency"}
+{"id": "retrieval-08", "kind": "retrieval", "query": "연결을 빌리려는 요청이 줄을 서서 기다려요", "alerts": ["커넥션 풀 대기로 응답 시간 증가"], "expected_incident_type": "high-latency"}
+{"id": "retrieval-09", "kind": "retrieval", "query": "gateway-service 요청이 타임아웃 납니다", "alerts": ["upstream timeout to payments-service (504)", "network packet loss 3%"], "expected_incident_type": "network-timeout"}
+{"id": "retrieval-10", "kind": "retrieval", "query": "패킷이 사라지고 상위 서비스에 닿지 않아요", "alerts": ["게이트웨이 요청 제한 시간 초과"], "expected_incident_type": "network-timeout"}
+{"id": "retrieval-11", "kind": "retrieval", "query": "데이터베이스가 내려가 연결할 수 없어요", "alerts": ["database down", "connection refused"], "expected_incident_type": "db-down"}
+{"id": "retrieval-12", "kind": "retrieval", "query": "데이터 저장소가 멈춰 접속을 거부해요", "alerts": ["데이터베이스 연결 불가"], "expected_incident_type": "db-down"}
