@@ -9,7 +9,7 @@
 - 발표 자료: **Canva 표지 포함 9장 PPT, PDF, 5분 발표 대본**을 작성했습니다. 내일 실제 발표·연습은 별도입니다.
 - 제공 API: `gpt-4o-mini` / `gpt-4o` 실제 기능 검사 통과. **LangSmith 실제 추적은 미검증**입니다.
 
-[Canva에서 열기](https://www.canva.com/d/cjF24xIGGMoC-ja) · [최종 PPT](output/presentation/AI-Mini-Project_G028_최민석_Canva_v2_20261021.pptx) · [PDF](output/pdf/AI-Mini-Project_G028_최민석_Canva_v2_20261021.pdf) · [5분 발표 대본](docs/TALK_5MIN_CANVA.md) · [코드 설명·예상 질문](docs/DEFENSE_GUIDE.md)
+[Canva에서 열기](https://www.canva.com/d/aVuXOpnbAcDEq69) · [최종 PPT](output/presentation/AI-Mini-Project_G028_최민석_Canva_v3_20261021.pptx) · [PDF](output/pdf/AI-Mini-Project_G028_최민석_Canva_v3_20261021.pdf) · [5분 발표 대본](docs/TALK_5MIN_CANVA.md) · [코드 설명·예상 질문](docs/DEFENSE_GUIDE.md)
 
 기존 에이전트는 현재 모니터링 수치를 조회하고 런북으로 대응 절차를 작성합니다. 이번 작업은 **이전 조사와 비교하고 복구 여부를 다시 확인하는 기능**을 추가합니다.
 CPU가 95%에서 55%로 내려가도 메모리·알림이 남아 있거나 정상 관측이 한 번뿐이면 복구를 확정하지 않습니다.
@@ -24,7 +24,7 @@ CPU가 95%에서 55%로 내려가도 메모리·알림이 남아 있거나 정�
 [수정 내용·실행 원문·실제 채팅 스크린샷](results/bugfix-2026-10-21/README.md) · [처음 기획과의 대조 감사](docs/PLAN_ALIGNMENT_AUDIT_20261021.md)
 
 이번 실제 화면 비교에서 원본은 정상 첫 관측으로 복구 완료를 답했고, 수정본은 정상 1/2회라며 보류 이유·다음 확인 조건을 설명했습니다.
-고정 합성 관측의 단일 화면 비교이며 일반 정확도 측정은 아닙니다. 새 사진 중심 Canva 수정 초안은 저장 승인 전이며, 위 PPT 링크는 직전 승인본입니다.
+고정 합성 관측의 단일 화면 비교이며 일반 정확도 측정은 아닙니다. 실제 채팅 화면과 개선 이유를 담은 9장 Canva 최종본을 저장하고 PPTX·PDF 및 5분 발표 대본을 갱신했습니다.
 
 ## 진단 답변 설명 보완 (2026-10-21)
 
@@ -45,7 +45,7 @@ CPU가 95%에서 55%로 내려가도 메모리·알림이 남아 있거나 정�
 
 [새 핵심 기능 후보 전체 검토](docs/FEATURE_REVIEW.md): 연관 서비스 조사·영향 범위, 배포 변경 이력 연계, HTTP 기능 상태 확인을 비교했습니다. 후보는 아직 선택·구현하지 않았습니다.
 
-발표 순서: **표지 → 기존 구조 → 추가한 처리 → 발견한 문제 → 개선 전 답변 → 판정·근거 검증 코드 → 전후 비교 → 추가 기능 → 한계**. `G028 최민석`은 표지 좌측 하단에만 작게 표기했습니다.
+발표 순서: **표지 → 기존 구조 → 추가한 처리 → 개선 전 실제 답변 → 개선 후 실제 답변 → 판정·근거 검증 코드 → 전후 비교 → 조사 이력과 보고서 → 한계**. `G028 최민석`은 표지 좌측 하단에만 작게 표기했습니다.
 
 ## 초기 질의응답 전후 기록 (설명 보완 전)
 
@@ -221,7 +221,7 @@ LangSmith는 별도 추적 설정·확인 대상입니다. [설정·실행·확�
 
 [발표 대비 최신 재검증](docs/PROFESSOR_AUDIT.md) · [쉬운 코드 설명·예상 질문](docs/DEFENSE_GUIDE.md) · [일반 진단·근거 검증](docs/GROUNDING_VALIDATION.md) · [복구 기능 검증](docs/RECOVERY_VALIDATION.md) · [원본 검증](docs/BASELINE_VALIDATION.md)
 
-[최종 Canva PPT — 표지 포함 9장](output/presentation/AI-Mini-Project_G028_최민석_Canva_v2_20261021.pptx) · [PDF](output/pdf/AI-Mini-Project_G028_최민석_Canva_v2_20261021.pdf) · [이전 표 중심 PPT](output/presentation/AI-Mini-Project_G028_최민석_Final_20261021.pptx)
+[최종 Canva PPT — 표지 포함 9장](output/presentation/AI-Mini-Project_G028_최민석_Canva_v3_20261021.pptx) · [PDF](output/pdf/AI-Mini-Project_G028_최민석_Canva_v3_20261021.pdf) · [이전 표 중심 PPT](output/presentation/AI-Mini-Project_G028_최민석_Final_20261021.pptx)
 
 ## 평가 항목 대응
 
