@@ -1,6 +1,6 @@
 # 발표·코드 설명 준비
 
-이 문서는 코드 이해를 위한 Markdown 안내다. PDF/PPT 최종본은 아직 만들지 않는다.
+이 문서는 코드 이해를 위한 Markdown 안내다. 최종 PPT·보기용 PDF·5분 대본과 함께 사용한다.
 외워서 읽기보다 아래 흐름을 실제 코드와 실행 화면에서 따라가며 설명할 수 있어야 한다.
 
 ## 먼저 설명할 프로젝트 한 문장
@@ -155,7 +155,7 @@ Validator는 코드 검사다. 다른 LLM이 응답을 채점하는 LLM-as-a-Jud
 제공 Supervisor, MCP Tool/Resource/Prompt, 모델 백엔드, Vue/SSE, 의존성 주입 구조를 재사용했다.
 추가 핵심은 recovery.py, recovery_store.py, recovery_nodes.py, grounding.py와 연결·검사 코드다.
 기존 선택적 analysis 노드의 자유 문장 결과는 현재 Writer의 일차 근거로 쓰지 않는다. 불필요한 호출 제거는 추가 최적화 여지가 있다.
-제공 API·LangSmith 실제 연결과 최종 PDF/PPT는 아직 남아 있다. 로컬 검증을 과제 전체 완료로 설명하지 않는다.
+제공 API 실제 진단 POST 3건·SSE 1건, 복구 5단계·이력·보고서를 확인하고 최종 PPT/PDF·대본을 작성했다. LangSmith는 미검증이며 실제 발표·최종 제출은 별도다. [API 증거](../results/api-2026-10-21/README.md)를 확인한다.
 
 ## 2분 설명 연습 순서
 
@@ -163,6 +163,6 @@ Validator는 코드 검사다. 다른 LLM이 응답을 채점하는 LLM-as-a-Jud
 2. 위의 숫자 예시로 정상 1회와 정상 2회의 차이를 말한다.
 3. request_context → collect → store → assess → answer를 코드에서 짚는다.
 4. “판정은 규칙, 일반 진단 제안은 모델, 채택은 코드 검증”이라는 역할을 설명한다.
-5. 샘플 데이터·교육용 임계값·실제 API 미검증이라는 한계를 말한다.
+5. 샘플 데이터·교육용 임계값·제한된 API 검사·LangSmith 미검증이라는 한계를 말한다.
 
 설명하다 이해되지 않는 함수가 나오면 그 함수를 실행 예시와 함께 먼저 확인한다. 이 문서만 외우는 것으로 코드 이해를 대신하지 않는다.

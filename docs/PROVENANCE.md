@@ -12,6 +12,7 @@
 - server.py, graph.py, deps.py: 그래프·API·주입·요청 잠금/시간 제한
 - web_chat.html, web_demo_server.py: 기능 버튼·다운로드
 - tests/, eval/compare_recovery.py, eval/probe_grounding.py: 검사·전후 비교·일반 진단 재검증
+- eval/probe_provided_api.py: 실제 제공 API의 제한된 웹 진단·복구·이력·보고서 호환 검사
 
 ## 재사용
 

@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-10-21T05:04:38.729198+00:00",
+  "scope": "real remote API authentication + fast model access; minimal prompt; not end-to-end diagnosis",
+  "model": "gpt-4o-mini-2024-07-18",
+  "http_status": 200,
+  "status": "passed",
+  "reply": "OK.",
+  "usage": {
+    "prompt_tokens": 11,
+    "completion_tokens": 2,
+    "total_tokens": 13,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "request_id": "req_4b57fd2057074c32840afed6d384310a"
+}
