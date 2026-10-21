@@ -9,6 +9,17 @@
 
 실제 운영 서버를 복구하는 제품은 아니다. JSON 샘플과 합성 시나리오로 동작을 검증한 교육용 프로젝트다.
 
+## 수치만 보여 주는 것과 무엇이 다른가요?
+
+“CPU가 높다”를 보여 주는 데서 끝내지 않고 정상 기준과 비교해 무엇을 점검해야 하는지 설명한다.
+CPU 89.5%·메모리 55%라면 CPU 쪽 이상을 우선 확인할 근거가 있다고 해석하고, 조회한 CPU 런북에서 반복 호출·배치 중복 등 확인 방향을 연결한다.
+하지만 89.5%는 런북의 CPU >90%라는 증설 수치 조건을 충족하지 않으므로 증설보다 원인 점검과 추세 확인을 안내한다.
+
+LLM은 조사 계획·관련 원인 분류·우선 확인할 런북 단계를 선택한다. 코드는 선택의 근거를 검증하고 수치와 조건을 계산한다.
+검증된 결과를 자연스러운 상태 설명과 점검 방향으로 구성하는 부분이 `grounding.render_answer`다.
+제공 런북의 해설은 미리 검토한 문장이다. 해당 절차 전체가 조회 결과와 일치할 때만 사용한다. 새로운 문서를 자동으로 해설하는 기능까지 구현한 것은 아니다.
+복구 재점검은 `recovery.explain_assessment`에서 무엇이 남아 있는지·왜 보류하는지·언제 새 관측이 필요한지 설명한다.
+
 ## 용어를 코드에 연결하기
 
 | 용어 | 이 프로젝트에서 하는 일 |
@@ -33,7 +44,7 @@
 | 2 | [recovery_nodes.py — recovery_collect_node](../agent/recovery_nodes.py#L89) | MCP에서 새 관측을 가져오며 대상·실패를 확인 |
 | 3 | [recovery_store.py — record](../agent/recovery_store.py#L74) | 관측 저장, 중복·충돌 검사, 조회 실패 이후의 연속성 관리 |
 | 4 | [recovery.py — assess](../agent/recovery.py#L92) | 수치 변화·정상 조건·정상 횟수·재발을 판정하는 핵심 규칙 |
-| 5 | [grounding.py — validate_draft / render_answer](../agent/grounding.py#L115) | 모델 제안의 출처·적용 가능성 검사와 실제 값으로 답변 구성 |
+| 5 | [grounding.py — validate_draft](../agent/grounding.py#L136), [render_answer](../agent/grounding.py#L270) | 모델 제안 검사 후 상태 해석·점검 방향과 수치·출처를 함께 설명 |
 
 전체 연결은 [graph.py — build_graph](../agent/graph.py)에 있다.
 현재 실행 버전은 v2다. v1·기존 write는 원본 비교용으로 보존한다.

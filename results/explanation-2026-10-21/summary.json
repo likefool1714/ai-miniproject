@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "before_commit": "74162611687117480eed2c1e0fa94383c27c7ce1",
+  "after_commit": "b84065e2e1087b3d5183f836aea36558fac4d37d",
+  "completed": 8,
+  "fixed_query_and_snapshot_match": true,
+  "cpu_diagnosis_validation": "validated",
+  "scope": "Real Ollama, injected fixed MCP input; not full HTTP/MCP timings; one execution per question/version",
+  "initial_failure_record": "initial-duplicate-selection.json",
+  "test_count": 67
+}

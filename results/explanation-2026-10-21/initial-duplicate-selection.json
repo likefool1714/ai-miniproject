@@ -1,0 +1,957 @@
+{
+  "metadata": {
+    "status": "completed",
+    "started_at": "2026-10-21T00:40:25.781436+00:00",
+    "before_commit": "74162611687117480eed2c1e0fa94383c27c7ce1",
+    "after_commit": "0972104668bb4fd82b14b237d2a8a6f376aae53e",
+    "fast_model": "qwen3:0.6b",
+    "quality_model": "qwen3:8b",
+    "io": "Injected fixed MCP input; real local Ollama. Not stdio MCP/HTTP end-to-end timing.",
+    "limits": [
+      "1 execution per question/version; not an accuracy benchmark.",
+      "Original graph AND original Ollama adapter loaded from before_commit.",
+      "After recovery/clarification routes are code decisions without LLM generation.",
+      "HTML comparison viewer displays saved replies; it is not the original product UI."
+    ],
+    "completed_at": "2026-10-21T00:40:55.033365+00:00"
+  },
+  "rows": [
+    {
+      "case": "target",
+      "title": "조사 대상 확인",
+      "version": "before",
+      "step": 1,
+      "query": "서비스가 느려졌어요. 장애를 진단해주세요.",
+      "snapshot": {
+        "system_name": "auth-service",
+        "status": "degraded",
+        "cpu_percent": 78,
+        "memory_percent": 61,
+        "alerts": [
+          "p95 latency 2.4s (threshold 1.0s)",
+          "connection pool 92% used"
+        ],
+        "last_checked": "2026-10-21T00:40:25.781436+00:00",
+        "sample_id": "target-1",
+        "data_source": "controlled-comparison-fixture"
+      },
+      "status": "completed",
+      "reply": "조사할 서비스를 확정하지 못했습니다. 어떤 서비스를 확인할까요?\n등록 서비스: auth-service, web-01, payments-service, cache-service, gateway-service, log-service",
+      "events": [
+        {
+          "type": "ClarificationRequired"
+        }
+      ],
+      "recovery_results": [],
+      "validation_status": null,
+      "collected": [],
+      "elapsed_seconds": 0.0028125829994678497,
+      "tool_calls": []
+    },
+    {
+      "case": "target",
+      "title": "조사 대상 확인",
+      "version": "after",
+      "step": 1,
+      "query": "서비스가 느려졌어요. 장애를 진단해주세요.",
+      "snapshot": {
+        "system_name": "auth-service",
+        "status": "degraded",
+        "cpu_percent": 78,
+        "memory_percent": 61,
+        "alerts": [
+          "p95 latency 2.4s (threshold 1.0s)",
+          "connection pool 92% used"
+        ],
+        "last_checked": "2026-10-21T00:40:25.781436+00:00",
+        "sample_id": "target-1",
+        "data_source": "controlled-comparison-fixture"
+      },
+      "status": "completed",
+      "reply": "조사할 서비스를 확정하지 못했습니다. 어떤 서비스를 확인할까요?\n등록 서비스: auth-service, web-01, payments-service, cache-service, gateway-service, log-service",
+      "events": [
+        {
+          "type": "ClarificationRequired"
+        }
+      ],
+      "recovery_results": [],
+      "validation_status": null,
+      "collected": [],
+      "elapsed_seconds": 0.0012558329908642918,
+      "tool_calls": []
+    },
+    {
+      "case": "cpu",
+      "title": "런북 조건 확인",
+      "version": "before",
+      "step": 1,
+      "query": "payments-service 장애 원인과 CPU 런북 조건을 진단해주세요.",
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 89.5,
+        "memory_percent": 55,
+        "alerts": [
+          "CPU high (threshold 80%)"
+        ],
+        "last_checked": "2026-10-21T00:40:25.781436+00:00",
+        "sample_id": "cpu-1",
+        "data_source": "controlled-comparison-fixture"
+      },
+      "status": "completed",
+      "reply": "## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 89.5%, 메모리 55%, 알림 1건.\n  관측 시각 2026-10-21T00:40:25.781436Z / 관측 ID cpu-1 / 자료 controlled-comparison-fixture\n  모니터링 알림 원문: CPU high (threshold 80%)\n\n## 추가 확인할 원인 후보 (미확정)\n- [M1] CPU 부하 원인을 추가 확인할 필요가 있습니다. 원인은 확정되지 않았습니다.\n\n## 권장 확인·대응 절차 (미실행)\n- [R1] 조회한 런북: cpu-spike / runbook://incident-response/cpu-spike\n- [M1 → R1.3] 런북 수치 조건: CPU 89.5% > 90% → 불충족. 지속 시간·기타 조치 조건은 미확인입니다.\n- [M1 → R1.1] cpu-spike 런북 원문: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n- [M1 → R1.2] cpu-spike 런북 원문: 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n- [M1 → R1.3] cpu-spike 런북 원문: CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n- [M1 → R1.4] cpu-spike 런북 원문: 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n- [M1 → R1.5] cpu-spike 런북 원문: 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### payments-service: 장애 지속\n- 관측: 상태=degraded, CPU 89.5%, 메모리 55%, 알림 1건\n- 활성 알림: CPU high (threshold 80%)\n- 관측 시각: 2026-10-21T00:40:25.781436Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 89.5% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: controlled-comparison-fixture / 관측 cpu-1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+      "events": [
+        {
+          "type": "RouteDecided",
+          "route": "incident"
+        },
+        {
+          "type": "PlanCreated",
+          "task_count": 2,
+          "targets": [
+            "payments-service"
+          ]
+        },
+        {
+          "type": "GateApplied",
+          "removed_analysis_tasks": 0
+        },
+        {
+          "type": "TaskCompleted",
+          "id": "task-0",
+          "source": "monitoring",
+          "target": "payments-service",
+          "retries": 0
+        },
+        {
+          "type": "ReplanCheck",
+          "round": 0,
+          "is_sufficient": false,
+          "target": "cpu-spike"
+        },
+        {
+          "type": "TaskCompleted",
+          "id": "task-gap-cpu-spike",
+          "source": "runbook",
+          "target": "cpu-spike",
+          "retries": 0
+        },
+        {
+          "type": "ReplanCheck",
+          "round": 1,
+          "is_sufficient": true,
+          "stop": true,
+          "missing_runbooks": []
+        },
+        {
+          "type": "AnalysisCompleted",
+          "length": 9
+        },
+        {
+          "type": "RecoveryAssessed",
+          "target": "payments-service",
+          "phase": "ongoing",
+          "label": "장애 지속",
+          "recurrence": false,
+          "observation_id": 1
+        },
+        {
+          "type": "DraftWritten",
+          "attempt": 1,
+          "length": 323
+        },
+        {
+          "type": "Validation",
+          "attempt": 1,
+          "verdict": "합격",
+          "errors": []
+        },
+        {
+          "type": "Finalize",
+          "pipeline": "incident-v2"
+        }
+      ],
+      "recovery_results": [
+        {
+          "id": 1,
+          "snapshot": {
+            "system_name": "payments-service",
+            "status": "degraded",
+            "cpu_percent": 89.5,
+            "memory_percent": 55.0,
+            "last_checked": "2026-10-21T00:40:25.781436Z",
+            "alerts": [
+              "CPU high (threshold 80%)"
+            ],
+            "sample_id": "cpu-1",
+            "data_source": "controlled-comparison-fixture"
+          },
+          "assessment": {
+            "phase": "ongoing",
+            "recurrence": false,
+            "normal_streak": 0,
+            "comparison": null,
+            "reasons": [
+              "서비스 상태 degraded",
+              "CPU 89.5% (정상 기준 < 80%)",
+              "활성 알림 1건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "policy": {
+              "cpu_limit": 80.0,
+              "memory_limit": 85.0,
+              "freshness_seconds": 300,
+              "required_normal_samples": 2,
+              "minimum_interval_seconds": 5,
+              "recurrence_window_seconds": 3600,
+              "future_tolerance_seconds": 5
+            },
+            "sample_id": "cpu-1",
+            "issues": [
+              "서비스 상태 degraded",
+              "CPU 89.5% (정상 기준 < 80%)",
+              "활성 알림 1건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "observation_usable": true
+          },
+          "duplicate": false,
+          "usable": true
+        }
+      ],
+      "validation_status": "validated",
+      "collected": [
+        {
+          "source": "monitoring",
+          "data": {
+            "system_name": "payments-service",
+            "status": "degraded",
+            "cpu_percent": 89.5,
+            "memory_percent": 55,
+            "alerts": [
+              "CPU high (threshold 80%)"
+            ],
+            "last_checked": "2026-10-21T00:40:25.781436+00:00",
+            "sample_id": "cpu-1",
+            "data_source": "controlled-comparison-fixture"
+          },
+          "target": "payments-service",
+          "uri": null
+        },
+        {
+          "source": "runbook",
+          "data": "# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n",
+          "target": "cpu-spike",
+          "uri": "runbook://incident-response/cpu-spike"
+        },
+        {
+          "source": "analysis",
+          "data": "특이 패턴 없음."
+        }
+      ],
+      "elapsed_seconds": 13.23376487501082,
+      "tool_calls": [
+        {
+          "tool": "get_monitoring_status",
+          "system_name": "payments-service",
+          "observation_context": "cpu"
+        }
+      ]
+    },
+    {
+      "case": "cpu",
+      "title": "런북 조건 확인",
+      "version": "after",
+      "step": 1,
+      "query": "payments-service 장애 원인과 CPU 런북 조건을 진단해주세요.",
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 89.5,
+        "memory_percent": 55,
+        "alerts": [
+          "CPU high (threshold 80%)"
+        ],
+        "last_checked": "2026-10-21T00:40:25.781436+00:00",
+        "sample_id": "cpu-1",
+        "data_source": "controlled-comparison-fixture"
+      },
+      "status": "completed",
+      "reply": "## 진단 요약\n검증 보류: 모델 제안을 채택하지 않고 확인된 근거와 참고 절차만 제공합니다.\npayments-service는 모니터링상 성능 저하(degraded) 상태입니다. CPU 89.5%는 정상 기준(80% 미만)을 벗어나 CPU 부하를 우선 점검할 근거가 있습니다. 메모리 55%는 정상 기준 안에 있어, 이번 관측의 자원 수치에서는 CPU 쪽 이상이 두드러집니다. 활성 알림 1건도 함께 확인해야 합니다. [M1]\n\n## 다음 확인 순서·조치 판단 (미실행)\n1) [M1 → R1.1] 먼저 확인할 사항: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n- [M1 → R1.3] 런북 수치 조건: CPU 89.5% > 90% → 불충족. 지속 시간·기타 조치 조건은 미확인입니다.\n  이 수치만으로는 런북의 증설 조건을 충족하지 않습니다. 먼저 요청·작업 패턴을 점검하고 CPU 추세를 재확인하세요.\n\n## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 89.5%, 메모리 55%, 알림 1건.\n  관측 시각 2026-10-21T00:40:25.781436Z / 관측 ID cpu-1 / 자료 controlled-comparison-fixture\n  모니터링 알림 원문: CPU high (threshold 80%)\n- [R1] 조회한 런북: cpu-spike / runbook://incident-response/cpu-spike\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### payments-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 서비스 응답 상태·CPU 부하·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 89.5%, 메모리 55%, 알림 1건\n- 활성 알림: CPU high (threshold 80%)\n- 관측 시각: 2026-10-21T00:40:25.781436Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 89.5% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 1건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: controlled-comparison-fixture / 관측 cpu-1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+      "events": [
+        {
+          "type": "RouteDecided",
+          "route": "incident"
+        },
+        {
+          "type": "PlanCreated",
+          "task_count": 2,
+          "targets": [
+            "payments-service"
+          ]
+        },
+        {
+          "type": "GateApplied",
+          "removed_analysis_tasks": 0
+        },
+        {
+          "type": "TaskCompleted",
+          "id": "task-0",
+          "source": "monitoring",
+          "target": "payments-service",
+          "retries": 0
+        },
+        {
+          "type": "ReplanCheck",
+          "round": 0,
+          "is_sufficient": false,
+          "target": "cpu-spike"
+        },
+        {
+          "type": "TaskCompleted",
+          "id": "task-gap-cpu-spike",
+          "source": "runbook",
+          "target": "cpu-spike",
+          "retries": 0
+        },
+        {
+          "type": "ReplanCheck",
+          "round": 1,
+          "is_sufficient": true,
+          "stop": true,
+          "missing_runbooks": []
+        },
+        {
+          "type": "AnalysisCompleted",
+          "length": 9
+        },
+        {
+          "type": "RecoveryAssessed",
+          "target": "payments-service",
+          "phase": "ongoing",
+          "label": "장애 지속",
+          "recurrence": false,
+          "observation_id": 1
+        },
+        {
+          "type": "DraftWritten",
+          "attempt": 1,
+          "length": 315
+        },
+        {
+          "type": "Validation",
+          "attempt": 1,
+          "verdict": "불합격",
+          "errors": [
+            "duplicate_hypothesis"
+          ]
+        },
+        {
+          "type": "DraftWritten",
+          "attempt": 2,
+          "length": 315
+        },
+        {
+          "type": "Validation",
+          "attempt": 2,
+          "verdict": "보류",
+          "errors": [
+            "duplicate_hypothesis"
+          ]
+        },
+        {
+          "type": "Finalize",
+          "pipeline": "incident-v2"
+        }
+      ],
+      "recovery_results": [
+        {
+          "id": 1,
+          "snapshot": {
+            "system_name": "payments-service",
+            "status": "degraded",
+            "cpu_percent": 89.5,
+            "memory_percent": 55.0,
+            "last_checked": "2026-10-21T00:40:25.781436Z",
+            "alerts": [
+              "CPU high (threshold 80%)"
+            ],
+            "sample_id": "cpu-1",
+            "data_source": "controlled-comparison-fixture"
+          },
+          "assessment": {
+            "phase": "ongoing",
+            "recurrence": false,
+            "normal_streak": 0,
+            "comparison": null,
+            "reasons": [
+              "서비스 상태 degraded",
+              "CPU 89.5% (정상 기준 < 80%)",
+              "활성 알림 1건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "policy": {
+              "cpu_limit": 80.0,
+              "memory_limit": 85.0,
+              "freshness_seconds": 300,
+              "required_normal_samples": 2,
+              "minimum_interval_seconds": 5,
+              "recurrence_window_seconds": 3600,
+              "future_tolerance_seconds": 5
+            },
+            "sample_id": "cpu-1",
+            "issues": [
+              "서비스 상태 degraded",
+              "CPU 89.5% (정상 기준 < 80%)",
+              "활성 알림 1건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "observation_usable": true
+          },
+          "duplicate": false,
+          "usable": true
+        }
+      ],
+      "validation_status": "fallback",
+      "collected": [
+        {
+          "source": "monitoring",
+          "data": {
+            "system_name": "payments-service",
+            "status": "degraded",
+            "cpu_percent": 89.5,
+            "memory_percent": 55,
+            "alerts": [
+              "CPU high (threshold 80%)"
+            ],
+            "last_checked": "2026-10-21T00:40:25.781436+00:00",
+            "sample_id": "cpu-1",
+            "data_source": "controlled-comparison-fixture"
+          },
+          "target": "payments-service",
+          "uri": null
+        },
+        {
+          "source": "runbook",
+          "data": "# Runbook: CPU 급증 대응 절차\n\n1. get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2. 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3. CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n4. 급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\n5. 정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\n",
+          "target": "cpu-spike",
+          "uri": "runbook://incident-response/cpu-spike"
+        },
+        {
+          "source": "analysis",
+          "data": "특이 패턴 없음."
+        }
+      ],
+      "elapsed_seconds": 15.852510790980887,
+      "tool_calls": [
+        {
+          "tool": "get_monitoring_status",
+          "system_name": "payments-service",
+          "observation_context": "cpu"
+        }
+      ]
+    },
+    {
+      "case": "recovery",
+      "title": "일시적 정상화 확인",
+      "version": "before",
+      "step": 1,
+      "query": "payments-service의 복구 여부를 진단해 주세요.",
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 95,
+        "memory_percent": 90,
+        "alerts": [
+          "CPU high (threshold 80%)",
+          "memory high"
+        ],
+        "last_checked": "2026-10-21T00:40:15.781436+00:00",
+        "sample_id": "recovery-1",
+        "data_source": "controlled-comparison-fixture"
+      },
+      "status": "completed",
+      "reply": "### payments-service: 장애 지속\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high (threshold 80%), memory high\n- 관측 시각: 2026-10-21T00:40:15.781436Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: controlled-comparison-fixture / 관측 recovery-1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+      "events": [
+        {
+          "type": "RouteDecided",
+          "route": "recheck"
+        },
+        {
+          "type": "TargetsResolved",
+          "targets": [
+            "payments-service"
+          ]
+        },
+        {
+          "type": "TaskCompleted",
+          "source": "monitoring",
+          "target": "payments-service",
+          "retries": 0
+        },
+        {
+          "type": "RecoveryAssessed",
+          "target": "payments-service",
+          "phase": "ongoing",
+          "label": "장애 지속",
+          "recurrence": false,
+          "observation_id": 1
+        },
+        {
+          "type": "Finalize",
+          "pipeline": "recovery"
+        }
+      ],
+      "recovery_results": [
+        {
+          "id": 1,
+          "snapshot": {
+            "system_name": "payments-service",
+            "status": "degraded",
+            "cpu_percent": 95.0,
+            "memory_percent": 90.0,
+            "last_checked": "2026-10-21T00:40:15.781436Z",
+            "alerts": [
+              "CPU high (threshold 80%)",
+              "memory high"
+            ],
+            "sample_id": "recovery-1",
+            "data_source": "controlled-comparison-fixture"
+          },
+          "assessment": {
+            "phase": "ongoing",
+            "recurrence": false,
+            "normal_streak": 0,
+            "comparison": null,
+            "reasons": [
+              "서비스 상태 degraded",
+              "CPU 95% (정상 기준 < 80%)",
+              "메모리 90% (정상 기준 < 85%)",
+              "활성 알림 2건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "policy": {
+              "cpu_limit": 80.0,
+              "memory_limit": 85.0,
+              "freshness_seconds": 300,
+              "required_normal_samples": 2,
+              "minimum_interval_seconds": 5,
+              "recurrence_window_seconds": 3600,
+              "future_tolerance_seconds": 5
+            },
+            "sample_id": "recovery-1",
+            "issues": [
+              "서비스 상태 degraded",
+              "CPU 95% (정상 기준 < 80%)",
+              "메모리 90% (정상 기준 < 85%)",
+              "활성 알림 2건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "observation_usable": true
+          },
+          "duplicate": false,
+          "usable": true
+        }
+      ],
+      "validation_status": null,
+      "collected": [
+        {
+          "source": "monitoring",
+          "data": {
+            "system_name": "payments-service",
+            "status": "degraded",
+            "cpu_percent": 95,
+            "memory_percent": 90,
+            "alerts": [
+              "CPU high (threshold 80%)",
+              "memory high"
+            ],
+            "last_checked": "2026-10-21T00:40:15.781436+00:00",
+            "sample_id": "recovery-1",
+            "data_source": "controlled-comparison-fixture"
+          }
+        }
+      ],
+      "elapsed_seconds": 0.0026681670278776437,
+      "tool_calls": [
+        {
+          "tool": "get_monitoring_status",
+          "system_name": "payments-service",
+          "observation_context": "recovery"
+        }
+      ]
+    },
+    {
+      "case": "recovery",
+      "title": "일시적 정상화 확인",
+      "version": "before",
+      "step": 2,
+      "query": "payments-service의 복구 여부를 진단해 주세요.",
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "healthy",
+        "cpu_percent": 55,
+        "memory_percent": 60,
+        "alerts": [],
+        "last_checked": "2026-10-21T00:40:25.781436+00:00",
+        "sample_id": "recovery-2",
+        "data_source": "controlled-comparison-fixture"
+      },
+      "status": "completed",
+      "reply": "### payments-service: 부분 회복\n- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-21T00:40:25.781436Z\n- 이전 대비: CPU -40%p, 메모리 -30%p (개선)\n- 새 알림: 없음\n- 해소된 알림: CPU high (threshold 80%), memory high\n- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.\n- 출처: controlled-comparison-fixture / 관측 recovery-2\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+      "events": [
+        {
+          "type": "RouteDecided",
+          "route": "recheck"
+        },
+        {
+          "type": "TargetsResolved",
+          "targets": [
+            "payments-service"
+          ]
+        },
+        {
+          "type": "TaskCompleted",
+          "source": "monitoring",
+          "target": "payments-service",
+          "retries": 0
+        },
+        {
+          "type": "RecoveryAssessed",
+          "target": "payments-service",
+          "phase": "partial",
+          "label": "부분 회복",
+          "recurrence": false,
+          "observation_id": 2
+        },
+        {
+          "type": "Finalize",
+          "pipeline": "recovery"
+        }
+      ],
+      "recovery_results": [
+        {
+          "id": 2,
+          "snapshot": {
+            "system_name": "payments-service",
+            "status": "healthy",
+            "cpu_percent": 55.0,
+            "memory_percent": 60.0,
+            "last_checked": "2026-10-21T00:40:25.781436Z",
+            "alerts": [],
+            "sample_id": "recovery-2",
+            "data_source": "controlled-comparison-fixture"
+          },
+          "assessment": {
+            "phase": "partial",
+            "recurrence": false,
+            "normal_streak": 1,
+            "comparison": {
+              "cpu_delta_pp": -40.0,
+              "memory_delta_pp": -30.0,
+              "alerts_added": [],
+              "alerts_cleared": [
+                "CPU high (threshold 80%)",
+                "memory high"
+              ],
+              "previous_checked": "2026-10-21T00:40:15.781436+00:00",
+              "trend": "개선"
+            },
+            "reasons": [
+              "현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다."
+            ],
+            "policy": {
+              "cpu_limit": 80.0,
+              "memory_limit": 85.0,
+              "freshness_seconds": 300,
+              "required_normal_samples": 2,
+              "minimum_interval_seconds": 5,
+              "recurrence_window_seconds": 3600,
+              "future_tolerance_seconds": 5
+            },
+            "sample_id": "recovery-2",
+            "issues": [],
+            "observation_usable": true
+          },
+          "duplicate": false,
+          "usable": true
+        }
+      ],
+      "validation_status": null,
+      "collected": [
+        {
+          "source": "monitoring",
+          "data": {
+            "system_name": "payments-service",
+            "status": "healthy",
+            "cpu_percent": 55,
+            "memory_percent": 60,
+            "alerts": [],
+            "last_checked": "2026-10-21T00:40:25.781436+00:00",
+            "sample_id": "recovery-2",
+            "data_source": "controlled-comparison-fixture"
+          }
+        }
+      ],
+      "elapsed_seconds": 0.002300166990607977,
+      "tool_calls": [
+        {
+          "tool": "get_monitoring_status",
+          "system_name": "payments-service",
+          "observation_context": "recovery"
+        }
+      ]
+    },
+    {
+      "case": "recovery",
+      "title": "일시적 정상화 확인",
+      "version": "after",
+      "step": 1,
+      "query": "payments-service의 복구 여부를 진단해 주세요.",
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "degraded",
+        "cpu_percent": 95,
+        "memory_percent": 90,
+        "alerts": [
+          "CPU high (threshold 80%)",
+          "memory high"
+        ],
+        "last_checked": "2026-10-21T00:40:15.781436+00:00",
+        "sample_id": "recovery-1",
+        "data_source": "controlled-comparison-fixture"
+      },
+      "status": "completed",
+      "reply": "### payments-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 서비스 응답 상태·CPU 부하·메모리 사용 추세·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high (threshold 80%), memory high\n- 관측 시각: 2026-10-21T00:40:15.781436Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: controlled-comparison-fixture / 관측 recovery-1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+      "events": [
+        {
+          "type": "RouteDecided",
+          "route": "recheck"
+        },
+        {
+          "type": "TargetsResolved",
+          "targets": [
+            "payments-service"
+          ]
+        },
+        {
+          "type": "TaskCompleted",
+          "source": "monitoring",
+          "target": "payments-service",
+          "retries": 0
+        },
+        {
+          "type": "RecoveryAssessed",
+          "target": "payments-service",
+          "phase": "ongoing",
+          "label": "장애 지속",
+          "recurrence": false,
+          "observation_id": 1
+        },
+        {
+          "type": "Finalize",
+          "pipeline": "recovery"
+        }
+      ],
+      "recovery_results": [
+        {
+          "id": 1,
+          "snapshot": {
+            "system_name": "payments-service",
+            "status": "degraded",
+            "cpu_percent": 95.0,
+            "memory_percent": 90.0,
+            "last_checked": "2026-10-21T00:40:15.781436Z",
+            "alerts": [
+              "CPU high (threshold 80%)",
+              "memory high"
+            ],
+            "sample_id": "recovery-1",
+            "data_source": "controlled-comparison-fixture"
+          },
+          "assessment": {
+            "phase": "ongoing",
+            "recurrence": false,
+            "normal_streak": 0,
+            "comparison": null,
+            "reasons": [
+              "서비스 상태 degraded",
+              "CPU 95% (정상 기준 < 80%)",
+              "메모리 90% (정상 기준 < 85%)",
+              "활성 알림 2건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "policy": {
+              "cpu_limit": 80.0,
+              "memory_limit": 85.0,
+              "freshness_seconds": 300,
+              "required_normal_samples": 2,
+              "minimum_interval_seconds": 5,
+              "recurrence_window_seconds": 3600,
+              "future_tolerance_seconds": 5
+            },
+            "sample_id": "recovery-1",
+            "issues": [
+              "서비스 상태 degraded",
+              "CPU 95% (정상 기준 < 80%)",
+              "메모리 90% (정상 기준 < 85%)",
+              "활성 알림 2건",
+              "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+            ],
+            "observation_usable": true
+          },
+          "duplicate": false,
+          "usable": true
+        }
+      ],
+      "validation_status": null,
+      "collected": [
+        {
+          "source": "monitoring",
+          "data": {
+            "system_name": "payments-service",
+            "status": "degraded",
+            "cpu_percent": 95,
+            "memory_percent": 90,
+            "alerts": [
+              "CPU high (threshold 80%)",
+              "memory high"
+            ],
+            "last_checked": "2026-10-21T00:40:15.781436+00:00",
+            "sample_id": "recovery-1",
+            "data_source": "controlled-comparison-fixture"
+          }
+        }
+      ],
+      "elapsed_seconds": 0.0025096670142374933,
+      "tool_calls": [
+        {
+          "tool": "get_monitoring_status",
+          "system_name": "payments-service",
+          "observation_context": "recovery"
+        }
+      ]
+    },
+    {
+      "case": "recovery",
+      "title": "일시적 정상화 확인",
+      "version": "after",
+      "step": 2,
+      "query": "payments-service의 복구 여부를 진단해 주세요.",
+      "snapshot": {
+        "system_name": "payments-service",
+        "status": "healthy",
+        "cpu_percent": 55,
+        "memory_percent": 60,
+        "alerts": [],
+        "last_checked": "2026-10-21T00:40:25.781436+00:00",
+        "sample_id": "recovery-2",
+        "data_source": "controlled-comparison-fixture"
+      },
+      "status": "completed",
+      "reply": "### payments-service: 부분 회복\n현재 수치와 알림은 정상 기준으로 돌아왔습니다. 하지만 일시적으로만 정상화됐을 가능성을 배제하려면 추가 관측이 필요합니다. 현재 정상 관측은 1/2회이므로 복구 확정은 보류합니다. 관측 시각이 최소 5초 이상 떨어진 새 자료에서 정상 상태가 이어지는지 다시 확인하세요.\n\n- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-21T00:40:25.781436Z\n- 이전 대비: CPU -40%p, 메모리 -30%p (개선)\n- 새 알림: 없음\n- 해소된 알림: CPU high (threshold 80%), memory high\n- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.\n- 출처: controlled-comparison-fixture / 관측 recovery-2\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+      "events": [
+        {
+          "type": "RouteDecided",
+          "route": "recheck"
+        },
+        {
+          "type": "TargetsResolved",
+          "targets": [
+            "payments-service"
+          ]
+        },
+        {
+          "type": "TaskCompleted",
+          "source": "monitoring",
+          "target": "payments-service",
+          "retries": 0
+        },
+        {
+          "type": "RecoveryAssessed",
+          "target": "payments-service",
+          "phase": "partial",
+          "label": "부분 회복",
+          "recurrence": false,
+          "observation_id": 2
+        },
+        {
+          "type": "Finalize",
+          "pipeline": "recovery"
+        }
+      ],
+      "recovery_results": [
+        {
+          "id": 2,
+          "snapshot": {
+            "system_name": "payments-service",
+            "status": "healthy",
+            "cpu_percent": 55.0,
+            "memory_percent": 60.0,
+            "last_checked": "2026-10-21T00:40:25.781436Z",
+            "alerts": [],
+            "sample_id": "recovery-2",
+            "data_source": "controlled-comparison-fixture"
+          },
+          "assessment": {
+            "phase": "partial",
+            "recurrence": false,
+            "normal_streak": 1,
+            "comparison": {
+              "cpu_delta_pp": -40.0,
+              "memory_delta_pp": -30.0,
+              "alerts_added": [],
+              "alerts_cleared": [
+                "CPU high (threshold 80%)",
+                "memory high"
+              ],
+              "previous_checked": "2026-10-21T00:40:15.781436+00:00",
+              "trend": "개선"
+            },
+            "reasons": [
+              "현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다."
+            ],
+            "policy": {
+              "cpu_limit": 80.0,
+              "memory_limit": 85.0,
+              "freshness_seconds": 300,
+              "required_normal_samples": 2,
+              "minimum_interval_seconds": 5,
+              "recurrence_window_seconds": 3600,
+              "future_tolerance_seconds": 5
+            },
+            "sample_id": "recovery-2",
+            "issues": [],
+            "observation_usable": true
+          },
+          "duplicate": false,
+          "usable": true
+        }
+      ],
+      "validation_status": null,
+      "collected": [
+        {
+          "source": "monitoring",
+          "data": {
+            "system_name": "payments-service",
+            "status": "healthy",
+            "cpu_percent": 55,
+            "memory_percent": 60,
+            "alerts": [],
+            "last_checked": "2026-10-21T00:40:25.781436+00:00",
+            "sample_id": "recovery-2",
+            "data_source": "controlled-comparison-fixture"
+          }
+        }
+      ],
+      "elapsed_seconds": 0.0021872920042369515,
+      "tool_calls": [
+        {
+          "tool": "get_monitoring_status",
+          "system_name": "payments-service",
+          "observation_context": "recovery"
+        }
+      ]
+    }
+  ]
+}
