@@ -1,0 +1,3550 @@
+{
+  "status": "passed",
+  "scope": "synthetic fixed-clock contract checks; no real incident/root-cause accuracy claim",
+  "edge_cases": {
+    "failure_between_normal_samples": {
+      "phase": "partial",
+      "normal_streak": 1
+    },
+    "failed_recheck_then_duplicate_old_normal": {
+      "phase": "hold",
+      "failure_preserved": true
+    },
+    "more_than_100_fresh_observations": {
+      "phase": "recovered",
+      "report_heading": "### payments-service: 복구 확인"
+    }
+  },
+  "threshold_combinations": 392,
+  "matched": 392,
+  "cases": [
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": true,
+      "phase": "recovered",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": true,
+      "phase": "recovered",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 0,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": true,
+      "phase": "recovered",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": true,
+      "phase": "recovered",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 79.9,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 80.1,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 89.5,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 90,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "healthy",
+      "cpu": 100,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 0,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 79.9,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 80.1,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 89.5,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 90,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "degraded",
+      "cpu": 100,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 0,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 79.9,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 80.1,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 89.5,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 90,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "down",
+      "cpu": 100,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "ongoing",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 0,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 79.9,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 80.1,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 89.5,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 90,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 0,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 0,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 84.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 84.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 85,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 85,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 85.1,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 85.1,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 89.9,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 89.9,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 90,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 90,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 100,
+      "alarm": false,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    },
+    {
+      "status": "unknown",
+      "cpu": 100,
+      "memory": 100,
+      "alarm": true,
+      "expected_recovered": false,
+      "phase": "hold",
+      "matched": true
+    }
+  ]
+}

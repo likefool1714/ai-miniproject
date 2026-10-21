@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "scope": "actual HTTP proxy + FastAPI + stdio MCP + Ollama; synthetic recovery-demo data",
+  "fast_generation": "think=false; num_predict=512; transport timeout=20s",
+  "health": {
+    "status": "ok",
+    "instance_id": 4495178640,
+    "creation_count": 1,
+    "supervisor_version": "v2",
+    "llm_backend": "ollama",
+    "fast_llm": "ollama:qwen3:0.6b",
+    "quality_llm": "ollama:qwen3:8b",
+    "recovery_enabled": true,
+    "monitoring_mode": "recovery-demo"
+  },
+  "full_lifecycle_repetitions": 3,
+  "lifecycle_checks": 15,
+  "initial_diagnosis_validated": 3,
+  "extra_diagnoses_validated": 2,
+  "sse_diagnosis_validated": true,
+  "sse_unvalidated_tokens": 0,
+  "initial_diagnosis_median_seconds": 9.961729333008407
+}

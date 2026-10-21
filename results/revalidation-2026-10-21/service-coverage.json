@@ -1,0 +1,753 @@
+{
+  "status": "passed",
+  "scope": "actual Ollama + HTTP + MCP; synthetic sample-json-jitter data",
+  "records": [
+    {
+      "query": "auth-service 장애를 진단해주세요",
+      "target": "auth-service",
+      "required_runbook": "high-latency",
+      "diagnosis": {
+        "reply": "## 진단 요약\nauth-service는 모니터링상 성능 저하(degraded) 상태입니다. CPU 75.3%와 메모리 59.6%는 설정한 정상 기준 안에 있습니다. 다만 활성 알림 2건이 남아 있어 알림 내용과 실제 증상을 대조해야 합니다. [M1]\n\n## 가능한 원인과 우선 점검 방향 (미확정)\n- auth-service: 지연 또는 커넥션 풀 관련 알림이 있습니다. 병목 원인은 미확정입니다. [M1]\n  커넥션 풀 대기나 느린 쿼리·외부 호출이 지연과 관련되는지 확인하는 방향입니다. 지연이 특정 인스턴스에 몰리는지도 점검해야 합니다. [M1 → R1]\n위 내용은 확인할 원인 후보입니다. 해당 로그·추세·설정 자료를 아직 확보하지 않았으므로 원인으로 단정하지 않습니다.\n\n## 다음 확인 순서·조치 판단 (미실행)\n1) [M1 → R1.1] 먼저 확인할 사항: get_monitoring_status로 p95 지연시간과 커넥션 풀 사용률을 확인한다.\n2) [M1 → R1.2] 조건·영향 확인 후 검토할 조치: 커넥션 풀 사용률이 90%를 넘으면 풀 크기를 늘리거나 느린 쿼리/외부 호출에 타임아웃을 건다.\n3) [M1 → R1.4] 조건·영향 확인 후 검토할 조치: 5분 내 p95가 임계치(1.0s) 아래로 내려오지 않으면 캐시 계층 또는 읽기 복제본으로 트래픽을 분산한다.\n\n## 확인된 모니터링 근거\n- [M1] auth-service: 상태 degraded, CPU 75.3%, 메모리 59.6%, 알림 2건.\n  관측 시각 2026-10-21T01:36:34.617902Z / 관측 ID 510d802c9b114b5588bd0b6749d710a0 / 자료 sample-json-jitter (synthetic)\n  모니터링 알림 원문: p95 latency 2.4s (threshold 1.0s); connection pool 92% used\n- [R1] 조회한 런북: high-latency / runbook://incident-response/high-latency\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### auth-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 서비스 응답 상태·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 75.3%, 메모리 59.6%, 알림 2건\n- 활성 알림: p95 latency 2.4s (threshold 1.0s), connection pool 92% used\n- 관측 시각: 2026-10-21T01:36:34.617902Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: sample-json-jitter (synthetic) / 관측 510d802c9b114b5588bd0b6749d710a0\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+        "events": [
+          {
+            "type": "RouteDecided",
+            "route": "incident"
+          },
+          {
+            "type": "PlanCreated",
+            "task_count": 2,
+            "targets": [
+              "auth-service"
+            ]
+          },
+          {
+            "type": "GateApplied",
+            "removed_analysis_tasks": 0
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-0",
+            "source": "monitoring",
+            "target": "auth-service",
+            "retries": 0
+          },
+          {
+            "type": "ReplanCheck",
+            "round": 0,
+            "is_sufficient": false,
+            "target": "high-latency"
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-gap-high-latency",
+            "source": "runbook",
+            "target": "high-latency",
+            "retries": 0
+          },
+          {
+            "type": "ReplanCheck",
+            "round": 1,
+            "is_sufficient": true,
+            "stop": true,
+            "missing_runbooks": []
+          },
+          {
+            "type": "AnalysisCompleted",
+            "length": 9
+          },
+          {
+            "type": "RecoveryAssessed",
+            "target": "auth-service",
+            "phase": "ongoing",
+            "label": "장애 지속",
+            "recurrence": false,
+            "observation_id": 176
+          },
+          {
+            "type": "DraftWritten",
+            "attempt": 1,
+            "length": 307
+          },
+          {
+            "type": "Validation",
+            "attempt": 1,
+            "verdict": "합격",
+            "errors": []
+          },
+          {
+            "type": "Finalize",
+            "pipeline": "incident-v2"
+          }
+        ],
+        "metadata": {
+          "route": "incident",
+          "task_count": 3,
+          "gate_removed": 0,
+          "replan_rounds": 1,
+          "retry_count": 0,
+          "parallel_elapsed": 0.36,
+          "validation_attempts": 1,
+          "validation_status": "validated",
+          "validation_errors": [],
+          "cost_usd": 0.006426,
+          "llm_backend": "ollama",
+          "supervisor_version": "v2",
+          "instance_id": 4495178640,
+          "langsmith_run_id": null,
+          "recovery_action": "legacy",
+          "recovery_results": [
+            {
+              "id": 176,
+              "snapshot": {
+                "system_name": "auth-service",
+                "status": "degraded",
+                "cpu_percent": 75.3,
+                "memory_percent": 59.6,
+                "last_checked": "2026-10-21T01:36:34.617902Z",
+                "alerts": [
+                  "p95 latency 2.4s (threshold 1.0s)",
+                  "connection pool 92% used"
+                ],
+                "sample_id": "510d802c9b114b5588bd0b6749d710a0",
+                "data_source": "sample-json-jitter (synthetic)"
+              },
+              "assessment": {
+                "phase": "ongoing",
+                "recurrence": false,
+                "normal_streak": 0,
+                "comparison": null,
+                "reasons": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "policy": {
+                  "cpu_limit": 80.0,
+                  "memory_limit": 85.0,
+                  "freshness_seconds": 300,
+                  "required_normal_samples": 2,
+                  "minimum_interval_seconds": 5,
+                  "recurrence_window_seconds": 3600,
+                  "future_tolerance_seconds": 5
+                },
+                "sample_id": "510d802c9b114b5588bd0b6749d710a0",
+                "issues": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "observation_usable": true
+              },
+              "duplicate": false,
+              "usable": true
+            }
+          ],
+          "reports": []
+        }
+      },
+      "followup": {
+        "reply": "### auth-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 이전 대비 지표가 악화됐습니다. 서비스 응답 상태·CPU 부하·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 82.9%, 메모리 63.5%, 알림 2건\n- 활성 알림: p95 latency 2.4s (threshold 1.0s), connection pool 92% used\n- 관측 시각: 2026-10-21T01:36:42.254175Z\n- 이전 대비: CPU +7.6%p, 메모리 +3.9%p (악화)\n- 새 알림: 없음\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 82.9% (정상 기준 < 80%)\n- 판단 근거: 활성 알림 2건\n- 출처: sample-json-jitter (synthetic) / 관측 1456cc87c09f4d67ad26aca5ca0722f1\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+        "events": [
+          {
+            "type": "RouteDecided",
+            "route": "recheck"
+          },
+          {
+            "type": "TargetsResolved",
+            "targets": [
+              "auth-service"
+            ]
+          },
+          {
+            "type": "TaskCompleted",
+            "source": "monitoring",
+            "target": "auth-service",
+            "retries": 0
+          },
+          {
+            "type": "RecoveryAssessed",
+            "target": "auth-service",
+            "phase": "ongoing",
+            "label": "장애 지속",
+            "recurrence": false,
+            "observation_id": 177
+          },
+          {
+            "type": "Finalize",
+            "pipeline": "recovery"
+          }
+        ],
+        "metadata": {
+          "route": null,
+          "task_count": 0,
+          "gate_removed": 0,
+          "replan_rounds": 0,
+          "retry_count": 0,
+          "parallel_elapsed": null,
+          "validation_attempts": 0,
+          "validation_status": null,
+          "validation_errors": [],
+          "cost_usd": 0.0,
+          "llm_backend": "ollama",
+          "supervisor_version": "v2",
+          "instance_id": 4495178640,
+          "langsmith_run_id": null,
+          "recovery_action": "recheck",
+          "recovery_results": [
+            {
+              "id": 177,
+              "snapshot": {
+                "system_name": "auth-service",
+                "status": "degraded",
+                "cpu_percent": 82.9,
+                "memory_percent": 63.5,
+                "last_checked": "2026-10-21T01:36:42.254175Z",
+                "alerts": [
+                  "p95 latency 2.4s (threshold 1.0s)",
+                  "connection pool 92% used"
+                ],
+                "sample_id": "1456cc87c09f4d67ad26aca5ca0722f1",
+                "data_source": "sample-json-jitter (synthetic)"
+              },
+              "assessment": {
+                "phase": "ongoing",
+                "recurrence": false,
+                "normal_streak": 0,
+                "comparison": {
+                  "cpu_delta_pp": 7.6,
+                  "memory_delta_pp": 3.9,
+                  "alerts_added": [],
+                  "alerts_cleared": [],
+                  "previous_checked": "2026-10-21T01:36:34.617902+00:00",
+                  "trend": "악화"
+                },
+                "reasons": [
+                  "서비스 상태 degraded",
+                  "CPU 82.9% (정상 기준 < 80%)",
+                  "활성 알림 2건"
+                ],
+                "policy": {
+                  "cpu_limit": 80.0,
+                  "memory_limit": 85.0,
+                  "freshness_seconds": 300,
+                  "required_normal_samples": 2,
+                  "minimum_interval_seconds": 5,
+                  "recurrence_window_seconds": 3600,
+                  "future_tolerance_seconds": 5
+                },
+                "sample_id": "1456cc87c09f4d67ad26aca5ca0722f1",
+                "issues": [
+                  "서비스 상태 degraded",
+                  "CPU 82.9% (정상 기준 < 80%)",
+                  "활성 알림 2건"
+                ],
+                "observation_usable": true
+              },
+              "duplicate": false,
+              "usable": true
+            }
+          ],
+          "reports": []
+        }
+      },
+      "elapsed_including_followup_seconds": 8.782090124994284
+    },
+    {
+      "query": "gateway-service 장애를 진단해주세요",
+      "target": "gateway-service",
+      "required_runbook": "network-timeout",
+      "diagnosis": {
+        "reply": "## 진단 요약\ngateway-service는 모니터링상 성능 저하(degraded) 상태입니다. CPU 27.3%와 메모리 43.7%는 설정한 정상 기준 안에 있습니다. 다만 활성 알림 2건이 남아 있어 알림 내용과 실제 증상을 대조해야 합니다. [M1]\n\n## 가능한 원인과 우선 점검 방향 (미확정)\n- gateway-service: 타임아웃 또는 네트워크 관련 알림이 있습니다. 장애 구간은 추가 확인이 필요합니다. [M1]\n  서비스 간 호출의 어느 구간에서 실패하는지 좁히는 방향입니다. DNS·방화벽·로드밸런서 설정의 최근 변경과 실제 타임아웃 구간을 대조해야 합니다. [M1 → R1]\n위 내용은 확인할 원인 후보입니다. 해당 로그·추세·설정 자료를 아직 확보하지 않았으므로 원인으로 단정하지 않습니다.\n\n## 다음 확인 순서·조치 판단 (미실행)\n1) [M1 → R1.1] 먼저 확인할 사항: get_monitoring_status로 어떤 시스템 간 호출에서 타임아웃이 발생하는지 확인한다.\n2) [M1 → R1.2] 먼저 확인할 사항: DNS 해석 실패, 방화벽/보안그룹 변경, 로드밸런서 헬스체크 실패 중 최근 변경 사항이 있었는지 점검한다.\n3) [M1 → R1.3] 조건·영향 확인 후 검토할 조치: 특정 리전/가용영역에서만 발생하면 해당 구간을 우회하는 라우팅으로 임시 전환한다.\n\n## 확인된 모니터링 근거\n- [M1] gateway-service: 상태 degraded, CPU 27.3%, 메모리 43.7%, 알림 2건.\n  관측 시각 2026-10-21T01:36:43.593750Z / 관측 ID 7576d12732ea43eb8ed45bff61ba738f / 자료 sample-json-jitter (synthetic)\n  모니터링 알림 원문: upstream timeout to payments-service (504); network packet loss 3%\n- [R1] 조회한 런북: network-timeout / runbook://incident-response/network-timeout\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### gateway-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 서비스 응답 상태·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 27.3%, 메모리 43.7%, 알림 2건\n- 활성 알림: upstream timeout to payments-service (504), network packet loss 3%\n- 관측 시각: 2026-10-21T01:36:43.593750Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: sample-json-jitter (synthetic) / 관측 7576d12732ea43eb8ed45bff61ba738f\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+        "events": [
+          {
+            "type": "RouteDecided",
+            "route": "incident"
+          },
+          {
+            "type": "PlanCreated",
+            "task_count": 2,
+            "targets": [
+              "gateway-service"
+            ]
+          },
+          {
+            "type": "GateApplied",
+            "removed_analysis_tasks": 0
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-0",
+            "source": "monitoring",
+            "target": "gateway-service",
+            "retries": 0
+          },
+          {
+            "type": "ReplanCheck",
+            "round": 0,
+            "is_sufficient": false,
+            "target": "network-timeout"
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-gap-network-timeout",
+            "source": "runbook",
+            "target": "network-timeout",
+            "retries": 0
+          },
+          {
+            "type": "ReplanCheck",
+            "round": 1,
+            "is_sufficient": true,
+            "stop": true,
+            "missing_runbooks": []
+          },
+          {
+            "type": "AnalysisCompleted",
+            "length": 9
+          },
+          {
+            "type": "RecoveryAssessed",
+            "target": "gateway-service",
+            "phase": "ongoing",
+            "label": "장애 지속",
+            "recurrence": false,
+            "observation_id": 178
+          },
+          {
+            "type": "DraftWritten",
+            "attempt": 1,
+            "length": 307
+          },
+          {
+            "type": "Validation",
+            "attempt": 1,
+            "verdict": "합격",
+            "errors": []
+          },
+          {
+            "type": "Finalize",
+            "pipeline": "incident-v2"
+          }
+        ],
+        "metadata": {
+          "route": "incident",
+          "task_count": 3,
+          "gate_removed": 0,
+          "replan_rounds": 1,
+          "retry_count": 0,
+          "parallel_elapsed": 0.36,
+          "validation_attempts": 1,
+          "validation_status": "validated",
+          "validation_errors": [],
+          "cost_usd": 0.006325,
+          "llm_backend": "ollama",
+          "supervisor_version": "v2",
+          "instance_id": 4495178640,
+          "langsmith_run_id": null,
+          "recovery_action": "legacy",
+          "recovery_results": [
+            {
+              "id": 178,
+              "snapshot": {
+                "system_name": "gateway-service",
+                "status": "degraded",
+                "cpu_percent": 27.3,
+                "memory_percent": 43.7,
+                "last_checked": "2026-10-21T01:36:43.593750Z",
+                "alerts": [
+                  "upstream timeout to payments-service (504)",
+                  "network packet loss 3%"
+                ],
+                "sample_id": "7576d12732ea43eb8ed45bff61ba738f",
+                "data_source": "sample-json-jitter (synthetic)"
+              },
+              "assessment": {
+                "phase": "ongoing",
+                "recurrence": false,
+                "normal_streak": 0,
+                "comparison": null,
+                "reasons": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "policy": {
+                  "cpu_limit": 80.0,
+                  "memory_limit": 85.0,
+                  "freshness_seconds": 300,
+                  "required_normal_samples": 2,
+                  "minimum_interval_seconds": 5,
+                  "recurrence_window_seconds": 3600,
+                  "future_tolerance_seconds": 5
+                },
+                "sample_id": "7576d12732ea43eb8ed45bff61ba738f",
+                "issues": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "observation_usable": true
+              },
+              "duplicate": false,
+              "usable": true
+            }
+          ],
+          "reports": []
+        }
+      },
+      "followup": {
+        "reply": "### gateway-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 이전 대비 지표가 악화됐습니다. 서비스 응답 상태·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 28%, 메모리 44%, 알림 2건\n- 활성 알림: upstream timeout to payments-service (504), network packet loss 3%\n- 관측 시각: 2026-10-21T01:36:51.063817Z\n- 이전 대비: CPU +0.7%p, 메모리 +0.3%p (악화)\n- 새 알림: 없음\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 활성 알림 2건\n- 출처: sample-json-jitter (synthetic) / 관측 3c257aa328c14808872cb29f25fc984d\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+        "events": [
+          {
+            "type": "RouteDecided",
+            "route": "recheck"
+          },
+          {
+            "type": "TargetsResolved",
+            "targets": [
+              "gateway-service"
+            ]
+          },
+          {
+            "type": "TaskCompleted",
+            "source": "monitoring",
+            "target": "gateway-service",
+            "retries": 0
+          },
+          {
+            "type": "RecoveryAssessed",
+            "target": "gateway-service",
+            "phase": "ongoing",
+            "label": "장애 지속",
+            "recurrence": false,
+            "observation_id": 179
+          },
+          {
+            "type": "Finalize",
+            "pipeline": "recovery"
+          }
+        ],
+        "metadata": {
+          "route": null,
+          "task_count": 0,
+          "gate_removed": 0,
+          "replan_rounds": 0,
+          "retry_count": 0,
+          "parallel_elapsed": null,
+          "validation_attempts": 0,
+          "validation_status": null,
+          "validation_errors": [],
+          "cost_usd": 0.0,
+          "llm_backend": "ollama",
+          "supervisor_version": "v2",
+          "instance_id": 4495178640,
+          "langsmith_run_id": null,
+          "recovery_action": "recheck",
+          "recovery_results": [
+            {
+              "id": 179,
+              "snapshot": {
+                "system_name": "gateway-service",
+                "status": "degraded",
+                "cpu_percent": 28.0,
+                "memory_percent": 44.0,
+                "last_checked": "2026-10-21T01:36:51.063817Z",
+                "alerts": [
+                  "upstream timeout to payments-service (504)",
+                  "network packet loss 3%"
+                ],
+                "sample_id": "3c257aa328c14808872cb29f25fc984d",
+                "data_source": "sample-json-jitter (synthetic)"
+              },
+              "assessment": {
+                "phase": "ongoing",
+                "recurrence": false,
+                "normal_streak": 0,
+                "comparison": {
+                  "cpu_delta_pp": 0.7,
+                  "memory_delta_pp": 0.3,
+                  "alerts_added": [],
+                  "alerts_cleared": [],
+                  "previous_checked": "2026-10-21T01:36:43.593750+00:00",
+                  "trend": "악화"
+                },
+                "reasons": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건"
+                ],
+                "policy": {
+                  "cpu_limit": 80.0,
+                  "memory_limit": 85.0,
+                  "freshness_seconds": 300,
+                  "required_normal_samples": 2,
+                  "minimum_interval_seconds": 5,
+                  "recurrence_window_seconds": 3600,
+                  "future_tolerance_seconds": 5
+                },
+                "sample_id": "3c257aa328c14808872cb29f25fc984d",
+                "issues": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건"
+                ],
+                "observation_usable": true
+              },
+              "duplicate": false,
+              "usable": true
+            }
+          ],
+          "reports": []
+        }
+      },
+      "elapsed_including_followup_seconds": 8.811562500020955
+    },
+    {
+      "query": "로그 서비스 상태를 진단해주세요",
+      "target": "log-service",
+      "required_runbook": "disk-full",
+      "diagnosis": {
+        "reply": "## 진단 요약\nlog-service는 모니터링상 성능 저하(degraded) 상태입니다. CPU 20.8%와 메모리 35.4%는 설정한 정상 기준 안에 있습니다. 다만 활성 알림 2건이 남아 있어 알림 내용과 실제 증상을 대조해야 합니다. [M1]\n\n## 가능한 원인과 우선 점검 방향 (미확정)\n- log-service: 디스크 관련 알림이 있습니다. 용량과 정리 대상은 추가 확인이 필요합니다. [M1]\n  저장 공간 부족과 로그 등의 비정상 증가를 확인하는 방향입니다. 실제 디스크 사용률과 공간을 많이 차지하는 항목을 확인한 뒤 정리·확장을 검토해야 합니다. [M1 → R1]\n위 내용은 확인할 원인 후보입니다. 해당 로그·추세·설정 자료를 아직 확보하지 않았으므로 원인으로 단정하지 않습니다.\n\n## 다음 확인 순서·조치 판단 (미실행)\n1) [M1 → R1.1] 먼저 확인할 사항: get_monitoring_status와 서버 디스크 사용률을 확인해 임계 수준(90% 이상)인지 판단한다.\n2) [M1 → R1.2] 조건·영향 확인 후 검토할 조치: 로그 파일, 임시 파일, 오래된 백업처럼 안전하게 지울 수 있는 항목부터 정리해 여유 공간을 즉시 확보한다.\n3) [M1 → R1.4] 조건·영향 확인 후 검토할 조치: 임시 조치로도 부족하면 볼륨을 확장하거나 추가 스토리지를 연결한다.\n\n## 확인된 모니터링 근거\n- [M1] log-service: 상태 degraded, CPU 20.8%, 메모리 35.4%, 알림 2건.\n  관측 시각 2026-10-21T01:36:52.045325Z / 관측 ID 16f11029dbf74310a1cf9d09335a22e9 / 자료 sample-json-jitter (synthetic)\n  모니터링 알림 원문: disk usage 95% on /var/log; disk space low\n- [R1] 조회한 런북: disk-full / runbook://incident-response/disk-full\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### log-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 서비스 응답 상태·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 20.8%, 메모리 35.4%, 알림 2건\n- 활성 알림: disk usage 95% on /var/log, disk space low\n- 관측 시각: 2026-10-21T01:36:52.045325Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: sample-json-jitter (synthetic) / 관측 16f11029dbf74310a1cf9d09335a22e9\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+        "events": [
+          {
+            "type": "RouteDecided",
+            "route": "incident"
+          },
+          {
+            "type": "PlanCreated",
+            "task_count": 2,
+            "targets": [
+              "log-service"
+            ]
+          },
+          {
+            "type": "GateApplied",
+            "removed_analysis_tasks": 0
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-0",
+            "source": "monitoring",
+            "target": "log-service",
+            "retries": 0
+          },
+          {
+            "type": "ReplanCheck",
+            "round": 0,
+            "is_sufficient": false,
+            "target": "disk-full"
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-gap-disk-full",
+            "source": "runbook",
+            "target": "disk-full",
+            "retries": 0
+          },
+          {
+            "type": "ReplanCheck",
+            "round": 1,
+            "is_sufficient": true,
+            "stop": true,
+            "missing_runbooks": []
+          },
+          {
+            "type": "AnalysisCompleted",
+            "length": 9
+          },
+          {
+            "type": "RecoveryAssessed",
+            "target": "log-service",
+            "phase": "ongoing",
+            "label": "장애 지속",
+            "recurrence": false,
+            "observation_id": 180
+          },
+          {
+            "type": "DraftWritten",
+            "attempt": 1,
+            "length": 304
+          },
+          {
+            "type": "Validation",
+            "attempt": 1,
+            "verdict": "합격",
+            "errors": []
+          },
+          {
+            "type": "Finalize",
+            "pipeline": "incident-v2"
+          }
+        ],
+        "metadata": {
+          "route": "incident",
+          "task_count": 3,
+          "gate_removed": 0,
+          "replan_rounds": 1,
+          "retry_count": 0,
+          "parallel_elapsed": 0.36,
+          "validation_attempts": 1,
+          "validation_status": "validated",
+          "validation_errors": [],
+          "cost_usd": 0.006266,
+          "llm_backend": "ollama",
+          "supervisor_version": "v2",
+          "instance_id": 4495178640,
+          "langsmith_run_id": null,
+          "recovery_action": "legacy",
+          "recovery_results": [
+            {
+              "id": 180,
+              "snapshot": {
+                "system_name": "log-service",
+                "status": "degraded",
+                "cpu_percent": 20.8,
+                "memory_percent": 35.4,
+                "last_checked": "2026-10-21T01:36:52.045325Z",
+                "alerts": [
+                  "disk usage 95% on /var/log",
+                  "disk space low"
+                ],
+                "sample_id": "16f11029dbf74310a1cf9d09335a22e9",
+                "data_source": "sample-json-jitter (synthetic)"
+              },
+              "assessment": {
+                "phase": "ongoing",
+                "recurrence": false,
+                "normal_streak": 0,
+                "comparison": null,
+                "reasons": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "policy": {
+                  "cpu_limit": 80.0,
+                  "memory_limit": 85.0,
+                  "freshness_seconds": 300,
+                  "required_normal_samples": 2,
+                  "minimum_interval_seconds": 5,
+                  "recurrence_window_seconds": 3600,
+                  "future_tolerance_seconds": 5
+                },
+                "sample_id": "16f11029dbf74310a1cf9d09335a22e9",
+                "issues": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "observation_usable": true
+              },
+              "duplicate": false,
+              "usable": true
+            }
+          ],
+          "reports": []
+        }
+      },
+      "followup": {
+        "reply": "### log-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 이전 대비 지표가 악화됐습니다. 서비스 응답 상태·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 21.9%, 메모리 35.9%, 알림 2건\n- 활성 알림: disk usage 95% on /var/log, disk space low\n- 관측 시각: 2026-10-21T01:36:59.548002Z\n- 이전 대비: CPU +1.1%p, 메모리 +0.5%p (악화)\n- 새 알림: 없음\n- 해소된 알림: 없음\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 활성 알림 2건\n- 출처: sample-json-jitter (synthetic) / 관측 79fdacff0d2b4ef2aa0e33e7240bffbb\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+        "events": [
+          {
+            "type": "RouteDecided",
+            "route": "recheck"
+          },
+          {
+            "type": "TargetsResolved",
+            "targets": [
+              "log-service"
+            ]
+          },
+          {
+            "type": "TaskCompleted",
+            "source": "monitoring",
+            "target": "log-service",
+            "retries": 0
+          },
+          {
+            "type": "RecoveryAssessed",
+            "target": "log-service",
+            "phase": "ongoing",
+            "label": "장애 지속",
+            "recurrence": false,
+            "observation_id": 181
+          },
+          {
+            "type": "Finalize",
+            "pipeline": "recovery"
+          }
+        ],
+        "metadata": {
+          "route": null,
+          "task_count": 0,
+          "gate_removed": 0,
+          "replan_rounds": 0,
+          "retry_count": 0,
+          "parallel_elapsed": null,
+          "validation_attempts": 0,
+          "validation_status": null,
+          "validation_errors": [],
+          "cost_usd": 0.0,
+          "llm_backend": "ollama",
+          "supervisor_version": "v2",
+          "instance_id": 4495178640,
+          "langsmith_run_id": null,
+          "recovery_action": "recheck",
+          "recovery_results": [
+            {
+              "id": 181,
+              "snapshot": {
+                "system_name": "log-service",
+                "status": "degraded",
+                "cpu_percent": 21.9,
+                "memory_percent": 35.9,
+                "last_checked": "2026-10-21T01:36:59.548002Z",
+                "alerts": [
+                  "disk usage 95% on /var/log",
+                  "disk space low"
+                ],
+                "sample_id": "79fdacff0d2b4ef2aa0e33e7240bffbb",
+                "data_source": "sample-json-jitter (synthetic)"
+              },
+              "assessment": {
+                "phase": "ongoing",
+                "recurrence": false,
+                "normal_streak": 0,
+                "comparison": {
+                  "cpu_delta_pp": 1.1,
+                  "memory_delta_pp": 0.5,
+                  "alerts_added": [],
+                  "alerts_cleared": [],
+                  "previous_checked": "2026-10-21T01:36:52.045325+00:00",
+                  "trend": "악화"
+                },
+                "reasons": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건"
+                ],
+                "policy": {
+                  "cpu_limit": 80.0,
+                  "memory_limit": 85.0,
+                  "freshness_seconds": 300,
+                  "required_normal_samples": 2,
+                  "minimum_interval_seconds": 5,
+                  "recurrence_window_seconds": 3600,
+                  "future_tolerance_seconds": 5
+                },
+                "sample_id": "79fdacff0d2b4ef2aa0e33e7240bffbb",
+                "issues": [
+                  "서비스 상태 degraded",
+                  "활성 알림 2건"
+                ],
+                "observation_usable": true
+              },
+              "duplicate": false,
+              "usable": true
+            }
+          ],
+          "reports": []
+        }
+      },
+      "elapsed_including_followup_seconds": 8.677091791993007
+    }
+  ],
+  "error": null
+}

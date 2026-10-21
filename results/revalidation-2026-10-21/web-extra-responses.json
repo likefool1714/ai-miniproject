@@ -1,0 +1,446 @@
+{
+  "extras": [
+    {
+      "input": "payments-service와 cache-service 장애를 함께 진단해주세요",
+      "elapsed_seconds": 12.80665641700034,
+      "body": {
+        "reply": "## 진단 요약\npayments-service는 모니터링상 성능 저하(degraded) 상태입니다. CPU 95%는 정상 기준(80% 미만)을 벗어나 CPU 부하를 우선 점검할 근거가 있습니다. 메모리 90%도 정상 기준(85% 미만)을 벗어나 메모리 사용 추세를 함께 확인해야 합니다. 활성 알림 2건도 함께 확인해야 합니다. [M1]\ncache-service는 모니터링상 성능 저하(degraded) 상태입니다. 메모리 88.1%는 정상 기준(85% 미만)을 벗어나 메모리 사용 추세를 우선 확인해야 합니다. CPU 40.2%는 정상 기준 안에 있어, 이번 관측의 자원 수치에서는 메모리 쪽 이상이 두드러집니다. 활성 알림 2건도 함께 확인해야 합니다. [M2]\n\n## 가능한 원인과 우선 점검 방향 (미확정)\n- payments-service: CPU 부하 원인을 추가 확인할 필요가 있습니다. 원인은 확정되지 않았습니다. [M1]\n  요청·트래픽 변화나 반복 호출, 배치 작업 중복처럼 CPU를 소모하는 작업이 있는지 확인하는 방향입니다. 최근 로그와 배포·트래픽 자료를 대조해야 원인을 좁힐 수 있습니다. [M1 → R1]\n- payments-service: 메모리 압박이 의심됩니다. 누수 여부는 추세·힙 자료로 추가 확인해야 합니다. [M1]\n  일시적인 사용량 증가와 메모리 누수를 구분하는 방향입니다. 사용량이 계속 증가하는지 추세를 보고, 힙 덤프와 최근 배포 내용을 확인해야 합니다. [M1 → R2]\n- cache-service: 메모리 압박이 의심됩니다. 누수 여부는 추세·힙 자료로 추가 확인해야 합니다. [M2]\n  일시적인 사용량 증가와 메모리 누수를 구분하는 방향입니다. 사용량이 계속 증가하는지 추세를 보고, 힙 덤프와 최근 배포 내용을 확인해야 합니다. [M2 → R2]\n위 내용은 확인할 원인 후보입니다. 해당 로그·추세·설정 자료를 아직 확보하지 않았으므로 원인으로 단정하지 않습니다.\n\n## 다음 확인 순서·조치 판단 (미실행)\n1) [M1 → R1.1] 먼저 확인할 사항: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2) [M1 → R1.2] 먼저 확인할 사항: 반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\n3) [M2 → R2.1] 먼저 확인할 사항: get_monitoring_status로 메모리 사용률 추세(시간에 따라 꾸준히 증가하는지)를 확인한다.\n4) [M2 → R2.2] 현재 수치 조건 미충족으로 보류할 조치: OOM 직전(90% 이상)이면 해당 프로세스를 즉시 재시작해 서비스 중단을 막는다 — 재시작은 임시 조치일 뿐임을 기록해둔다.\n5) [M2 → R2.3] 먼저 확인할 사항: 힙 덤프 또는 프로파일링 도구로 어떤 객체가 계속 쌓이는지 확인한다.\n6) [M2 → R2.4] 먼저 확인할 사항: 캐시 무제한 증가, 커넥션 미반환, 이벤트 리스너 중복 등록 같은 패턴이 최근 배포에 있었는지 점검한다.\n- [M1 → R1.3] 런북 수치 조건: CPU 95% > 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n  수치 조건은 충족했으므로 고부하가 지속되는지와 증설 영향을 확인한 뒤 부하 분산을 검토하세요. 즉시 증설을 실행했다는 뜻은 아닙니다.\n- [M1 → R2.2] 런북 수치 조건: 메모리 90% ≥ 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n  수치 조건은 충족했지만 실제 OOM 위험과 재시작 영향을 확인한 뒤 임시 조치를 결정해야 합니다. 메모리 누수 원인이 확인된 것은 아닙니다.\n- [M2 → R2.2] 런북 수치 조건: 메모리 88.1% ≥ 90% → 불충족. 지속 시간·기타 조치 조건은 미확인입니다.\n  이 수치만으로는 런북의 재시작 수치 조건을 충족하지 않습니다. 사용량 추세와 힙 자료로 원인을 먼저 좁히세요.\n\n## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 95%, 메모리 90%, 알림 2건.\n  관측 시각 2026-10-21T01:35:28.485807Z / 관측 ID bba92c02cf:payments-service:0 / 자료 scenario:recovery-demo (synthetic)\n  모니터링 알림 원문: CPU high; memory high\n- [M2] cache-service: 상태 degraded, CPU 40.2%, 메모리 88.1%, 알림 2건.\n  관측 시각 2026-10-21T01:36:08.489820Z / 관측 ID df6642bd309642f095f034f7b99ba8b3 / 자료 sample-json-jitter (synthetic)\n  모니터링 알림 원문: memory usage climbing steadily over 6h; heap near limit\n- [R1] 조회한 런북: cpu-spike / runbook://incident-response/cpu-spike\n- [R2] 조회한 런북: memory-leak / runbook://incident-response/memory-leak\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### payments-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 서비스 응답 상태·CPU 부하·메모리 사용 추세·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high, memory high\n- 관측 시각: 2026-10-21T01:35:28.485807Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 bba92c02cf:payments-service:0\n\n### cache-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 서비스 응답 상태·메모리 사용 추세·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 40.2%, 메모리 88.1%, 알림 2건\n- 활성 알림: memory usage climbing steadily over 6h, heap near limit\n- 관측 시각: 2026-10-21T01:36:08.489820Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: 메모리 88.1% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: sample-json-jitter (synthetic) / 관측 df6642bd309642f095f034f7b99ba8b3\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+        "events": [
+          {
+            "type": "RouteDecided",
+            "route": "incident"
+          },
+          {
+            "type": "PlanCreated",
+            "task_count": 3,
+            "targets": [
+              "payments-service",
+              "cache-service"
+            ]
+          },
+          {
+            "type": "GateApplied",
+            "removed_analysis_tasks": 0
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-0",
+            "source": "monitoring",
+            "target": "payments-service",
+            "retries": 0
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-1",
+            "source": "monitoring",
+            "target": "cache-service",
+            "retries": 0
+          },
+          {
+            "type": "ReplanCheck",
+            "round": 0,
+            "is_sufficient": false,
+            "target": "cpu-spike, memory-leak"
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-gap-cpu-spike",
+            "source": "runbook",
+            "target": "cpu-spike",
+            "retries": 0
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-gap-memory-leak",
+            "source": "runbook",
+            "target": "memory-leak",
+            "retries": 0
+          },
+          {
+            "type": "ReplanCheck",
+            "round": 1,
+            "is_sufficient": true,
+            "stop": true,
+            "missing_runbooks": []
+          },
+          {
+            "type": "AnalysisCompleted",
+            "length": 9
+          },
+          {
+            "type": "RecoveryAssessed",
+            "target": "payments-service",
+            "phase": "ongoing",
+            "label": "장애 지속",
+            "recurrence": false,
+            "observation_id": 172
+          },
+          {
+            "type": "RecoveryAssessed",
+            "target": "cache-service",
+            "phase": "ongoing",
+            "label": "장애 지속",
+            "recurrence": false,
+            "observation_id": 173
+          },
+          {
+            "type": "DraftWritten",
+            "attempt": 1,
+            "length": 459
+          },
+          {
+            "type": "Validation",
+            "attempt": 1,
+            "verdict": "합격",
+            "errors": []
+          },
+          {
+            "type": "Finalize",
+            "pipeline": "incident-v2"
+          }
+        ],
+        "metadata": {
+          "route": "incident",
+          "task_count": 5,
+          "gate_removed": 0,
+          "replan_rounds": 1,
+          "retry_count": 0,
+          "parallel_elapsed": 0.36,
+          "validation_attempts": 1,
+          "validation_status": "validated",
+          "validation_errors": [],
+          "cost_usd": 0.009313,
+          "llm_backend": "ollama",
+          "supervisor_version": "v2",
+          "instance_id": 4495178640,
+          "langsmith_run_id": null,
+          "recovery_action": "legacy",
+          "recovery_results": [
+            {
+              "id": 172,
+              "snapshot": {
+                "system_name": "payments-service",
+                "status": "degraded",
+                "cpu_percent": 95.0,
+                "memory_percent": 90.0,
+                "last_checked": "2026-10-21T01:35:28.485807Z",
+                "alerts": [
+                  "CPU high",
+                  "memory high"
+                ],
+                "sample_id": "bba92c02cf:payments-service:0",
+                "data_source": "scenario:recovery-demo (synthetic)"
+              },
+              "assessment": {
+                "phase": "ongoing",
+                "recurrence": false,
+                "normal_streak": 0,
+                "comparison": null,
+                "reasons": [
+                  "서비스 상태 degraded",
+                  "CPU 95% (정상 기준 < 80%)",
+                  "메모리 90% (정상 기준 < 85%)",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "policy": {
+                  "cpu_limit": 80.0,
+                  "memory_limit": 85.0,
+                  "freshness_seconds": 300,
+                  "required_normal_samples": 2,
+                  "minimum_interval_seconds": 5,
+                  "recurrence_window_seconds": 3600,
+                  "future_tolerance_seconds": 5
+                },
+                "sample_id": "bba92c02cf:payments-service:0",
+                "issues": [
+                  "서비스 상태 degraded",
+                  "CPU 95% (정상 기준 < 80%)",
+                  "메모리 90% (정상 기준 < 85%)",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "observation_usable": true
+              },
+              "duplicate": false,
+              "usable": true
+            },
+            {
+              "id": 173,
+              "snapshot": {
+                "system_name": "cache-service",
+                "status": "degraded",
+                "cpu_percent": 40.2,
+                "memory_percent": 88.1,
+                "last_checked": "2026-10-21T01:36:08.489820Z",
+                "alerts": [
+                  "memory usage climbing steadily over 6h",
+                  "heap near limit"
+                ],
+                "sample_id": "df6642bd309642f095f034f7b99ba8b3",
+                "data_source": "sample-json-jitter (synthetic)"
+              },
+              "assessment": {
+                "phase": "ongoing",
+                "recurrence": false,
+                "normal_streak": 0,
+                "comparison": null,
+                "reasons": [
+                  "서비스 상태 degraded",
+                  "메모리 88.1% (정상 기준 < 85%)",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "policy": {
+                  "cpu_limit": 80.0,
+                  "memory_limit": 85.0,
+                  "freshness_seconds": 300,
+                  "required_normal_samples": 2,
+                  "minimum_interval_seconds": 5,
+                  "recurrence_window_seconds": 3600,
+                  "future_tolerance_seconds": 5
+                },
+                "sample_id": "df6642bd309642f095f034f7b99ba8b3",
+                "issues": [
+                  "서비스 상태 degraded",
+                  "메모리 88.1% (정상 기준 < 85%)",
+                  "활성 알림 2건",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "observation_usable": true
+              },
+              "duplicate": false,
+              "usable": true
+            }
+          ],
+          "reports": []
+        }
+      }
+    },
+    {
+      "input": "web-01 상태를 진단해주세요",
+      "elapsed_seconds": 3.869054957991466,
+      "body": {
+        "reply": "## 진단 요약\nweb-01는 모니터링상 정상(healthy) 상태입니다. CPU 37.9%와 메모리 49.9%는 설정한 정상 기준 안에 있습니다. 현재 조회한 항목에서는 이상 신호가 없지만, 이 한 번의 관측만으로 실제 장애 복구까지 확정하지는 않습니다. [M1]\n\n## 가능한 원인과 우선 점검 방향 (미확정)\n- web-01: 이 관측만으로 장애 원인을 특정할 수 없습니다. [M1]\n위 내용은 확인할 원인 후보입니다. 해당 로그·추세·설정 자료를 아직 확보하지 않았으므로 원인으로 단정하지 않습니다.\n\n## 다음 확인 순서·조치 판단 (미실행)\n현재 자료로 적용할 런북 절차를 선택하지 않았습니다. 요청한 증상을 추가 확인하고 새 관측으로 재점검하세요.\n\n## 확인된 모니터링 근거\n- [M1] web-01: 상태 healthy, CPU 37.9%, 메모리 49.9%, 알림 0건.\n  관측 시각 2026-10-21T01:36:21.233714Z / 관측 ID 4ff18bb203644b3fb30d7cf69246e4ab / 자료 sample-json-jitter (synthetic)\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### web-01: 판단 보류\n지금 확보한 자료만으로 현재 복구 상태를 판단하기 어렵습니다. 현재 정상 기준은 충족하지만 최근 장애 기록이 없어 복구 여부를 확정하지 않습니다. 이전 조사 기록이 없어 변화량을 비교할 수 없습니다. 새 관측을 확보한 뒤 다시 판단해야 합니다.\n\n- 관측: 상태=healthy, CPU 37.9%, 메모리 49.9%, 알림 0건\n- 활성 알림: 없음\n- 관측 시각: 2026-10-21T01:36:21.233714Z\n- 판단 근거: 현재 정상 기준은 충족하지만 최근 장애 기록이 없어 복구 여부를 확정하지 않습니다.\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: sample-json-jitter (synthetic) / 관측 4ff18bb203644b3fb30d7cf69246e4ab\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+        "events": [
+          {
+            "type": "RouteDecided",
+            "route": "incident"
+          },
+          {
+            "type": "PlanCreated",
+            "task_count": 2,
+            "targets": [
+              "web-01"
+            ]
+          },
+          {
+            "type": "GateApplied",
+            "removed_analysis_tasks": 0
+          },
+          {
+            "type": "TaskCompleted",
+            "id": "task-0",
+            "source": "monitoring",
+            "target": "web-01",
+            "retries": 0
+          },
+          {
+            "type": "ReplanCheck",
+            "round": 0,
+            "is_sufficient": true,
+            "stop": true,
+            "missing_runbooks": []
+          },
+          {
+            "type": "AnalysisCompleted",
+            "length": 9
+          },
+          {
+            "type": "RecoveryAssessed",
+            "target": "web-01",
+            "phase": "hold",
+            "label": "판단 보류",
+            "recurrence": false,
+            "observation_id": 174
+          },
+          {
+            "type": "DraftWritten",
+            "attempt": 1,
+            "length": 113
+          },
+          {
+            "type": "Validation",
+            "attempt": 1,
+            "verdict": "합격",
+            "errors": []
+          },
+          {
+            "type": "Finalize",
+            "pipeline": "incident-v2"
+          }
+        ],
+        "metadata": {
+          "route": "incident",
+          "task_count": 2,
+          "gate_removed": 0,
+          "replan_rounds": 0,
+          "retry_count": 0,
+          "parallel_elapsed": 0.36,
+          "validation_attempts": 1,
+          "validation_status": "validated",
+          "validation_errors": [],
+          "cost_usd": 0.004198,
+          "llm_backend": "ollama",
+          "supervisor_version": "v2",
+          "instance_id": 4495178640,
+          "langsmith_run_id": null,
+          "recovery_action": "legacy",
+          "recovery_results": [
+            {
+              "id": 174,
+              "snapshot": {
+                "system_name": "web-01",
+                "status": "healthy",
+                "cpu_percent": 37.9,
+                "memory_percent": 49.9,
+                "last_checked": "2026-10-21T01:36:21.233714Z",
+                "alerts": [],
+                "sample_id": "4ff18bb203644b3fb30d7cf69246e4ab",
+                "data_source": "sample-json-jitter (synthetic)"
+              },
+              "assessment": {
+                "phase": "hold",
+                "recurrence": false,
+                "normal_streak": 1,
+                "comparison": null,
+                "reasons": [
+                  "현재 정상 기준은 충족하지만 최근 장애 기록이 없어 복구 여부를 확정하지 않습니다.",
+                  "이전 조사 기록이 없어 변화량을 비교할 수 없습니다."
+                ],
+                "policy": {
+                  "cpu_limit": 80.0,
+                  "memory_limit": 85.0,
+                  "freshness_seconds": 300,
+                  "required_normal_samples": 2,
+                  "minimum_interval_seconds": 5,
+                  "recurrence_window_seconds": 3600,
+                  "future_tolerance_seconds": 5
+                },
+                "sample_id": "4ff18bb203644b3fb30d7cf69246e4ab",
+                "issues": [],
+                "observation_usable": true
+              },
+              "duplicate": false,
+              "usable": true
+            }
+          ],
+          "reports": []
+        }
+      }
+    }
+  ],
+  "sse": [
+    {
+      "type": "RouteDecided",
+      "route": "incident",
+      "node": "route"
+    },
+    {
+      "type": "PlanCreated",
+      "task_count": 2,
+      "targets": [
+        "payments-service"
+      ],
+      "node": "plan"
+    },
+    {
+      "type": "GateApplied",
+      "removed_analysis_tasks": 0,
+      "node": "gate"
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-0",
+      "source": "monitoring",
+      "target": "payments-service",
+      "retries": 0,
+      "node": "research"
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 0,
+      "is_sufficient": false,
+      "target": "cpu-spike, memory-leak",
+      "node": "replan_check"
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-gap-cpu-spike",
+      "source": "runbook",
+      "target": "cpu-spike",
+      "retries": 0,
+      "node": "research"
+    },
+    {
+      "type": "TaskCompleted",
+      "id": "task-gap-memory-leak",
+      "source": "runbook",
+      "target": "memory-leak",
+      "retries": 0,
+      "node": "research"
+    },
+    {
+      "type": "ReplanCheck",
+      "round": 1,
+      "is_sufficient": true,
+      "stop": true,
+      "missing_runbooks": [],
+      "node": "replan_check"
+    },
+    {
+      "type": "AnalysisCompleted",
+      "length": 9,
+      "node": "analysis"
+    },
+    {
+      "type": "RecoveryAssessed",
+      "target": "payments-service",
+      "phase": "ongoing",
+      "label": "장애 지속",
+      "recurrence": false,
+      "observation_id": 175,
+      "node": "record_observations"
+    },
+    {
+      "type": "DraftStarted",
+      "attempt": 1
+    },
+    {
+      "type": "DraftWritten",
+      "attempt": 1,
+      "length": 366,
+      "node": "write"
+    },
+    {
+      "type": "Validation",
+      "attempt": 1,
+      "verdict": "합격",
+      "errors": [],
+      "node": "validate"
+    },
+    {
+      "type": "Finalize",
+      "pipeline": "incident-v2",
+      "node": "finalize"
+    },
+    {
+      "type": "FinalAnswer",
+      "reply": "## 진단 요약\npayments-service는 모니터링상 성능 저하(degraded) 상태입니다. CPU 95%는 정상 기준(80% 미만)을 벗어나 CPU 부하를 우선 점검할 근거가 있습니다. 메모리 90%도 정상 기준(85% 미만)을 벗어나 메모리 사용 추세를 함께 확인해야 합니다. 활성 알림 2건도 함께 확인해야 합니다. [M1]\n\n## 가능한 원인과 우선 점검 방향 (미확정)\n- payments-service: CPU 부하 원인을 추가 확인할 필요가 있습니다. 원인은 확정되지 않았습니다. [M1]\n  요청·트래픽 변화나 반복 호출, 배치 작업 중복처럼 CPU를 소모하는 작업이 있는지 확인하는 방향입니다. 최근 로그와 배포·트래픽 자료를 대조해야 원인을 좁힐 수 있습니다. [M1 → R1]\n- payments-service: 메모리 압박이 의심됩니다. 누수 여부는 추세·힙 자료로 추가 확인해야 합니다. [M1]\n  일시적인 사용량 증가와 메모리 누수를 구분하는 방향입니다. 사용량이 계속 증가하는지 추세를 보고, 힙 덤프와 최근 배포 내용을 확인해야 합니다. [M1 → R2]\n위 내용은 확인할 원인 후보입니다. 해당 로그·추세·설정 자료를 아직 확보하지 않았으므로 원인으로 단정하지 않습니다.\n\n## 다음 확인 순서·조치 판단 (미실행)\n1) [M1 → R1.1] 먼저 확인할 사항: get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\n2) [M1 → R2.1] 먼저 확인할 사항: get_monitoring_status로 메모리 사용률 추세(시간에 따라 꾸준히 증가하는지)를 확인한다.\n3) [M1 → R1.3] 조건·영향 확인 후 검토할 조치: CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\n- [M1 → R1.3] 런북 수치 조건: CPU 95% > 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n  수치 조건은 충족했으므로 고부하가 지속되는지와 증설 영향을 확인한 뒤 부하 분산을 검토하세요. 즉시 증설을 실행했다는 뜻은 아닙니다.\n- [M1 → R2.2] 런북 수치 조건: 메모리 90% ≥ 90% → 충족. 지속 시간·기타 조치 조건은 미확인입니다.\n  수치 조건은 충족했지만 실제 OOM 위험과 재시작 영향을 확인한 뒤 임시 조치를 결정해야 합니다. 메모리 누수 원인이 확인된 것은 아닙니다.\n\n## 확인된 모니터링 근거\n- [M1] payments-service: 상태 degraded, CPU 95%, 메모리 90%, 알림 2건.\n  관측 시각 2026-10-21T01:35:45.122222Z / 관측 ID bba92c02cf:payments-service:0 / 자료 scenario:recovery-demo (synthetic)\n  모니터링 알림 원문: CPU high; memory high\n- [R1] 조회한 런북: cpu-spike / runbook://incident-response/cpu-spike\n- [R2] 조회한 런북: memory-leak / runbook://incident-response/memory-leak\n\n확인 범위: MCP 모니터링 조회와 표시된 런북 조회. 로그·배포 이력·트래픽·힙 덤프는 수집하지 않았습니다. 재시작·확장·롤백 등 조치는 실행하지 않았으며, 런북의 조건 충족·지속 시간은 추가 확인해야 합니다. 알림 원문은 알림 시점의 정보이며 현재 수치와 다를 수 있습니다.\n\n## 상태 변화·복구 확인 (정책 기반 판정)\n### payments-service: 장애 지속\n현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다. 서비스 응답 상태·CPU 부하·메모리 사용 추세·남아 있는 알림의 원인과 해소 여부를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다.\n\n- 관측: 상태=degraded, CPU 95%, 메모리 90%, 알림 2건\n- 활성 알림: CPU high, memory high\n- 관측 시각: 2026-10-21T01:35:45.122222Z\n- 판단 근거: 서비스 상태 degraded\n- 판단 근거: CPU 95% (정상 기준 < 80%)\n- 판단 근거: 메모리 90% (정상 기준 < 85%)\n- 판단 근거: 활성 알림 2건\n- 판단 근거: 이전 조사 기록이 없어 변화량을 비교할 수 없습니다.\n- 출처: scenario:recovery-demo (synthetic) / 관측 bba92c02cf:payments-service:0\n\n※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.",
+      "prompt": "[SYSTEM]\n당신은 운영 진단 제안 선택기입니다. JSON 객체만 반환하세요. 자유 문장과 수치는 쓰지 마세요. 각 monitoring의 id마다 hypotheses에 evidence_id와 관련 allowed_kinds 중 kind를 하나 이상 중복 없이 선택하세요. allowed_step_ids가 있으면 recommendations에 evidence_id와 해당 step_id를 선택하세요. 각 서비스에서 원인을 좁히는 현재 점검 절차를 먼저 선택하고, 관련 항목을 세 개 이내로 우선순위대로 고르세요. 정상화 후 회고보다 현재 확인할 절차가 우선입니다. 조건부 조치를 이미 수행한 것으로 취급하지 마세요. 서비스별 허용 목록을 지키세요. 이 선택은 원인 확정이나 조치 실행을 뜻하지 않습니다. 스키마: {\"$defs\": {\"Hypothesis\": {\"additionalProperties\": false, \"properties\": {\"evidence_id\": {\"title\": \"Evidence Id\", \"type\": \"string\", \"enum\": [\"M1\"]}, \"kind\": {\"enum\": [\"cpu\", \"memory\"], \"title\": \"Kind\", \"type\": \"string\"}}, \"required\": [\"evidence_id\", \"kind\"], \"title\": \"Hypothesis\", \"type\": \"object\"}, \"Recommendation\": {\"additionalProperties\": false, \"properties\": {\"evidence_id\": {\"title\": \"Evidence Id\", \"type\": \"string\", \"enum\": [\"M1\"]}, \"step_id\": {\"title\": \"Step Id\", \"type\": \"string\", \"enum\": [\"R1.1\", \"R1.2\", \"R1.3\", \"R1.4\", \"R1.5\", \"R2.1\", \"R2.2\", \"R2.3\", \"R2.4\", \"R2.5\"]}}, \"required\": [\"evidence_id\", \"step_id\"], \"title\": \"Recommendation\", \"type\": \"object\"}}, \"additionalProperties\": false, \"properties\": {\"hypotheses\": {\"items\": {\"$ref\": \"#/$defs/Hypothesis\"}, \"maxItems\": 2, \"title\": \"Hypotheses\", \"type\": \"array\", \"minItems\": 1}, \"recommendations\": {\"items\": {\"$ref\": \"#/$defs/Recommendation\"}, \"maxItems\": 3, \"title\": \"Recommendations\", \"type\": \"array\"}}, \"required\": [\"hypotheses\", \"recommendations\"], \"title\": \"WriterDraft\", \"type\": \"object\"}\n\n[USER]\n{\"query\": \"payments-service 장애 진단\", \"evidence\": {\"monitoring\": [{\"id\": \"M1\", \"snapshot\": {\"system_name\": \"payments-service\", \"status\": \"degraded\", \"cpu_percent\": 95.0, \"memory_percent\": 90.0, \"last_checked\": \"2026-10-21T01:35:45.122222Z\", \"alerts\": [\"CPU high\", \"memory high\"], \"sample_id\": \"bba92c02cf:payments-service:0\", \"data_source\": \"scenario:recovery-demo (synthetic)\"}, \"allowed_kinds\": [\"cpu\", \"memory\"], \"incident_types\": [\"cpu-spike\", \"memory-leak\"], \"allowed_step_ids\": [\"R1.1\", \"R1.2\", \"R1.3\", \"R1.4\", \"R1.5\", \"R2.1\", \"R2.2\", \"R2.3\", \"R2.4\", \"R2.5\"]}], \"runbooks\": [{\"id\": \"R1\", \"incident_type\": \"cpu-spike\", \"steps\": [{\"id\": \"R1.1\", \"text\": \"get_monitoring_status로 CPU 사용률과 최근 배포/트래픽 변화 시점을 확인한다.\"}, {\"id\": \"R1.2\", \"text\": \"반복 호출, 배치 작업 중복 실행 같은 특정 요청 패턴이 원인인지 최근 로그에서 확인한다.\"}, {\"id\": \"R1.3\", \"text\": \"CPU가 90%를 넘고 지속되면 해당 인스턴스를 오토스케일링 그룹에서 한 대 더 띄워 부하를 분산한다.\"}, {\"id\": \"R1.4\", \"text\": \"급증이 특정 배포 직후 시작됐다면 직전 배포를 롤백하고 원인 분석은 별도로 진행한다.\"}, {\"id\": \"R1.5\", \"text\": \"정상화 후 프로파일링 결과를 바탕으로 핫스팟 코드를 식별해 최적화 작업을 등록한다.\"}], \"uri\": \"runbook://incident-response/cpu-spike\"}, {\"id\": \"R2\", \"incident_type\": \"memory-leak\", \"steps\": [{\"id\": \"R2.1\", \"text\": \"get_monitoring_status로 메모리 사용률 추세(시간에 따라 꾸준히 증가하는지)를 확인한다.\"}, {\"id\": \"R2.2\", \"text\": \"OOM 직전(90% 이상)이면 해당 프로세스를 즉시 재시작해 서비스 중단을 막는다 — 재시작은 임시 조치일 뿐임을 기록해둔다.\"}, {\"id\": \"R2.3\", \"text\": \"힙 덤프 또는 프로파일링 도구로 어떤 객체가 계속 쌓이는지 확인한다.\"}, {\"id\": \"R2.4\", \"text\": \"캐시 무제한 증가, 커넥션 미반환, 이벤트 리스너 중복 등록 같은 패턴이 최근 배포에 있었는지 점검한다.\"}, {\"id\": \"R2.5\", \"text\": \"원인이 된 배포가 있으면 롤백하고, 컨테이너 메모리 상한선을 재확인해 재발 시 더 빨리 감지되도록 조정한다.\"}], \"uri\": \"runbook://incident-response/memory-leak\"}], \"unavailable\": [], \"policy\": {\"cpu_limit\": 80.0, \"memory_limit\": 85.0, \"freshness_seconds\": 300, \"required_normal_samples\": 2, \"minimum_interval_seconds\": 5, \"recurrence_window_seconds\": 3600, \"future_tolerance_seconds\": 5}}, \"validation_feedback\": null}",
+      "reports": [],
+      "validation_status": "validated",
+      "validation_errors": []
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "status": "passed",
+  "product_commit": "e3312f6bf0072b6fc7d309c1d07792ec43108f20",
+  "automated_tests": 67,
+  "contract_combinations_matched": 392,
+  "contract_edge_cases": 3,
+  "live_lifecycle_checks": 15,
+  "live_lifecycle_repetitions": 3,
+  "http_post_diagnoses_validated": 8,
+  "http_sse_diagnoses_validated": 1,
+  "fixed_mcp_diagnoses_validated": 1,
+  "services": [
+    "auth-service",
+    "cache-service",
+    "gateway-service",
+    "log-service",
+    "payments-service",
+    "web-01"
+  ],
+  "history_and_report_cycles": 3,
+  "sse_unvalidated_tokens": 0,
+  "review_scope": "Observed values, target, wording/phase consistency and proposed checks reviewed; not root-cause accuracy or universal prose correctness. SSE lacks observation metadata: reviewed final validation, explanation and token release separately.",
+  "diagnosis_reviews": [
+    {
+      "targets": [
+        "payments-service"
+      ],
+      "validation": "validated",
+      "interpretation_before_raw_evidence": true,
+      "shown_values_match_observations": true,
+      "unperformed_work_claim_not_found": true
+    },
+    {
+      "targets": [
+        "payments-service"
+      ],
+      "validation": "validated",
+      "interpretation_before_raw_evidence": true,
+      "shown_values_match_observations": true,
+      "unperformed_work_claim_not_found": true
+    },
+    {
+      "targets": [
+        "payments-service"
+      ],
+      "validation": "validated",
+      "interpretation_before_raw_evidence": true,
+      "shown_values_match_observations": true,
+      "unperformed_work_claim_not_found": true
+    },
+    {
+      "targets": [
+        "payments-service",
+        "cache-service"
+      ],
+      "validation": "validated",
+      "interpretation_before_raw_evidence": true,
+      "shown_values_match_observations": true,
+      "unperformed_work_claim_not_found": true
+    },
+    {
+      "targets": [
+        "web-01"
+      ],
+      "validation": "validated",
+      "interpretation_before_raw_evidence": true,
+      "shown_values_match_observations": true,
+      "unperformed_work_claim_not_found": true
+    },
+    {
+      "targets": [
+        "auth-service"
+      ],
+      "validation": "validated",
+      "interpretation_before_raw_evidence": true,
+      "shown_values_match_observations": true,
+      "unperformed_work_claim_not_found": true
+    },
+    {
+      "targets": [
+        "gateway-service"
+      ],
+      "validation": "validated",
+      "interpretation_before_raw_evidence": true,
+      "shown_values_match_observations": true,
+      "unperformed_work_claim_not_found": true
+    },
+    {
+      "targets": [
+        "log-service"
+      ],
+      "validation": "validated",
+      "interpretation_before_raw_evidence": true,
+      "shown_values_match_observations": true,
+      "unperformed_work_claim_not_found": true
+    }
+  ]
+}

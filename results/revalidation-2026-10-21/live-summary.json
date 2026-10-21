@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "started_at": "2026-10-21T01:35:33.253984+00:00",
+  "product_commit": "e3312f6bf0072b6fc7d309c1d07792ec43108f20",
+  "components": {
+    "three_lifecycles_and_multi_healthy_sse": {
+      "status": "passed"
+    },
+    "other_services_and_context_switches": {
+      "status": "passed"
+    },
+    "fixed_cpu_interpretation_and_action": {
+      "status": "passed"
+    },
+    "clarification_and_duplicate": {
+      "status": "passed"
+    }
+  },
+  "scope": "local Ollama + HTTP proxy/FastAPI + stdio MCP; synthetic monitoring; fixed CPU comparison uses injected MCP",
+  "completed_at": "2026-10-21T01:37:08.660708+00:00"
+}
