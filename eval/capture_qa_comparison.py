@@ -3,6 +3,7 @@
 실행: .venv/bin/python -m eval.capture_qa_comparison
 스크린샷용 HTML은 별도 읽기 전용 뷰이며 제품 UI와 구별한다.
 """
+import argparse
 import asyncio
 import importlib
 import json
@@ -26,11 +27,11 @@ from agent.session_store import SqliteSessionStore
 OUT = ROOT / "results/qa-comparison-2026-10-21"
 
 
-async def main():
+async def main(baseline_commit="d1043ff"):
     OUT.mkdir(parents=True, exist_ok=True)
     now = datetime.now(timezone.utc)
     meta = {"status": "running", "started_at": now.isoformat(),
-            "before_commit": subprocess.check_output(["git", "rev-parse", "d1043ff"], cwd=ROOT, text=True).strip(),
+            "before_commit": subprocess.check_output(["git", "rev-parse", baseline_commit], cwd=ROOT, text=True).strip(),
             "after_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
             "fast_model": "qwen3:0.6b", "quality_model": "qwen3:8b",
             "io": "Injected fixed MCP input; real local Ollama. Not stdio MCP/HTTP end-to-end timing.",
@@ -61,13 +62,16 @@ async def main():
     save()
     with tempfile.TemporaryDirectory(prefix="qa-comparison-") as directory:
         directory = Path(directory)
-        original = load_original(directory / "baseline", "d1043ff")
+        original = load_original(directory / "baseline", baseline_commit)
         old_llm = importlib.import_module("baseline_agent.ollama_llm")
+        old_store = (importlib.import_module("baseline_agent.recovery_store").RecoveryStore
+                     if (directory / "baseline/agent/recovery_store.py").exists() else None)
         for case_id, title, query, snapshots in cases:
             for version in ("before", "after"):
                 db = directory / f"{case_id}-{version}.db"
                 session = SqliteSessionStore(db)
-                store = RecoveryStore(db, clock=lambda: now) if version == "after" else None
+                store_class = RecoveryStore if version == "after" else old_store
+                store = store_class(db, clock=lambda: now) if store_class else None
                 provider = old_llm if version == "before" else None
                 fast = (provider.OllamaFastLLM if provider else OllamaFastLLM)("qwen3:0.6b", 0.00015)
                 quality = (provider.OllamaQualityLLM if provider else OllamaQualityLLM)("qwen3:8b", 0.005)
@@ -103,4 +107,9 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--baseline-commit", default="d1043ff")
+    parser.add_argument("--output", default="results/qa-comparison-2026-10-21")
+    args = parser.parse_args()
+    OUT = ROOT / args.output
+    asyncio.run(main(args.baseline_commit))

@@ -199,11 +199,45 @@ def assess(rows: list[dict], policy: RecoveryPolicy, now: datetime,
     return result
 
 
+def explain_assessment(snapshot: dict, assessment: dict) -> str:
+    """복구 판정의 의미와 다음 확인을 설명한다. 조회 실패·오래된 수치는 해석하지 않는다."""
+    phase = assessment["phase"]
+    if phase == "hold":
+        return "지금 확보한 자료만으로 현재 복구 상태를 판단하기 어렵습니다. " + " ".join(assessment["reasons"]) + " 새 관측을 확보한 뒤 다시 판단해야 합니다."
+    remaining = assessment.get("issues", [])
+    policy = assessment["policy"]
+    comparison = assessment.get("comparison")
+    if phase == "recovered":
+        return ("현재 서비스 상태·CPU·메모리·알림이 모두 설정한 정상 기준을 충족하고, "
+                "장애 이후 간격을 둔 정상 관측도 필요한 횟수만큼 확인되어 정책상 복구로 판단합니다. "
+                "복구 이후에도 새 관측에서 수치와 알림이 다시 악화되는지 확인하세요. 실제 사용자 요청 성공까지 검증한 것은 아닙니다.")
+    if phase == "partial" and not remaining:
+        return ("현재 수치와 알림은 정상 기준으로 돌아왔습니다. 하지만 일시적으로만 정상화됐을 가능성을 배제하려면 추가 관측이 필요합니다. "
+                f"현재 정상 관측은 {assessment['normal_streak']}/{policy['required_normal_samples']}회이므로 복구 확정은 보류합니다. "
+                f"관측 시각이 최소 {policy['minimum_interval_seconds']}초 이상 떨어진 새 자료에서 정상 상태가 이어지는지 다시 확인하세요.")
+    opening = ("이전보다 지표가 개선됐지만 아직 정상 기준을 모두 충족하지 못했습니다." if phase == "partial" else
+               "현재 정상 기준을 충족하지 못한 항목이 있어 장애가 지속되는 상태로 판단합니다.")
+    if comparison and comparison["trend"] in ("악화", "혼재"):
+        opening += " 이전 대비 지표가 악화됐습니다." if comparison["trend"] == "악화" else " 지표별 변화 방향이 달라 일부 수치가 좋아진 것만으로 복구를 판단할 수 없습니다."
+    if assessment.get("recurrence"):
+        opening = "최근 복구 확인 이후 이상이 다시 관측되어 장애 재발로 표시합니다. 같은 원인인지는 추가 조사가 필요합니다. " + opening
+    checks = []
+    if snapshot["status"] != "healthy":
+        checks.append("서비스 응답 상태")
+    if snapshot["cpu_percent"] >= policy["cpu_limit"]:
+        checks.append("CPU 부하")
+    if snapshot["memory_percent"] >= policy["memory_limit"]:
+        checks.append("메모리 사용 추세")
+    if snapshot["alerts"]:
+        checks.append("남아 있는 알림의 원인과 해소 여부")
+    return opening + " " + "·".join(checks) + "를 우선 점검하고, 조치 후 새 관측으로 재확인하세요. 복구 여부 판정만으로 근본 원인이 밝혀진 것은 아닙니다."
+
+
 def render_assessment(system_name: str, snapshot: dict, assessment: dict) -> str:
     label = PHASE_LABELS[assessment["phase"]]
     if assessment.get("recurrence"):
         label = "장애 재발 / " + label
-    lines = [f"### {system_name}: {label}"]
+    lines = [f"### {system_name}: {label}", explain_assessment(snapshot, assessment), ""]
     if assessment.get("issues") is not None:
         lines.append(f"- 관측: 상태={snapshot['status']}, CPU {snapshot['cpu_percent']:g}%, 메모리 {snapshot['memory_percent']:g}%, 알림 {len(snapshot['alerts'])}건")
         lines.append(f"- 활성 알림: {', '.join(snapshot['alerts']) or '없음'}")
