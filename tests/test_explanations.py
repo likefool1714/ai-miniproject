@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from agent.grounding import (Recommendation, build_bundle, default_draft,
-                             render_answer, validate_draft)
+                             render_answer, validate_draft, writer_schema)
 from agent.recovery import RecoveryPolicy, assess, render_assessment
 
 
@@ -41,6 +41,15 @@ class ExplanationTests(unittest.TestCase):
         self.assertIn("CPU 50%와 메모리 55%는 설정한 정상 기준 안", text)
         self.assertIn("알림 내용과 실제 증상을 대조", text)
         self.assertNotIn("CPU 부하를 우선 점검할 근거", text)
+
+    def test_generation_caps_duplicates_without_removing_multiple_supported_signals(self):
+        cpu_only = writer_schema(self.bundle())
+        self.assertEqual(cpu_only["properties"]["hypotheses"]["maxItems"], 1)
+        self.assertEqual(cpu_only["properties"]["recommendations"]["maxItems"], 3)
+        both = writer_schema(self.bundle(self.sample(memory_percent=90), books=("cpu-spike", "memory-leak")))
+        self.assertEqual(both["properties"]["hypotheses"]["maxItems"], 2)
+        healthy = writer_schema(self.bundle(self.sample(status="healthy", cpu_percent=50, alerts=[])))
+        self.assertEqual(healthy["properties"]["recommendations"]["maxItems"], 0)
 
     def test_interpretation_uses_configured_policy_not_hardcoded_eighty(self):
         bundle = self.bundle(policy=RecoveryPolicy(cpu_limit=95))

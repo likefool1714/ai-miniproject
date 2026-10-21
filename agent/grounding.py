@@ -190,6 +190,12 @@ def writer_schema(bundle: dict) -> dict:
     sources = sorted({m["id"] for m in bundle["monitoring"]})
     kinds = sorted({kind for m in bundle["monitoring"] for kind in m["allowed_kinds"]})
     steps = sorted({step for m in bundle["monitoring"] for step in m["allowed_step_ids"]})
+    # 실제 허용된 후보 수로 생성 길이를 제한한다. 서로 다른 CPU·메모리 후보는 함께 허용한다.
+    schema["properties"]["hypotheses"].update(
+        minItems=len(sources),
+        maxItems=min(36, sum(len(m["allowed_kinds"]) for m in bundle["monitoring"])))
+    schema["properties"]["recommendations"]["maxItems"] = min(
+        36, sum(min(3, len(m["allowed_step_ids"])) for m in bundle["monitoring"]))
     hypotheses = schema["$defs"]["Hypothesis"]["properties"]
     recommendations = schema["$defs"]["Recommendation"]["properties"]
     hypotheses["kind"]["enum"] = kinds
@@ -205,7 +211,7 @@ def writer_schema(bundle: dict) -> dict:
 def writer_prompt(query: str, bundle: dict, feedback=None) -> tuple[str, str]:
     system = (
         "당신은 운영 진단 제안 선택기입니다. JSON 객체만 반환하세요. 자유 문장과 수치는 쓰지 마세요. "
-        "각 monitoring의 id마다 hypotheses에 evidence_id와 allowed_kinds 중 kind를 하나 선택하세요. "
+        "각 monitoring의 id마다 hypotheses에 evidence_id와 관련 allowed_kinds 중 kind를 하나 이상 중복 없이 선택하세요. "
         "allowed_step_ids가 있으면 recommendations에 evidence_id와 해당 step_id를 선택하세요. "
         "각 서비스에서 원인을 좁히는 현재 점검 절차를 먼저 선택하고, 관련 항목을 세 개 이내로 우선순위대로 고르세요. "
         "정상화 후 회고보다 현재 확인할 절차가 우선입니다. 조건부 조치를 이미 수행한 것으로 취급하지 마세요. "

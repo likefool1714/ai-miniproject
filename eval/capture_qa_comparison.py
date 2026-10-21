@@ -89,7 +89,8 @@ async def main(baseline_commit="d1043ff"):
                                 "history": history, "events": [], "cost_usd": 0.0}), timeout=120)
                             row.update(status="completed", reply=answer["final"], events=answer.get("events", []),
                                        recovery_results=answer.get("recovery_results", []),
-                                       validation_status=answer.get("validation_status"), collected=answer.get("collected", []))
+                                       validation_status=answer.get("validation_status"), collected=answer.get("collected", []),
+                                       draft=answer.get("draft"), validation_errors=answer.get("validation_errors", []))
                             history += [{"role": "user", "content": query}, {"role": "assistant", "content": answer["final"]}]
                         except Exception as exc:
                             row.update(status="error", error_type=type(exc).__name__, error=str(exc)[:300])
