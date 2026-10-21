@@ -1,0 +1,42 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>03 · 한 번의 정상화와 복구 구분 — 실제 실행 비교</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#edf1f6;color:#182239;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif}
+header{background:#17233a;color:white;padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
+header strong{font-size:21px}nav{display:flex;gap:10px}nav a{color:#e1e8f4;text-decoration:none;padding:8px 12px;border:1px solid #61718b;border-radius:7px;font-size:14px}
+main{padding:15px 30px;max-width:1600px;margin:auto}.intro{font-size:13px;color:#526079;margin-bottom:8px}
+h1{font-size:25px;margin:0 0 10px}.question{padding:12px 18px;border-left:5px solid #4c58d9;background:white;font-size:18px;margin-bottom:10px}
+.input{font-size:14px;background:#dfe7f0;border-radius:7px;padding:10px 18px;margin-bottom:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+article{background:white;border:1px solid #d5deea;border-radius:12px;overflow:hidden}.label{padding:12px 18px;font-weight:700;font-size:20px;background:#e9edf3}.after .label{background:#e0f0ec;color:#126552}
+.info{padding:9px 18px;color:#59677e;font-size:13px;border-bottom:1px solid #e7ebf2}.reply{padding:14px 18px;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:15.5px;line-height:1.5;margin:0}
+details{border-top:1px solid #e7ebf2;padding:12px 18px;color:#475870;font-size:14px}details pre{white-space:pre-wrap;font-size:14px;color:#182239}
+footer{margin-top:14px;font-size:13px;color:#526079;line-height:1.7}.note{padding:10px 0 0;font-size:14px;color:#526079}
+</style><header><strong>운영장애 대응 에이전트 · 실제 실행 기록</strong><nav><a href="target.html">01 · 조사 대상 확인</a><a href="cpu.html">02 · 수치 조건과 근거 확인</a><a href="recovery.html">03 · 한 번의 정상화와 복구 구분</a></nav></header>
+<main><div class="intro">2026.10.21 실행 · 읽기 전용 비교 뷰 (제품 채팅 UI와 구분)</div><h1>03 · 한 번의 정상화와 복구 구분</h1>
+<div class="question">질문: payments-service의 복구 여부를 진단해 주세요.</div><div class="input">같은 대화에서 10초 간격 관측: degraded / CPU 95% / 메모리 90% / 알림 2건 → healthy / CPU 55% / 메모리 60% / 알림 0건</div>
+<div class="grid"><article class="before"><div class="label">개선 전 · 원본 d1043ff</div><div class="info">실제 모니터링 조회: payments-service · 답변 원문</div><pre class="reply">1) 모니터링 상태 확인: payments-service는 현재 상태=healthy로 정상 운영 중이며, CPU 사용률 55%, 메모리 사용률 60%로 자원 부하가 정상 범위 내입니다. &#32;
+2) 알림 확인: 최근 0건의 알림이 발생하여 장애 사례가 없습니다. &#32;
+3) 대응 절차 검토: Runbook에 명시된 DB Down 대응 절차 중 &#x27;장애 인지&#x27; 및 &#x27;커넥션 풀/리플리케이션 점검&#x27; 단계가 수행되었으며, 특이 패턴 없음으로 서비스 복구 완료 판단됩니다.</pre><details><summary>전체 답변 원문 보기</summary><pre>1) 모니터링 상태 확인: payments-service는 현재 상태=healthy로 정상 운영 중이며, CPU 사용률 55%, 메모리 사용률 60%로 자원 부하가 정상 범위 내입니다. &#32;
+2) 알림 확인: 최근 0건의 알림이 발생하여 장애 사례가 없습니다. &#32;
+3) 대응 절차 검토: Runbook에 명시된 DB Down 대응 절차 중 &#x27;장애 인지&#x27; 및 &#x27;커넥션 풀/리플리케이션 점검&#x27; 단계가 수행되었으며, 특이 패턴 없음으로 서비스 복구 완료 판단됩니다.</pre></details></article><article class="after"><div class="label">개선 후 · 1296a54</div><div class="info">실제 모니터링 조회: payments-service · 답변 원문</div><pre class="reply">### payments-service: 부분 회복
+- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건
+- 활성 알림: 없음
+- 관측 시각: 2026-10-21T00:10:52.240539Z
+- 이전 대비: CPU -40%p, 메모리 -30%p (개선)
+- 새 알림: 없음
+- 해소된 알림: CPU high (threshold 80%), memory high
+- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.
+- 출처: controlled-comparison-fixture / 관측 recovery-2
+
+※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.</pre><details><summary>전체 답변 원문 보기</summary><pre>### payments-service: 부분 회복
+- 관측: 상태=healthy, CPU 55%, 메모리 60%, 알림 0건
+- 활성 알림: 없음
+- 관측 시각: 2026-10-21T00:10:52.240539Z
+- 이전 대비: CPU -40%p, 메모리 -30%p (개선)
+- 새 알림: 없음
+- 해소된 알림: CPU high (threshold 80%), memory high
+- 판단 근거: 현재 정상 기준은 충족했지만 정상 관측 1/2회로 복구 확정을 보류합니다.
+- 출처: controlled-comparison-fixture / 관측 recovery-2
+
+※ 샘플 데이터와 설정한 정책에 따른 판정입니다. 실제 서비스 복구·원인 확정을 보장하지 않습니다.</pre></details></article></div>
+<footer>원본·개선 그래프와 각 버전의 Ollama 연결 코드 실행 / 같은 모델 qwen3:0.6b · qwen3:8b / 모니터링 입력은 고정된 합성 자료<br>
+개선 후 대상 확인·복구 판단은 LLM 없이 코드로 처리합니다. 질문별 1회 실행 사례이며 전체 정확도·운영 환경 성능을 뜻하지 않습니다.
+ · <a href="responses.json">전체 실행 원문 JSON</a></footer></main></html>

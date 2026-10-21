@@ -1,0 +1,24 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>01 · 조사 대상 확인 — 실제 실행 비교</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#edf1f6;color:#182239;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif}
+header{background:#17233a;color:white;padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
+header strong{font-size:21px}nav{display:flex;gap:10px}nav a{color:#e1e8f4;text-decoration:none;padding:8px 12px;border:1px solid #61718b;border-radius:7px;font-size:14px}
+main{padding:15px 30px;max-width:1600px;margin:auto}.intro{font-size:13px;color:#526079;margin-bottom:8px}
+h1{font-size:25px;margin:0 0 10px}.question{padding:12px 18px;border-left:5px solid #4c58d9;background:white;font-size:18px;margin-bottom:10px}
+.input{font-size:14px;background:#dfe7f0;border-radius:7px;padding:10px 18px;margin-bottom:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+article{background:white;border:1px solid #d5deea;border-radius:12px;overflow:hidden}.label{padding:12px 18px;font-weight:700;font-size:20px;background:#e9edf3}.after .label{background:#e0f0ec;color:#126552}
+.info{padding:9px 18px;color:#59677e;font-size:13px;border-bottom:1px solid #e7ebf2}.reply{padding:14px 18px;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:15.5px;line-height:1.5;margin:0}
+details{border-top:1px solid #e7ebf2;padding:12px 18px;color:#475870;font-size:14px}details pre{white-space:pre-wrap;font-size:14px;color:#182239}
+footer{margin-top:14px;font-size:13px;color:#526079;line-height:1.7}.note{padding:10px 0 0;font-size:14px;color:#526079}
+</style><header><strong>운영장애 대응 에이전트 · 실제 실행 기록</strong><nav><a href="target.html">01 · 조사 대상 확인</a><a href="cpu.html">02 · 수치 조건과 근거 확인</a><a href="recovery.html">03 · 한 번의 정상화와 복구 구분</a></nav></header>
+<main><div class="intro">2026.10.21 실행 · 읽기 전용 비교 뷰 (제품 채팅 UI와 구분)</div><h1>01 · 조사 대상 확인</h1>
+<div class="question">질문: 서비스가 느려졌어요. 장애를 진단해주세요.</div><div class="input">서비스명 미지정 · 원본 코드가 선택한 auth-service 조회에만 고정 관측값 제공 · 개선 후에는 조회하지 않음</div>
+<div class="grid"><article class="before"><div class="label">개선 전 · 원본 d1043ff</div><div class="info">실제 모니터링 조회: auth-service · 답변 원문</div><pre class="reply">1) **커넥션 풀 사용률 92% 초과**로 인해 풀 크기 확장 또는 느린 쿼리/외부 호출 타임아웃 적용 필요 (runbook 단계 2). &#32;
+2) **p95 지연 2.4s (임계치 1.0s)**로 5분 내 개선되지 않으면 캐시 계층 또는 읽기 복제본으로 트래픽 분산 (runbook 단계 4). &#32;
+3) **지연 분산 여부 확인** 필요 (특이 패턴 없음) 및 정상화 후 느린 쿼리 로그 분석을 통한 근본 원인 문서화 (runbook 단계 5).</pre><details><summary>전체 답변 원문 보기</summary><pre>1) **커넥션 풀 사용률 92% 초과**로 인해 풀 크기 확장 또는 느린 쿼리/외부 호출 타임아웃 적용 필요 (runbook 단계 2). &#32;
+2) **p95 지연 2.4s (임계치 1.0s)**로 5분 내 개선되지 않으면 캐시 계층 또는 읽기 복제본으로 트래픽 분산 (runbook 단계 4). &#32;
+3) **지연 분산 여부 확인** 필요 (특이 패턴 없음) 및 정상화 후 느린 쿼리 로그 분석을 통한 근본 원인 문서화 (runbook 단계 5).</pre></details></article><article class="after"><div class="label">개선 후 · 1296a54</div><div class="info">실제 모니터링 조회: 없음 · 답변 원문</div><pre class="reply">조사할 서비스를 확정하지 못했습니다. 어떤 서비스를 확인할까요?
+등록 서비스: auth-service, web-01, payments-service, cache-service, gateway-service, log-service</pre><details><summary>전체 답변 원문 보기</summary><pre>조사할 서비스를 확정하지 못했습니다. 어떤 서비스를 확인할까요?
+등록 서비스: auth-service, web-01, payments-service, cache-service, gateway-service, log-service</pre></details></article></div>
+<footer>원본·개선 그래프와 각 버전의 Ollama 연결 코드 실행 / 같은 모델 qwen3:0.6b · qwen3:8b / 모니터링 입력은 고정된 합성 자료<br>
+개선 후 대상 확인·복구 판단은 LLM 없이 코드로 처리합니다. 질문별 1회 실행 사례이며 전체 정확도·운영 환경 성능을 뜻하지 않습니다.
+ · <a href="responses.json">전체 실행 원문 JSON</a></footer></main></html>
