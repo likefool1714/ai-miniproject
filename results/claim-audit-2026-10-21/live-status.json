@@ -1,0 +1,5 @@
+{
+  "status": "passed",
+  "cases": 2,
+  "scope": "actual HTTP proxy + MCP + local Ollama for diagnosis; synthetic monitoring; one execution per case"
+}

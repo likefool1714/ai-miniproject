@@ -1,0 +1,26 @@
+{
+  "historical_baseline_round_files": 18,
+  "test_log_count": 67,
+  "contract_case_count": 392,
+  "contract_all_matched": true,
+  "lifecycle_turns": 15,
+  "lifecycle_repetitions": 3,
+  "post_validated": 8,
+  "sse_validated": 1,
+  "services_match_registered": [
+    "auth-service",
+    "cache-service",
+    "gateway-service",
+    "log-service",
+    "payments-service",
+    "web-01"
+  ],
+  "canonical_runbook_hashes_match": 6,
+  "limits": [
+    "Test success is not universal factual or root-cause accuracy.",
+    "Live monitoring sources are synthetic.",
+    "67 tests include fake/mock models; actual LLM evidence is recorded separately.",
+    "New explanation prose uses code and pre-reviewed runbook text.",
+    "Grounding applies to incident diagnosis, not all direct chat."
+  ]
+}
