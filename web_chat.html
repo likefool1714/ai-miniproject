@@ -2,128 +2,188 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
-<title>운영 에이전트 채팅 (Vue)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>운영 에이전트 · 장애 조사</title>
 <style>
-  :root { color-scheme: dark; }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    margin: 0; height: 100vh; display: flex; flex-direction: column;
-    font-family: -apple-system, "Apple SD Gothic Neo", sans-serif;
-    background: #1e1e2e; color: #e2e2f0;
-    overflow: hidden;   /* #log만 스크롤되게, 바디 자체는 늘어나지 않게 고정 */
-  }
-  #app {
-    flex: 1; min-height: 0;   /* Vue 마운트 루트가 header/#log/form을 감싸므로,
-                                 body의 flex 흐름이 여기까지 이어지게 한다 */
-    display: flex; flex-direction: column;
-  }
-  header {
-    padding: 14px 20px; background: #262638; border-bottom: 1px solid #3a3a52;
-    font-weight: 600; font-size: 15px;
-  }
-  header span { color: #8b8bd8; font-weight: 400; font-size: 13px; margin-left: 8px; }
-  #log {
-    flex: 1; min-height: 0;   /* flex 자식 기본 최소높이(콘텐츠 크기)를 풀어줘야
-                                 내용이 길어져도 바디가 안 늘어나고 여기서만 스크롤됨 */
-    overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px;
-  }
-  #log::-webkit-scrollbar { width: 9px; }
-  #log::-webkit-scrollbar-track { background: transparent; }
-  #log::-webkit-scrollbar-thumb { background: #3a3a52; border-radius: 6px; }
-  #log::-webkit-scrollbar-thumb:hover { background: #4a4a68; }
-  .row { display: flex; }
-  .row.user { justify-content: flex-end; }
-  .bubble {
-    max-width: 70%; padding: 10px 14px; border-radius: 14px; line-height: 1.5;
-    font-size: 14px; white-space: pre-wrap;
-  }
-  .row.user .bubble { background: #5b5bd6; color: white; border-bottom-right-radius: 4px; }
-  .row.agent .bubble { background: #2e2e42; border-bottom-left-radius: 4px; }
-  .steps {
-    max-width: 70%; font-size: 12px; color: #9a9ac0; padding: 6px 14px;
-    display: flex; flex-direction: column; gap: 3px;
-  }
-  .steps .step::before { content: "⏳ "; }
-  .steps .step.done::before { content: "✓ "; color: #7ee787; }
-  .prompt-box {
-    flex-shrink: 0;   /* #log가 스크롤 영역이 되면서(min-height:0) <details>가 flex
-                         자식으로서 내용 없이 찌그러지는 걸 방지 */
-    max-width: 70%; margin-top: -4px; background: #17171f; border: 1px solid #3a3a52;
-    border-radius: 10px; font-size: 12px; overflow: hidden;
-  }
-  .prompt-box summary {
-    cursor: pointer; padding: 7px 12px; color: #8b8bd8; user-select: none;
-    list-style: none;
-  }
-  .prompt-box summary::-webkit-details-marker { display: none; }
-  .prompt-box summary::before { content: "🔍 "; }
-  .prompt-box[open] summary::before { content: "🔽 "; }
-  .prompt-box pre {
-    margin: 0; padding: 10px 12px; border-top: 1px solid #3a3a52;
-    background: #11111a; color: #c3c3e0; white-space: pre-wrap; word-break: break-word;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace; max-height: 320px; overflow-y: auto;
-  }
-  form { display: flex; gap: 8px; padding: 14px 20px; background: #262638; border-top: 1px solid #3a3a52; }
-  input {
-    flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid #3a3a52;
-    background: #1e1e2e; color: #e2e2f0; font-size: 14px;
-  }
-  input:focus { outline: 1px solid #5b5bd6; }
-  button {
-    padding: 11px 20px; border-radius: 10px; border: none; background: #5b5bd6;
-    color: white; font-size: 14px; cursor: pointer;
-  }
-  button:disabled { background: #3a3a52; cursor: default; }
-  .quick-actions { display: flex; gap: 8px; padding: 8px 20px; flex-wrap: wrap; }
-  .quick-actions button { padding: 7px 12px; font-size: 12px; }
-  .report-link { color: #b7b7ff; padding: 8px 14px; }
+:root { color-scheme: light; --ink:#202c3d; --muted:#69788b; --line:#e6ebf0; --blue:#3369e8; --soft:#f0f5ff; --surface:#f7f9fc; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; color:var(--ink); background:var(--surface); font-size:14px; -webkit-font-smoothing:antialiased; }
+button,textarea { font:inherit; } button,a { -webkit-tap-highlight-color:transparent; }
+button { cursor:pointer; } button:disabled { cursor:not-allowed; opacity:.45; }
+button:focus-visible,a:focus-visible,summary:focus-visible { outline:3px solid #a9c4ff; outline-offset:3px; }
+button { transition:background .15s,border-color .15s,transform .15s; }
+button:not(:disabled):active { transform:translateY(1px); }
+[v-cloak] { display:none; } .icon { width:20px; height:20px; flex-shrink:0; }
+#app { display:flex; height:100vh; height:100dvh; overflow:hidden; }
+.sidebar { width:232px; flex-shrink:0; background:#fff; border-right:1px solid var(--line); padding:28px 18px 20px; display:flex; flex-direction:column; }
+.brand { display:flex; align-items:center; gap:11px; padding:0 9px; }
+.brand-mark { width:36px; height:36px; border-radius:11px; display:grid; place-items:center; color:white; background:var(--blue); }
+.brand strong { display:block; font-size:16px; letter-spacing:-.6px; } .brand small { display:block; color:var(--muted); font-size:11px; margin-top:3px; letter-spacing:.3px; }
+.new-investigation { display:flex; align-items:center; gap:10px; border:1px solid #d7e2f7; color:#315daf; background:#f5f8ff; padding:12px 14px; border-radius:9px; margin:31px 0 29px; font-weight:600; text-align:left; }
+.new-investigation:hover { background:#eaf1ff; }
+.nav-label { color:#8995a5; font-size:11px; font-weight:600; letter-spacing:1.2px; margin:0 13px 12px; }
+.tools { display:flex; flex-direction:column; gap:5px; }
+.tool { display:flex; align-items:center; gap:12px; width:100%; border:0; background:transparent; text-align:left; padding:13px; border-radius:8px; color:#596a80; }
+.tool:hover { background:#f3f6fa; color:var(--blue); } .tool .icon { width:18px; height:18px; }
+.sidebar-note { border-top:1px solid var(--line); margin:25px 12px 0; padding-top:20px; }
+.sidebar-note p { font-size:12px; color:#7b8797; line-height:1.75; margin:8px 0; }
+.sidebar-bottom { margin-top:auto; padding:18px 11px 0; }
+.mode-badge { display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:600; color:#66748b; background:#f0f3f7; padding:7px 9px; border-radius:6px; }
+.environment { margin-top:12px; font-size:11px; line-height:1.7; color:var(--muted); overflow-wrap:anywhere; }
+.environment summary { cursor:pointer; width:fit-content; } .environment p { margin:8px 0 0; }
+.workspace { flex:1; min-width:0; display:flex; flex-direction:column; }
+.topbar { min-height:78px; padding:0 40px; display:flex; align-items:center; justify-content:space-between; gap:16px; background:#ffffffd9; border-bottom:1px solid var(--line); }
+.breadcrumb { color:#8a96a6; font-size:12px; display:flex; gap:9px; align-items:center; } .breadcrumb strong { color:#43536b; font-weight:600; }
+.connection { display:flex; align-items:center; gap:7px; font-size:12px; color:#64748b; }
+.status-dot { width:6px; height:6px; border-radius:50%; background:#a5afbc; } .connection.online .status-dot { background:#3c9d79; } .connection.offline .status-dot { background:#cb6b45; }
+.retry-health { border:0; background:none; color:var(--blue); padding:4px; text-decoration:underline; }
+#log { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; scroll-behavior:smooth; padding:30px 42px; }
+#log::-webkit-scrollbar { width:6px; } #log::-webkit-scrollbar-thumb { border-radius:9px; background:#d8e0ea; }
+.welcome { width:min(850px,100%); margin:clamp(8px,2.5vh,28px) auto 20px; }
+.eyebrow { display:flex; align-items:center; gap:8px; color:var(--blue); font-size:12px; font-weight:600; letter-spacing:.2px; }
+.eyebrow .icon { width:17px; height:17px; }
+.welcome h1 { font-size:clamp(29px,3.1vw,43px); line-height:1.35; letter-spacing:-1.8px; margin:20px 0 17px; font-weight:700; }
+.welcome > p { color:var(--muted); font-size:15px; line-height:1.85; margin:0; word-break:keep-all; }
+.example-label { font-size:12px; color:#8b96a6; margin:38px 0 13px; }
+.examples { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; }
+.example { border:1px solid #e2e8f0; background:white; border-radius:12px; padding:21px 20px 17px; text-align:left; min-width:0; box-shadow:0 3px 9px #25365d03; }
+.example:hover { border-color:#a7bfee; background:#fcfdff; box-shadow:0 5px 18px #2a4a8910; }
+.example .example-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.example .example-icon { width:32px; height:32px; display:grid; place-items:center; background:#edf3ff; border-radius:9px; color:#4b75c2; }
+.example .arrow { color:#9aa8ba; width:16px; height:16px; }
+.example strong { display:block; font-size:14px; margin-bottom:8px; } .example p { margin:0; font-size:12px; line-height:1.8; color:#7b879a; word-break:keep-all; }
+.example code { display:block; margin-top:17px; font-size:10px; color:#8c98aa; }
+.welcome-foot { display:flex; align-items:center; gap:7px; color:#8b97a7; font-size:11px; margin-top:22px; } .welcome-foot .icon { width:14px; height:14px; }
+.conversation { width:min(960px,100%); margin:0 auto; }
+.conversation-heading { display:flex; align-items:center; justify-content:space-between; margin:0 0 12px; padding-bottom:0; gap:15px; }
+.conversation-heading strong { font-size:13px; } .target-list { color:#7d8ba0; font-size:11px; overflow-wrap:anywhere; }
+.row { display:flex; margin:16px 0; gap:12px; align-items:flex-start; }
+.row.user { justify-content:flex-end; } .row.user .bubble { max-width:80%; background:#eaf0fd; border:1px solid #e0e9fb; color:#33517e; padding:14px 19px; border-radius:13px 13px 3px 13px; white-space:pre-wrap; line-height:1.8; overflow-wrap:anywhere; }
+.agent-avatar { width:29px; height:29px; display:grid; place-items:center; flex-shrink:0; background:white; border:1px solid #dde6f4; border-radius:9px; color:var(--blue); margin-top:3px; } .agent-avatar .icon { width:16px; height:16px; }
+.answer-wrap { min-width:0; flex:1; } .answer-meta { display:flex; align-items:center; justify-content:space-between; min-height:25px; margin-bottom:8px; color:#65748a; font-size:11px; }
+.answer-meta strong { color:#43536b; font-size:12px; font-weight:600; } .copy-button { display:flex; align-items:center; gap:5px; padding:3px 6px; font-size:10px; color:#8a97a9; background:none; border:0; border-radius:4px; } .copy-button:hover { color:var(--blue); background:#eaf0fa; } .copy-button .icon { width:13px; height:13px; }
+.row.agent .bubble { background:white; border:1px solid var(--line); border-radius:3px 12px 12px 12px; padding:23px 27px; box-shadow:0 2px 5px #1d345404; }
+.row.error .bubble { background:#fffaf6; border-color:#f0ddcb; }
+.markdown { font-size:14px; line-height:1.9; overflow-wrap:anywhere; }
+.markdown h2,.markdown h3,.markdown h4 { font-size:15px; line-height:1.6; margin:23px 0 10px; color:#253c5c; letter-spacing:-.3px; }
+.markdown > :first-child { margin-top:0; } .markdown > :last-child { margin-bottom:0; }
+.markdown p { margin:10px 0; white-space:pre-wrap; } .markdown ul,.markdown ol { margin:10px 0; padding-left:21px; } .markdown li { padding-left:3px; margin:6px 0; }
+.markdown code { font-size:.88em; background:#f0f4fa; padding:2px 5px; border-radius:4px; color:#3b629b; } .markdown strong { color:#294766; font-weight:650; }
+.markdown pre { background:#f5f7fa; padding:15px; border:1px solid var(--line); border-radius:7px; overflow:auto; white-space:pre; font-size:12px; }
+.markdown .table-scroll { overflow-x:auto; margin:16px 0; border:1px solid var(--line); border-radius:8px; }
+.markdown table { width:100%; border-collapse:collapse; font-size:12px; white-space:nowrap; } .markdown th { background:#f5f8fc; color:#526783; font-weight:600; } .markdown td,.markdown th { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); } .markdown tr:last-child td { border:0; }
+.markdown .facts { list-style:none; padding:0; margin:18px 0; border-top:1px solid #edf1f6; } .markdown .facts .fact-row { display:grid; grid-template-columns:90px minmax(0,1fr); gap:12px; padding:8px 0; margin:0; border-bottom:1px solid #edf1f6; font-size:12px; line-height:1.75; } .fact-label { color:#8592a4; }
+.markdown hr { border:0; border-top:1px solid var(--line); margin:20px 0; }
+.process { margin:6px 0 6px 41px; color:#7c899b; font-size:11px; }
+.process summary { cursor:pointer; display:flex; align-items:center; gap:7px; width:fit-content; list-style:none; padding:5px 0; } .process summary::-webkit-details-marker { display:none; }
+.process summary .icon { width:13px; height:13px; } .process[open] .chevron { transform:rotate(90deg); }
+.process ul { list-style:none; border-left:1px solid #dce5f1; padding:0 0 0 15px; margin:10px 0 14px 6px; } .process li { padding:4px 0; line-height:1.65; }
+.process li::before { content:'✓'; color:#6c99b1; margin-right:8px; }
+.spinner { width:12px; height:12px; border:1.5px solid #d8e2f4; border-top-color:var(--blue); border-radius:50%; animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.prompt-box { margin:0 0 20px 41px; color:#8b98aa; font-size:11px; }
+.prompt-box summary { cursor:pointer; width:fit-content; padding:5px 0; } .prompt-box pre { max-height:280px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; background:#eef2f7; border:1px solid #dfe6ef; padding:15px; color:#61728a; border-radius:7px; font-size:11px; line-height:1.7; }
+.report-link { display:flex; align-items:center; gap:11px; margin:0 0 18px 41px; padding:15px 18px; width:fit-content; max-width:calc(100% - 41px); background:#fff; border:1px solid #d9e4f6; border-radius:9px; text-decoration:none; color:#3769be; font-size:12px; overflow-wrap:anywhere; }
+.report-link small { display:block; color:#8996aa; font-size:10px; margin-top:3px; } .report-link:hover { background:#f1f6ff; }
+.composer-area { flex-shrink:0; padding:12px 42px 19px; background:linear-gradient(0deg,#f7f9fc 85%,#f7f9fc00); }
+.composer-inner { width:min(960px,100%); margin:auto; }
+.followups { display:flex; gap:7px; margin-bottom:12px; flex-wrap:wrap; }
+.followups button { border:1px solid #e0e7f1; border-radius:7px; background:#fff; color:#697c96; padding:7px 10px; font-size:11px; }
+.followups button:hover { background:#edf3fe; border-color:#c2d2f0; color:var(--blue); }
+.composer { background:white; border:1px solid #dce4ef; border-radius:13px; box-shadow:0 5px 22px #2c4a7507; padding:16px 16px 12px; }
+.composer:focus-within { border-color:#97b2ee; box-shadow:0 0 0 3px #3369e809; }
+.composer textarea { display:block; width:100%; resize:none; height:40px; max-height:120px; border:0; padding:0 3px; line-height:1.8; color:#344861; background:transparent; outline:0; font-size:14px; } .composer textarea::placeholder { color:#a0adbd; }
+.composer-bottom { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.input-hint { color:#99a5b5; font-size:10px; display:flex; align-items:center; gap:6px; } .input-hint .icon { width:13px; height:13px; }
+.send-button { display:flex; gap:8px; align-items:center; border:0; background:var(--blue); color:#fff; padding:9px 15px; border-radius:7px; font-size:12px; font-weight:500; } .send-button:hover { background:#285bd2; } .send-button .icon { width:14px; height:14px; }
+.disclaimer { text-align:center; font-size:10px; color:#97a3b3; margin:11px 0 0; line-height:1.6; }
+@media(min-width:1600px) { .sidebar { width:250px; } }
+@media(min-width:721px) and (max-height:820px) { #log { padding-top:22px; padding-bottom:18px; } .welcome { margin:0 auto; } .welcome h1 { font-size:34px; line-height:1.25; margin:13px 0; } .welcome > p { font-size:13px; line-height:1.7; } .example-label { margin:23px 0 10px; } .example { padding:15px 17px; } .example .example-top { margin-bottom:12px; } .example p { font-size:11px; line-height:1.7; } .example code { margin-top:10px; } .welcome-foot { margin-top:14px; } }
+@media(max-width:1000px) { .sidebar { width:200px; padding-left:12px; padding-right:12px; } .topbar { padding:0 27px; } #log { padding:24px 27px; } .composer-area { padding-left:27px; padding-right:27px; } .example { padding:17px 14px; } .welcome h1 { font-size:34px; } }
+@media(max-width:720px) { .sidebar { width:70px; padding:22px 10px; align-items:center; } .brand { padding:0; } .brand-copy,.nav-label,.sidebar-note,.sidebar-bottom,.tool span,.new-investigation span { display:none; } .new-investigation { padding:13px; margin:28px 0 16px; } .tool { padding:14px; } .tools { gap:6px; } .topbar { min-height:64px; padding:0 20px; } #log { padding:22px 20px; } .composer-area { padding:10px 20px 14px; } .welcome { margin:25px auto; } .welcome h1 { font-size:30px; } .welcome > p { font-size:13px; } .examples { grid-template-columns:1fr; gap:8px; } .example { padding:15px; display:grid; grid-template-columns:32px 1fr; column-gap:13px; } .example .example-top { grid-row:1/4; margin:0; align-items:start; } .example .arrow,.example code { display:none; } .example strong { margin:0 0 4px; } .example p { font-size:11px; } .example-label { margin-top:25px; } .welcome-foot { font-size:10px; } .row.agent .bubble { padding:18px; } .markdown { font-size:13px; } .agent-avatar { display:none; } .process,.prompt-box { margin-left:0; } .report-link { margin-left:0; max-width:100%; } .connection { font-size:10px; } .breadcrumb { font-size:11px; } .row.user .bubble { max-width:94%; font-size:13px; } .input-hint { font-size:9px; } .conversation-heading { flex-direction:column; align-items:flex-start; gap:8px; } }
+@media(max-width:420px) { .sidebar { width:56px; padding-left:5px; padding-right:5px; } .brand-mark { width:32px; height:32px; } .topbar { padding:0 13px; } .breadcrumb > span { display:none; } #log { padding:18px 13px; } .composer-area { padding:8px 13px 12px; } .welcome h1 { font-size:27px; } .input-hint { display:none; } .composer-bottom { justify-content:flex-end; } .disclaimer { font-size:9px; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
 </style>
 </head>
 <body>
-<div id="app">
-  <header>운영 인시던트 대응 에이전트 <span>{{ backendLabel }}</span></header>
-  <div id="log" ref="logEl">
-    <template v-for="item in log" :key="item.id">
-      <div v-if="item.kind === 'user'" class="row user">
-        <div class="bubble">{{ item.text }}</div>
-      </div>
-
-      <div v-else-if="item.kind === 'steps'" class="steps">
-        <div v-for="(step, i) in item.steps" :key="i" class="step">{{ step }}</div>
-      </div>
-
-      <div v-else-if="item.kind === 'agent'" class="row agent">
-        <div class="bubble">{{ item.text }}</div>
-      </div>
-
-      <details v-else-if="item.kind === 'prompt'" class="prompt-box">
-        <summary>LLM에 전달된 최종 프롬프트 보기</summary>
-        <pre>{{ item.text }}</pre>
-      </details>
-      <a v-else-if="item.kind === 'report'" class="report-link" :href="item.url" download>{{ item.text }}</a>
-    </template>
-  </div>
-  <div class="quick-actions">
-    <button :disabled="sending" @click="newInvestigation">새 조사</button>
-    <button :disabled="sending" @click="quick('다시 확인해 주세요')">복구 재점검</button>
-    <button :disabled="sending" @click="quick('조사 이력 보여주세요')">조사 이력</button>
-    <button :disabled="sending" @click="quick('보고서 내보내기')">Markdown 보고서</button>
-  </div>
-  <form @submit.prevent="onSubmit">
-    <input
-      v-model="input"
-      autocomplete="off"
-      placeholder="예: auth-service 로그인 응답이 느려졌어요. 원인 확인해주세요"
-    />
-    <button type="submit" :disabled="sending">보내기</button>
-  </form>
+<div id="app" v-cloak>
+  <aside class="sidebar" aria-label="조사 도구">
+    <div class="brand"><div class="brand-mark"><app-icon name="activity"></app-icon></div><div class="brand-copy"><strong>운영 에이전트</strong><small>INCIDENT WORKSPACE</small></div></div>
+    <button class="new-investigation" :disabled="sending" @click="newInvestigation" aria-label="새 조사" title="새 조사"><app-icon name="plus"></app-icon><span>새 조사 시작</span></button>
+    <p class="nav-label">WORKSPACE</p>
+    <nav class="tools" aria-label="후속 조사">
+      <button class="tool" :disabled="sending" @click="quick('다시 확인해 주세요')" aria-label="복구 재점검" title="복구 재점검"><app-icon name="refresh"></app-icon><span>복구 재점검</span></button>
+      <button class="tool" :disabled="sending" @click="quick('조사 이력 보여주세요')" aria-label="조사 이력" title="조사 이력"><app-icon name="history"></app-icon><span>조사 이력</span></button>
+      <button class="tool" :disabled="sending" @click="quick('보고서 내보내기')" aria-label="Markdown 보고서" title="Markdown 보고서"><app-icon name="file"></app-icon><span>보고서 내보내기</span></button>
+    </nav>
+    <div class="sidebar-note"><span class="nav-label" style="margin:0">조사의 흐름</span><p>상태를 확인하고,<br>이전 기록과 비교하고,<br>근거를 남깁니다.</p></div>
+    <div class="sidebar-bottom"><span class="mode-badge"><app-icon name="layers" style="width:13px;height:13px"></app-icon>{{ monitoringLabel }}</span><details class="environment"><summary>실행 환경</summary><p>{{ backendLabel }}</p></details></div>
+  </aside>
+  <main class="workspace">
+    <header class="topbar"><div class="breadcrumb"><span>워크스페이스</span><span>/</span><strong>장애 조사</strong></div><div class="connection" :class="connection"><span class="status-dot"></span><span>{{ connection === 'online' ? '에이전트 연결됨' : connection === 'offline' ? '연결 확인 필요' : '연결 확인 중' }}</span><button v-if="connection === 'offline'" class="retry-health" @click="checkHealth">다시 연결</button></div></header>
+    <div id="log" ref="logEl" :aria-busy="sending">
+      <section v-if="!log.length" class="welcome">
+        <div class="eyebrow"><app-icon name="activity"></app-icon>운영 장애 대응 워크스페이스</div>
+        <h1>운영 상태를,<br>근거와 함께 확인하세요.</h1>
+        <p>궁금한 서비스와 증상을 알려주세요.<br>현재 상태부터 이전 조사와의 변화, 복구 여부까지 함께 살펴봅니다.</p>
+        <div class="example-label">이런 질문으로 시작해 보세요</div>
+        <div class="examples">
+          <button v-for="example in examples" :key="example.title" class="example" @click="useExample(example.query)"><div class="example-top"><span class="example-icon"><app-icon :name="example.icon"></app-icon></span><app-icon name="arrow" class="arrow"></app-icon></div><strong>{{ example.title }}</strong><p>{{ example.description }}</p><code>{{ example.service }}</code></button>
+        </div>
+        <div class="welcome-foot"><app-icon name="shield"></app-icon>확인된 관측과 판단 근거를 함께 제공합니다.</div>
+      </section>
+      <section v-else class="conversation" aria-label="조사 대화">
+        <div class="conversation-heading"><strong>조사 대화</strong><span class="target-list">{{ targets.length ? '조사 대상 · ' + targets.join(' · ') : '서비스와 증상을 확인합니다' }}</span></div>
+        <template v-for="item in log" :key="item.id">
+          <div v-if="item.kind === 'user'" class="row user"><div class="bubble">{{ item.text }}</div></div>
+          <details v-else-if="item.kind === 'steps'" class="process" :open="item.running"><summary><span v-if="item.running" class="spinner"></span><app-icon v-else name="check"></app-icon><span>{{ item.running ? '조사 진행 중' : item.failed ? '처리 과정 · 확인 필요' : '처리 과정' }} · {{ item.steps.length }}단계</span><app-icon name="chevron" class="chevron"></app-icon></summary><ul><li v-for="(step,i) in item.steps" :key="i">{{ step }}</li></ul></details>
+          <div v-else-if="item.kind === 'agent'" class="row agent" :class="{error:item.error}"><div class="agent-avatar"><app-icon name="activity"></app-icon></div><div class="answer-wrap"><div class="answer-meta"><strong>{{ item.error ? '확인이 필요합니다' : '운영 에이전트' }}</strong><button v-if="item.text" class="copy-button" @click="copyReply(item)" :aria-label="'답변 복사 ' + item.id"><app-icon name="copy"></app-icon>{{ item.copyLabel || '복사' }}</button></div><div class="bubble"><markdown-content :text="item.text"></markdown-content></div></div></div>
+          <details v-else-if="item.kind === 'prompt'" class="prompt-box"><summary>모델에 전달한 프롬프트 보기</summary><pre>{{ item.text }}</pre></details>
+          <a v-else-if="item.kind === 'report'" class="report-link" :href="item.url" download><app-icon name="download"></app-icon><span>{{ item.text }}<small>관측 기록과 판단 근거 · Markdown 파일</small></span></a>
+        </template>
+      </section>
+    </div>
+    <div class="composer-area"><div class="composer-inner">
+      <div v-if="log.length && !sending" class="followups"><button @click="quick('다시 확인해 주세요')">다시 확인해 주세요</button><button @click="quick('조사 이력 보여주세요')">이력 확인하기</button><button @click="quick('보고서 내보내기')">보고서 만들기</button></div>
+      <form class="composer" @submit.prevent="onSubmit"><label for="question" style="position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%)">질문 입력</label><textarea id="question" ref="inputEl" v-model="input" rows="2" @keydown="onInputKey" :disabled="sending" autocomplete="off" placeholder="서비스 이름과 증상을 입력해 주세요."></textarea><div class="composer-bottom"><span class="input-hint"><app-icon name="corner"></app-icon>Enter로 전송 · Shift + Enter로 줄바꿈</span><button type="submit" class="send-button" :disabled="sending || !input.trim()"><span>{{ sending ? '확인 중' : '보내기' }}</span><app-icon name="arrow"></app-icon></button></div></form>
+      <p class="disclaimer">{{ monitoringLabel }} 기반의 판단입니다. 실제 서비스 복구나 원인 확정을 보장하지 않습니다.</p>
+    </div></div>
+  </main>
 </div>
-
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>
-const { createApp, ref, reactive, nextTick } = Vue;
-
+const { createApp, ref, reactive, nextTick, h } = Vue;
+const ICONS = {
+ activity:['M3 12h4l3-8 4 16 3-8h4'], plus:['M12 5v14','M5 12h14'], refresh:['M20 7v5h-5','M4 17v-5h5','M6.1 7a7 7 0 0 1 11.55-2L20 8','M4 16l2.35 3A7 7 0 0 0 17.9 17'],
+ history:['M3 11a9 9 0 1 1 2.5 7','M3 4v7h7','M12 7v5l3 2'], file:['M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z','M14 2v6h6','M8 13h8','M8 17h5'],
+ arrow:['M5 12h14','m13 6 6 6-6 6'], shield:['M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7z','m8 12 3 3 5-5'], layers:['m12 3 10 5-10 5L2 8z','m2 12 10 5 10-5','m2 16 10 5 10-5'],
+ check:['m5 12 4 4L19 6'], chevron:['m9 5 7 7-7 7'], copy:['M9 9h12v12H9z','M5 15H3V3h12v2'], download:['M12 3v12','m7 10 5 5 5-5','M4 16v5h16v-5'], corner:['M9 10 5 14l4 4','M5 14h10a4 4 0 0 0 4-4V5'], search:['M21 21l-5-5','M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0'], compare:['M5 4v16','m2 17 3 3 3-3','M19 20V4','m16 7 3-3 3 3']
+};
+const AppIcon = { props:['name'], setup: props => () => h('svg',{class:'icon',viewBox:'0 0 24 24',fill:'none',stroke:'currentColor','stroke-width':1.65,'stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true'},(ICONS[props.name] || ICONS.activity).map(d=>h('path',{d}))) };
+// Render a small Markdown subset as Vue text nodes. Model output is never inserted as HTML.
+function inlineNodes(text) {
+  return String(text).split(/(\*\*[^*\n]+\*\*|`[^`\n]+`)/g).filter(Boolean).map(part => part.startsWith('**') ? h('strong',part.slice(2,-2)) : part.startsWith('`') ? h('code',part.slice(1,-1)) : part);
+}
+function markdownNodes(text) {
+  const lines=String(text || '').split('\n'), nodes=[];
+  const cells=line=>line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(s=>s.trim());
+  for(let i=0;i<lines.length;) {
+    const line=lines[i]; if(!line.trim()){i++;continue;}
+    if(line.trim().startsWith('```')) { const code=[]; i++; while(i<lines.length && !lines[i].trim().startsWith('```')) code.push(lines[i++]); i++; nodes.push(h('pre',code.join('\n'))); continue; }
+    const heading=line.match(/^(#{1,6})\s+(.+)$/);
+    if(heading){nodes.push(h('h'+Math.min(4,Math.max(2,heading[1].length)),inlineNodes(heading[2])));i++;continue;}
+    if(/^\s*[-*_]{3,}\s*$/.test(line)){nodes.push(h('hr'));i++;continue;}
+    if(line.includes('|') && i+1<lines.length && /^\s*\|?\s*:?-{3,}/.test(lines[i+1]) && cells(lines[i+1]).every(c=>/^:?-{3,}:?$/.test(c))) {
+      const headers=cells(line), rows=[]; i+=2; while(i<lines.length && lines[i].includes('|') && lines[i].trim()) rows.push(cells(lines[i++]));
+      nodes.push(h('div',{class:'table-scroll'},[h('table',[h('thead',[h('tr',headers.map(c=>h('th',inlineNodes(c))))]),h('tbody',rows.map(row=>h('tr',row.map(c=>h('td',inlineNodes(c))))))])]));continue;
+    }
+    const list=line.match(/^\s*(?:([-*])\s+|(\d+)[.)]\s+)(.*)$/);
+    if(list) { const ordered=!!list[2], items=[],start=Number(list[2]); while(i<lines.length){const m=lines[i].match(/^\s*(?:([-*])\s+|(\d+)[.)]\s+)(.*)$/);if(!m || !!m[2]!==ordered)break;const fact=m[3].match(/^([^:]{1,18}):\s+(.+)$/);items.push(h('li',fact?{class:'fact-row'}:null,fact?[h('span',{class:'fact-label'},fact[1]),h('span',inlineNodes(fact[2]))]:inlineNodes(m[3])));i++;}const facts=!ordered && items.every(item=>item.props?.class==='fact-row');nodes.push(h(ordered?'ol':'ul',ordered?{start}:facts?{class:'facts'}:null,items));continue; }
+    const paragraph=[line]; i++; while(i<lines.length && lines[i].trim() && !/^(?:#{1,6}\s|\s*[-*]\s|\s*\d+[.)]\s|```|\s*\|)/.test(lines[i])) paragraph.push(lines[i++]); nodes.push(h('p',inlineNodes(paragraph.join('\n'))));
+  }
+  return nodes;
+}
+const MarkdownContent = { props:['text'], setup: props => () => h('div',{class:'markdown'},markdownNodes(props.text)) };
 const STEP_LABELS = {
   PlanCreated: e => `계획 수립: 할 일 ${e.task_count}가지${e.targets?.length ? ` (시스템: ${e.targets.join(', ')})` : ''}`,
   GateApplied: e => e.removed_analysis_tasks ? `불필요한 작업 ${e.removed_analysis_tasks}건 제거` : null,
@@ -147,100 +207,68 @@ const STEP_LABELS = {
 };
 
 createApp({
+  components: { AppIcon, MarkdownContent },
   setup() {
-    const backendLabel = ref('all_total_vue');
-    const log = ref([]);
-    const input = ref('');
-    const sending = ref(false);
-    const logEl = ref(null);
-    let thread = sessionStorage.getItem('incident-thread') || 't-web-' + crypto.randomUUID();
-    sessionStorage.setItem('incident-thread', thread);
-    let nextId = 0;
-
-    fetch('/health').then(r => r.json()).then(h => {
-      backendLabel.value = `${h.llm_backend === 'fake' ? '모의 모델' : h.llm_backend} (${h.fast_llm}/${h.quality_llm}) · ${h.monitoring_mode === 'sample-json-jitter' ? '샘플 모니터링' : '복구 시나리오(합성)'}`;
-    }).catch(() => {});
-
-    async function scrollToBottom() {
-      await nextTick();
-      if (logEl.value) logEl.value.scrollTop = logEl.value.scrollHeight;
+    const backendLabel=ref('실행 환경을 확인하고 있습니다.');
+    const monitoringLabel=ref('모니터링 확인 중');
+    const connection=ref('loading'), log=ref([]), input=ref(''), sending=ref(false), logEl=ref(null), inputEl=ref(null), targets=ref([]);
+    const examples=[
+      {title:'장애 원인 살펴보기',description:'응답이 느린 서비스의 상태와 점검 방향을 확인합니다.',service:'auth-service',icon:'search',query:'auth-service 로그인 응답이 느려졌어요. 원인을 진단해 주세요.'},
+      {title:'복구 여부 확인하기',description:'현재 상태를 조회하고 복구 조건을 확인합니다.',service:'payments-service',icon:'refresh',query:'payments-service의 복구 여부를 확인해 주세요.'},
+      {title:'이전 상태와 비교하기',description:'새 관측을 가져와 이전 조사와 달라진 점을 살펴봅니다.',service:'payments-service',icon:'compare',query:'payments-service의 상태를 이전 조사와 비교해 주세요.'}
+    ];
+    let thread=sessionStorage.getItem('incident-thread') || 't-web-'+crypto.randomUUID();
+    sessionStorage.setItem('incident-thread',thread);
+    let nextId=0;
+    async function checkHealth() {
+      connection.value='loading';
+      try {
+        const r=await fetch('/health'); if(!r.ok) throw new Error('health'); const health=await r.json();
+        backendLabel.value=`${health.llm_backend === 'fake' ? '모의 모델' : health.llm_backend} · ${health.fast_llm} / ${health.quality_llm}`;
+        monitoringLabel.value=health.monitoring_mode === 'sample-json-jitter' ? '샘플 모니터링' : '합성 복구 시나리오';
+        connection.value='online';
+      } catch { connection.value='offline'; backendLabel.value='백엔드 연결을 확인해 주세요.'; monitoringLabel.value='모니터링 미확인'; }
     }
-
+    checkHealth();
+    async function scrollToBottom(force=false) {
+      const el=logEl.value, nearBottom=!el || el.scrollHeight-el.scrollTop-el.clientHeight<160;
+      await nextTick(); if(logEl.value && (force || nearBottom)) logEl.value.scrollTop=logEl.value.scrollHeight;
+    }
+    function useExample(text) {input.value=text; nextTick(()=>inputEl.value?.focus());}
+    function onInputKey(event) {if(event.key==='Enter' && !event.shiftKey && !event.isComposing){event.preventDefault();onSubmit();}}
+    async function copyReply(item) {try {await navigator.clipboard.writeText(item.text);item.copyLabel='복사됨';}catch{item.copyLabel='복사 권한을 확인해 주세요';}}
     function onSubmit() {
-      const text = input.value.trim();
-      if (!text || sending.value) return;
-
-      log.value.push({ id: nextId++, kind: 'user', text });
-      input.value = '';
-      sending.value = true;
-      scrollToBottom();
-
-      const stepsItem = reactive({ id: nextId++, kind: 'steps', steps: [] });
-      log.value.push(stepsItem);
-      scrollToBottom();
-
-      const url = `/chat/stream?message=${encodeURIComponent(text)}&thread_id=${encodeURIComponent(thread)}`;
-      const es = new EventSource(url);
-      let streamItem = null;
-      let streamAttempt = null;   // write_node 재작성(attempt 증가) 시 새 말풍선으로 끊는다
-
-      es.onmessage = (event) => {
-        if (event.data === '[DONE]') { es.close(); sending.value = false; return; }
-        let e;
-        try { e = JSON.parse(event.data); } catch { return; }
-
-        if (e.type === 'AnswerToken') {
-          if (!streamItem || streamAttempt !== e.attempt) {
-            streamItem = reactive({ id: nextId++, kind: 'agent', text: '' });
-            log.value.push(streamItem);
-            streamAttempt = e.attempt;
-          }
-          streamItem.text += e.delta;
-          scrollToBottom();
-          return;
+      const text=input.value.trim(); if(!text || sending.value)return;
+      log.value.push({id:nextId++,kind:'user',text});input.value='';sending.value=true;scrollToBottom(true);
+      const stepsItem=reactive({id:nextId++,kind:'steps',steps:[],running:true,failed:false});log.value.push(stepsItem);
+      const es=new EventSource(`/chat/stream?message=${encodeURIComponent(text)}&thread_id=${encodeURIComponent(thread)}`);
+      let streamItem=null,streamAttempt=null,errorShown=false;
+      function finish(){es.close();sending.value=false;stepsItem.running=false;nextTick(()=>inputEl.value?.focus());}
+      function showError(message){if(errorShown)return;errorShown=true;stepsItem.failed=true;log.value.push({id:nextId++,kind:'agent',text:message,error:true});scrollToBottom();}
+      es.onmessage=(event)=>{
+        if(event.data==='[DONE]'){finish();return;}
+        let e;try{e=JSON.parse(event.data);}catch{return;}
+        if(['TargetsResolved','PlanCreated'].includes(e.type) && Array.isArray(e.targets))targets.value=e.targets;
+        if(e.type==='AnswerToken'){
+          if(!streamItem || streamAttempt!==e.attempt){streamItem=reactive({id:nextId++,kind:'agent',text:''});log.value.push(streamItem);streamAttempt=e.attempt;}
+          streamItem.text+=e.delta;scrollToBottom();return;
         }
-
-        if (e.type === 'FinalAnswer') {
-          if (!streamItem) {
-            streamItem = reactive({ id: nextId++, kind: 'agent', text: '' });
-            log.value.push(streamItem);
-          }
-          streamItem.text = e.reply;   // 토큰 합산 결과와 서버의 최종 텍스트를 일치시킨다
-          if (e.prompt) log.value.push({ id: nextId++, kind: 'prompt', text: e.prompt });
-          for (const report of e.reports || []) {
-            if (report.url.startsWith('/reports/markdown?')) log.value.push({ id: nextId++, kind: 'report', text: `${report.system_name} 보고서 다운로드 (.md)`, url: report.url });
-          }
-          streamItem = null;
-          streamAttempt = null;
-          scrollToBottom();
-          return;
+        if(e.type==='FinalAnswer'){
+          if(!streamItem){streamItem=reactive({id:nextId++,kind:'agent',text:''});log.value.push(streamItem);}
+          streamItem.text=e.reply;
+          if(e.prompt)log.value.push({id:nextId++,kind:'prompt',text:e.prompt});
+          for(const report of e.reports || []){if(report.url.startsWith('/reports/markdown?'))log.value.push({id:nextId++,kind:'report',text:`${report.system_name} 보고서 다운로드 (.md)`,url:report.url});}
+          streamItem=null;streamAttempt=null;scrollToBottom();return;
         }
-
-        const fn = STEP_LABELS[e.type];
-        if (!fn) return;
-        const label = fn(e);
-        if (!label) return;
-        stepsItem.steps.push(label);
-        scrollToBottom();
+        if(e.type==='Error')showError(e.reason || '조사를 완료하지 못했습니다. 다시 확인해 주세요.');
+        const label=STEP_LABELS[e.type]?.(e);if(label){stepsItem.steps.push(label);scrollToBottom();}
       };
-
-      es.onerror = () => {
-        es.close(); sending.value = false;
-        log.value.push({ id: nextId++, kind: 'agent', text: '연결이 중단됐습니다. 복구를 확정하지 않습니다. 조사 이력을 확인하거나 다시 점검해 주세요.' });
-        scrollToBottom();
-      };
+      es.onerror=()=>{finish();showError('연결이 중단됐습니다. 복구를 확정하지 않습니다. 조사 이력을 확인하거나 다시 점검해 주세요.');};
     }
-
-    function quick(text) { input.value = text; onSubmit(); }
-    function newInvestigation() {
-      if (sending.value) return;
-      thread = 't-web-' + crypto.randomUUID();
-      sessionStorage.setItem('incident-thread', thread);
-      log.value = [];
-      input.value = '';
-    }
-    return { backendLabel, log, input, sending, logEl, onSubmit, quick, newInvestigation };
-  },
+    function quick(text){if(sending.value)return;input.value=text;onSubmit();}
+    function newInvestigation(){if(sending.value)return;thread='t-web-'+crypto.randomUUID();sessionStorage.setItem('incident-thread',thread);log.value=[];input.value='';targets.value=[];nextTick(()=>inputEl.value?.focus());}
+    return {backendLabel,monitoringLabel,connection,checkHealth,log,input,sending,logEl,inputEl,targets,examples,useExample,onInputKey,onSubmit,quick,newInvestigation,copyReply};
+  }
 }).mount('#app');
 </script>
 </body>
