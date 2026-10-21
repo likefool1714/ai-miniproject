@@ -6,10 +6,10 @@
 - 저장소: https://github.com/likefool1714/ai-miniproject (Public)
 - 진행 계획 초안 제출 기한: **2026-10-20 17:00 KST**
 - 현재 (2026-10-21): **처음 등록한 개선 5항목·추가 5항목을 로컬 샘플 환경에서 구현·검증**했습니다. 근거 검증과 상태 해석·점검 방향 설명도 보완했습니다. 과제 전체 제출 완료를 뜻하지 않습니다.
-- 발표 자료: **본문 6장·질문용 참고 2장 최종 PPT, 보기용 PDF, 5분 발표 대본**을 작성했습니다. 내일 실제 발표·연습은 별도입니다.
+- 발표 자료: **Canva 개발 과정 중심 8장 PPT, PDF, 5분 발표 대본**을 작성했습니다. 내일 실제 발표·연습은 별도입니다.
 - 제공 API: `gpt-4o-mini` / `gpt-4o` 실제 기능 검사 통과. **LangSmith 실제 추적은 미검증**입니다.
 
-[최종 PPT](output/presentation/AI-Mini-Project_G028_최민석_Final_20261021.pptx) · [보기용 PDF](output/pdf/AI-Mini-Project_G028_최민석_Final_20261021.pdf) · [5분 발표 대본](docs/TALK_5MIN.md) · [코드 설명·예상 질문](docs/DEFENSE_GUIDE.md)
+[Canva에서 열기](https://canva.link/c2hzj3ertf41wb0) · [최종 PPT](output/presentation/AI-Mini-Project_G028_최민석_Canva_20261021.pptx) · [PDF](output/pdf/AI-Mini-Project_G028_최민석_Canva_20261021.pdf) · [5분 발표 대본](docs/TALK_5MIN_CANVA.md) · [코드 설명·예상 질문](docs/DEFENSE_GUIDE.md)
 
 기존 에이전트는 현재 모니터링 수치를 조회하고 런북으로 대응 절차를 작성합니다. 이번 작업은 **이전 조사와 비교하고 복구 여부를 다시 확인하는 기능**을 추가합니다.
 CPU가 95%에서 55%로 내려가도 메모리·알림이 남아 있거나 정상 관측이 한 번뿐이면 복구를 확정하지 않습니다.
@@ -34,6 +34,8 @@ CPU가 95%에서 55%로 내려가도 메모리·알림이 남아 있거나 정�
 [현재 완료 범위·화면 확인·추가 기능 구분](docs/CURRENT_STATUS_AND_SCOPE.md): 등록 기능은 로컬에서 구현·검증했으며, 새 기능 제안과 남은 API 검증·발표 준비를 분리했습니다.
 
 [새 핵심 기능 후보 전체 검토](docs/FEATURE_REVIEW.md): 연관 서비스 조사·영향 범위, 배포 변경 이력 연계, HTTP 기능 상태 확인을 비교했습니다. 후보는 아직 선택·구현하지 않았습니다.
+
+발표 순서: **기존 스켈레톤 → 추가한 흐름 → 문제점 → 개선 전 답변 → 개선 코드 → 전후 비교 → 추가 기능 → 한계**. 하단은 모든 장에 `G028 최민석`으로 통일했습니다.
 
 ## 초기 질의응답 전후 기록 (설명 보완 전)
 
@@ -209,7 +211,7 @@ LangSmith는 별도 추적 설정·확인 대상입니다. [설정·실행·확�
 
 [발표 대비 최신 재검증](docs/PROFESSOR_AUDIT.md) · [쉬운 코드 설명·예상 질문](docs/DEFENSE_GUIDE.md) · [일반 진단·근거 검증](docs/GROUNDING_VALIDATION.md) · [복구 기능 검증](docs/RECOVERY_VALIDATION.md) · [원본 검증](docs/BASELINE_VALIDATION.md)
 
-[최종 PPT — 본문 6장·참고 2장](output/presentation/AI-Mini-Project_G028_최민석_Final_20261021.pptx) · [보기용 PDF](output/pdf/AI-Mini-Project_G028_최민석_Final_20261021.pdf) · [이전 PPT 초안](output/presentation/AI-Mini-Project_G028_최민석.pptx)
+[최종 Canva PPT — 개발 과정 8장](output/presentation/AI-Mini-Project_G028_최민석_Canva_20261021.pptx) · [PDF](output/pdf/AI-Mini-Project_G028_최민석_Canva_20261021.pdf) · [이전 표 중심 PPT](output/presentation/AI-Mini-Project_G028_최민석_Final_20261021.pptx)
 
 ## 평가 항목 대응
 
@@ -219,7 +221,7 @@ LangSmith는 별도 추적 설정·확인 대상입니다. [설정·실행·확�
 | 전후 실측 보너스 10 | 같은 질문·관측, 원문·판정·시간·측정 범위 공개 |
 | 기술 요소 30 | 기존 Multi-Agent/MCP, LangGraph 분기, Pydantic·권위 게이트·Validator, SQLite, 의존성 주입·검사 |
 | 한계 20 | 확인 지연, 보수적 보류, 저장 비용, 정책·샘플 의존성 |
-| PPT·발표 20 | 최종 PPT 본문 6장·참고 2장, PDF·발표 대본 작성. 실제 발표 대기 |
+| PPT·발표 20 | Canva 개발 과정 중심 8장, PPT·PDF·발표 대본 작성. 실제 발표 대기 |
 
 RAG·LLM-as-a-Judge를 새 구현으로 기재하지 않습니다. 제공 API는 실제 확인했고 LangSmith는 미검증으로 구분합니다.
 
@@ -265,11 +267,11 @@ LLM은 분류·계획·원인 분류·런북 항목 선택에 사용합니다. �
 | 10/21 진단 설명 보완·재검증 | 로컬 완료 | 근거 검증·상태 해석·점검 방향, 67개 자동 검사·392개 정책 조합·웹 실행 기록 |
 | 제공 API 실제 확인 | 완료 | 일반 진단 POST 3건·SSE 1건 검증 통과, 복구 5단계·이력·보고서 확인 |
 | LangSmith 실제 추적 | 미검증 | 별도 키·설정·실행 기록 생성 확인 |
-| 최종 5분 발표 자료 | 작성 완료 | 본문 6장·참고 2장 PPT, 보기용 PDF, 발표 대본. 내일 시간 측정·설명 연습 |
+| 최종 5분 발표 자료 | 작성 완료 | Canva 8장 PPT·PDF, 흐름에 맞춘 5분 대본. 내일 시간 측정·설명 연습 |
 | 최종 제출 | 대기 | 재현 명령·저장소·제출 링크 점검. 과제 안내의 Day3 13:00 마감 기준 확인 |
 
 사용자 일정: **10/21 오늘 API 실제 확인·최종 발표 자료까지 마무리**, **10/22 09:00~13:00 구현 이해·발표 연습**, **10/22 13:00 발표**입니다.
-[오늘 마감·내일 오전 학습 순서](docs/REHEARSAL_PLAN.md) · [5분 발표 대본](docs/TALK_5MIN.md)
+[오늘 마감·내일 오전 학습 순서](docs/REHEARSAL_PLAN.md) · [5분 발표 대본](docs/TALK_5MIN_CANVA.md)
 API 실제 검사와 발표 파일 작성은 완료했고 발표 시각과 별도로 과제 제출 마감·링크를 확인합니다.
 
 다음 작업은 **내일 오전 구현·코드 흐름 이해 → 5분 발표 연습 → 제출·발표 점검**입니다. LangSmith 실제 추적은 확인한 기술로 주장하지 않습니다.

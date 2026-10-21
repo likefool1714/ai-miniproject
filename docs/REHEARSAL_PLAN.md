@@ -31,7 +31,7 @@
 
 ## 읽을 자료 순서
 
-1. [5분 발표 대본](TALK_5MIN.md): 발표에서 무엇을 말할지 파악.
+1. [Canva 구성의 5분 발표 대본](TALK_5MIN_CANVA.md): 발표에서 무엇을 말할지 파악.
 2. [발표·코드 설명과 예상 질문](DEFENSE_GUIDE.md): 용어·숫자·핵심 함수 확인.
 3. [현재 구현 범위](CURRENT_STATUS_AND_SCOPE.md): 완료 기능과 미구현 제안 구분.
 4. [전체 코드 흐름](CODE_WALKTHROUGH.md): 연결이 궁금한 부분만 찾아보기.
