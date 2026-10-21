@@ -24,8 +24,8 @@ monitoring_source = MonitoringSource(DATA_DIR, os.environ.get("MONITORING_SCENAR
 class SystemStatus(BaseModel):
     system_name: str = Field(description="시스템 이름")
     status: str = Field(description="상태: healthy / degraded / down")
-    cpu_percent: float = Field(description="CPU 사용률 (%)")
-    memory_percent: float = Field(description="메모리 사용률 (%)")
+    cpu_percent: float = Field(ge=0, le=100, strict=True, description="CPU 사용률 (%)")
+    memory_percent: float = Field(ge=0, le=100, strict=True, description="메모리 사용률 (%)")
     last_checked: str = Field(description="마지막 체크 시각 (ISO 8601)")
     alerts: list[str] = Field(default_factory=list, description="활성 알림 목록")
     sample_id: str = Field(description="동일 관측 중복 집계를 막는 식별자")

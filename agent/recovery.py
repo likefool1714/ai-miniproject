@@ -44,8 +44,8 @@ class Observation(BaseModel):
     model_config = ConfigDict(extra="ignore", allow_inf_nan=False)
     system_name: str = Field(min_length=1, max_length=100)
     status: Literal["healthy", "degraded", "down", "unknown"]
-    cpu_percent: float = Field(ge=0, le=100)
-    memory_percent: float = Field(ge=0, le=100)
+    cpu_percent: float = Field(ge=0, le=100, strict=True)
+    memory_percent: float = Field(ge=0, le=100, strict=True)
     last_checked: datetime
     alerts: list[str]
     sample_id: str = ""

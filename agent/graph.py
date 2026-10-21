@@ -200,9 +200,16 @@ async def research_node(state: AgentState, deps: SupervisorDeps) -> dict:
             arguments = {"system_name": task["target"]}
             if deps.recovery_store is not None:
                 arguments["observation_context"] = state["thread_id"]
-            data, retries = await asyncio.wait_for(with_retry(
-                deps.mcp.call_tool, "get_monitoring_status",
-                arguments), timeout=15)
+            try:
+                data, retries = await asyncio.wait_for(with_retry(
+                    deps.mcp.call_tool, "get_monitoring_status",
+                    arguments), timeout=15)
+            except asyncio.CancelledError:
+                if deps.recovery_store is not None:
+                    deps.recovery_store.failed(
+                        state["thread_id"], task["target"],
+                        "모니터링 수집이 취소되어 최신 상태를 확인하지 못했습니다.")
+                raise
             if data.get("system_name") != task["target"]:
                 raise ValueError("모니터링 응답 대상이 요청한 서비스와 다릅니다.")
             return {"idx": idx, "source": "monitoring", "data": data, "retries": retries}

@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "checked_at": "2026-10-21T09:29:09.623590+00:00",
+  "scope": "real remote model API + HTTP proxy + FastAPI + stdio MCP; synthetic monitoring",
+  "limits": "One lifecycle and selected compatibility cases, not an accuracy benchmark. Recovery/history/report do not call an LLM. cost_usd is a virtual-price estimate.",
+  "health": {
+    "status": "ok",
+    "instance_id": 4455991920,
+    "creation_count": 1,
+    "supervisor_version": "v2",
+    "llm_backend": "openai",
+    "fast_llm": "openai:gpt-4o-mini",
+    "quality_llm": "openai:gpt-4o",
+    "recovery_enabled": true,
+    "monitoring_mode": "recovery-demo"
+  },
+  "initial_diagnosis_seconds": 4.104161541996291,
+  "lifecycle_checks": 5,
+  "history_count": 5,
+  "report_download": "passed",
+  "extra_diagnoses": [
+    {
+      "targets": [
+        "cache-service",
+        "payments-service"
+      ],
+      "status": "validated"
+    },
+    {
+      "targets": [
+        "web-01"
+      ],
+      "status": "validated"
+    }
+  ],
+  "post_diagnoses_validated": 3,
+  "sse_diagnoses_validated": 1,
+  "sse_unvalidated_tokens": 0,
+  "finished_at": "2026-10-21T09:29:25.168929+00:00"
+}

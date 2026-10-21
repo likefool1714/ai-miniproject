@@ -19,14 +19,44 @@ SERVICE_PATTERN = re.compile(r"(?<![a-z0-9_-])[a-z][a-z0-9]*(?:-[a-z0-9]+)*-(?:s
 OPERATIONAL_PATTERN = re.compile(r"장애|진단|느려|느리|지연|모니터링|조사|점검|CPU|메모리|상태|다운", re.I)
 
 
-def extract_targets(query: str) -> tuple[list[str], list[str]]:
-    mentioned = [(m.start(), m.group().lower()) for m in SERVICE_PATTERN.finditer(query)]
-    compact = query.replace(" ", "")
+def _target_mentions(query: str) -> list[tuple[int, int, str]]:
+    mentioned = [(m.start(), m.end(), m.group().lower()) for m in SERVICE_PATTERN.finditer(query)]
     for alias, system in ALIASES.items():
-        if alias.replace(" ", "") in compact:
-            mentioned.append((compact.index(alias.replace(" ", "")), system))
-    ordered = list(dict.fromkeys(s for _, s in sorted(mentioned)))
+        pattern = r"\s*".join(map(re.escape, alias.split()))
+        mentioned.extend((m.start(), m.end(), system) for m in re.finditer(pattern, query))
+    return sorted(mentioned)
+
+
+def extract_targets(query: str) -> tuple[list[str], list[str]]:
+    mentioned = _target_mentions(query)
+    excluded = set()
+    exclusion = re.compile(
+        r"^\s*(?:[은는을를]\s*)?(?:말고|대신|빼고|"
+        r"제외(?:하고|한|해(?:\s*줘|\s*주세요)?|(?=\s|[,.!?]|$))|"
+        r"(?:조사|확인|점검)\s*하지\s*말고)")
+    for index, (_, end, _) in enumerate(mentioned):
+        following = query[end:mentioned[index + 1][0] if index + 1 < len(mentioned) else len(query)]
+        if exclusion.search(following):
+            excluded.add(index)
+            # 'A와 B는 제외하고 C'처럼 연결된 제외 대상도 함께 제거한다.
+            previous = index - 1
+            while previous >= 0 and re.fullmatch(
+                    r"\s*(?:와|과|및|하고|,|·)\s*",
+                    query[mentioned[previous][1]:mentioned[previous + 1][0]]):
+                excluded.add(previous)
+                previous -= 1
+    ordered = list(dict.fromkeys(system for i, (_, _, system) in enumerate(mentioned) if i not in excluded))
     return [s for s in ordered if s in KNOWN_SYSTEMS], [s for s in ordered if s not in KNOWN_SYSTEMS]
+
+
+def _target_answer(query: str) -> bool:
+    """대기 중인 확인 질문의 짧은 대상 답변과 새 전체 명령을 구분한다."""
+    remaining = query
+    for start, end, _ in reversed(_target_mentions(query)):
+        remaining = remaining[:start] + remaining[end:]
+    remaining = re.sub(r"[\s,.!?]", "", remaining)
+    return bool(re.fullmatch(
+        r"(?:의)?(?:상태)?(?:요|이요|입니다|이에요|예요|에요|로요|으로요)?", remaining))
 
 
 def command(query: str) -> str:
@@ -58,15 +88,17 @@ async def request_context_node(state, deps):
     if re.fullmatch(r"\s*(취소|그만|취소해\s*줘)[.!?]?\s*", query):
         store.set_context(thread, pending=None)
         return {"recovery_action": "clarify", **completed(state, "확인 대기 중인 요청을 취소했습니다.", "ClarificationCancelled")}
-    if pending and targets and action == "legacy" and not OPERATIONAL_PATTERN.search(query):
+    if pending and targets and not unknown and action == "legacy" and _target_answer(query):
         action = pending["action"]
         query = f"{pending['query']}\n확인된 대상: {', '.join(targets)}"
     elif pending and (action != "legacy" or (targets and OPERATIONAL_PATTERN.search(query))):
         # 사용자가 새 명령을 보냈으면 이전 확인 질문을 이어붙이지 않는다.
         store.set_context(thread, pending=None)
-    operational = bool(unknown) or action != "legacy" or bool(OPERATIONAL_PATTERN.search(query))
+    mentioned = _target_mentions(query)
+    operational = (bool(unknown) or action != "legacy" or bool(OPERATIONAL_PATTERN.search(query))
+                   or bool(mentioned and not targets))
     explicit_reference = bool(re.search(r"그\s*서비스|그\s*시스템|이전\s*서비스|방금", query))
-    if not targets and not unknown and (action != "legacy" or explicit_reference):
+    if not targets and not unknown and not mentioned and (action != "legacy" or explicit_reference):
         last_targets = context.get("targets", [])
         if len(last_targets) == 1 or re.search(r"모두|전부|전체|둘\s*다", query):
             targets = last_targets
@@ -93,6 +125,11 @@ async def recovery_collect_node(state, deps):
             if data.get("system_name") != system:
                 return system, None, "요청한 서비스와 응답 대상이 다릅니다.", retries
             return system, data, None, retries
+        except asyncio.CancelledError:
+            # 전체 요청 한도/연결 취소도 '수집 중이던 대상'의 연속성을 끊는다.
+            # 잠금 대기 중이거나 이미 끝난 조사는 이 경로에 들어오지 않는다.
+            deps.recovery_store.failed(state["thread_id"], system, "모니터링 수집이 취소되어 최신 상태를 확인하지 못했습니다.")
+            raise
         except Exception as exc:
             return system, None, f"모니터링 조회 실패 ({type(exc).__name__})", 0
     results = await asyncio.gather(*(fetch(s) for s in state["resolved_targets"]))
