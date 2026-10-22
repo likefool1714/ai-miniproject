@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>운영 에이전트 · 장애 조사</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233369e8'/%3E%3Cpath d='M4 16h6l4-9 5 18 4-9h5' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E">
 <style>
 :root { color-scheme: light; --ink:#202c3d; --muted:#69788b; --line:#e6ebf0; --blue:#3369e8; --soft:#f0f5ff; --surface:#f7f9fc; }
 * { box-sizing:border-box; }
@@ -78,7 +79,7 @@ button:not(:disabled):active { transform:translateY(1px); }
 .process summary { cursor:pointer; display:flex; align-items:center; gap:7px; width:fit-content; list-style:none; padding:5px 0; } .process summary::-webkit-details-marker { display:none; }
 .process summary .icon { width:13px; height:13px; } .process[open] .chevron { transform:rotate(90deg); }
 .process ul { list-style:none; border-left:1px solid #dce5f1; padding:0 0 0 15px; margin:10px 0 14px 6px; } .process li { padding:4px 0; line-height:1.65; }
-.process li::before { content:'✓'; color:#6c99b1; margin-right:8px; }
+.process li::before { content:'·'; color:#7c899b; margin-right:8px; } .process li.success::before { content:'✓'; color:#4f8b75; } .process li.warning::before,.process li.danger::before { content:'!'; color:#b66a32; } .process li.warning,.process li.danger { color:#946239; }
 .spinner { width:12px; height:12px; border:1.5px solid #d8e2f4; border-top-color:var(--blue); border-radius:50%; animation:spin 1s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .prompt-box { margin:0 0 20px 41px; color:#8b98aa; font-size:11px; }
@@ -136,7 +137,7 @@ button:not(:disabled):active { transform:translateY(1px); }
         <div class="conversation-heading"><strong>조사 대화</strong><span class="target-list">{{ targets.length ? '조사 대상 · ' + targets.join(' · ') : '서비스와 증상을 확인합니다' }}</span></div>
         <template v-for="item in log" :key="item.id">
           <div v-if="item.kind === 'user'" class="row user"><div class="bubble">{{ item.text }}</div></div>
-          <details v-else-if="item.kind === 'steps'" class="process" :open="item.running"><summary><span v-if="item.running" class="spinner"></span><app-icon v-else name="check"></app-icon><span>{{ item.running ? '조사 진행 중' : item.failed ? '처리 과정 · 확인 필요' : '처리 과정' }} · {{ item.steps.length }}단계</span><app-icon name="chevron" class="chevron"></app-icon></summary><ul><li v-for="(step,i) in item.steps" :key="i">{{ step }}</li></ul></details>
+          <details v-else-if="item.kind === 'steps'" class="process" :open="item.running"><summary><span v-if="item.running" class="spinner"></span><app-icon v-else name="check"></app-icon><span>{{ item.running ? '조사 진행 중' : item.failed ? '처리 과정 · 확인 필요' : '처리 과정' }} · {{ item.steps.length }}단계</span><app-icon name="chevron" class="chevron"></app-icon></summary><ul><li v-for="(step,i) in item.steps" :key="i" :class="step.tone">{{ step.text }}</li></ul></details>
           <div v-else-if="item.kind === 'agent'" class="row agent" :class="{error:item.error}"><div class="agent-avatar"><app-icon name="activity"></app-icon></div><div class="answer-wrap"><div class="answer-meta"><strong>{{ item.error ? '확인이 필요합니다' : '운영 에이전트' }}</strong><button v-if="item.text" class="copy-button" @click="copyReply(item)" :aria-label="'답변 복사 ' + item.id"><app-icon name="copy"></app-icon>{{ item.copyLabel || '복사' }}</button></div><div class="bubble"><markdown-content :text="item.text"></markdown-content></div></div></div>
           <details v-else-if="item.kind === 'prompt'" class="prompt-box"><summary>모델에 전달한 프롬프트 보기</summary><pre>{{ item.text }}</pre></details>
           <a v-else-if="item.kind === 'report'" class="report-link" :href="item.url" download><app-icon name="download"></app-icon><span>{{ item.text }}<small>관측 기록과 판단 근거 · Markdown 파일</small></span></a>
@@ -178,7 +179,20 @@ function markdownNodes(text) {
       nodes.push(h('div',{class:'table-scroll'},[h('table',[h('thead',[h('tr',headers.map(c=>h('th',inlineNodes(c))))]),h('tbody',rows.map(row=>h('tr',row.map(c=>h('td',inlineNodes(c))))))])]));continue;
     }
     const list=line.match(/^\s*(?:([-*])\s+|(\d+)[.)]\s+)(.*)$/);
-    if(list) { const ordered=!!list[2], items=[],start=Number(list[2]); while(i<lines.length){const m=lines[i].match(/^\s*(?:([-*])\s+|(\d+)[.)]\s+)(.*)$/);if(!m || !!m[2]!==ordered)break;const fact=m[3].match(/^([^:]{1,18}):\s+(.+)$/);items.push(h('li',fact?{class:'fact-row'}:null,fact?[h('span',{class:'fact-label'},fact[1]),h('span',inlineNodes(fact[2]))]:inlineNodes(m[3])));i++;}const facts=!ordered && items.every(item=>item.props?.class==='fact-row');nodes.push(h(ordered?'ol':'ul',ordered?{start}:facts?{class:'facts'}:null,items));continue; }
+    if(list) {
+      const ordered=!!list[2], start=Number(list[2]), entries=[];
+      while(i<lines.length) {
+        const entry=lines[i].match(/^\s*(?:([-*])\s+|(\d+)[.)]\s+)(.*)$/);
+        if(!entry || !!entry[2]!==ordered) break;
+        entries.push(entry[3]); i++;
+      }
+      const pairs=entries.map(entry=>entry.match(/^([^:]{1,18}):\s+(.+)$/));
+      const facts=!ordered && pairs.every(Boolean);
+      const items=entries.map((entry,index)=>facts
+        ? h('li',{class:'fact-row'},[h('span',{class:'fact-label'},pairs[index][1]),h('span',inlineNodes(pairs[index][2]))])
+        : h('li',inlineNodes(entry)));
+      nodes.push(h(ordered?'ol':'ul',ordered?{start}:facts?{class:'facts'}:null,items)); continue;
+    }
     const paragraph=[line]; i++; while(i<lines.length && lines[i].trim() && !/^(?:#{1,6}\s|\s*[-*]\s|\s*\d+[.)]\s|```|\s*\|)/.test(lines[i])) paragraph.push(lines[i++]); nodes.push(h('p',inlineNodes(paragraph.join('\n'))));
   }
   return nodes;
@@ -206,6 +220,12 @@ const STEP_LABELS = {
   Error: e => e.reason,
 };
 
+function stepTone(event) {
+  if (['TaskFailed','ObservationFailed','Error'].includes(event.type)) return 'danger';
+  if (event.type === 'ModelFallback' || (event.type === 'Validation' && event.verdict !== '합격')) return 'warning';
+  if (['ClarificationRequired','ReplanCheck'].includes(event.type)) return 'neutral';
+  return 'success';
+}
 createApp({
   components: { AppIcon, MarkdownContent },
   setup() {
@@ -261,7 +281,7 @@ createApp({
           streamItem=null;streamAttempt=null;scrollToBottom();return;
         }
         if(e.type==='Error')showError(e.reason || '조사를 완료하지 못했습니다. 다시 확인해 주세요.');
-        const label=STEP_LABELS[e.type]?.(e);if(label){stepsItem.steps.push(label);scrollToBottom();}
+        const label=STEP_LABELS[e.type]?.(e);if(label){const tone=stepTone(e);if(['danger','warning'].includes(tone))stepsItem.failed=true;stepsItem.steps.push({text:label,tone});scrollToBottom();}
       };
       es.onerror=()=>{finish();showError('연결이 중단됐습니다. 복구를 확정하지 않습니다. 조사 이력을 확인하거나 다시 점검해 주세요.');};
     }
