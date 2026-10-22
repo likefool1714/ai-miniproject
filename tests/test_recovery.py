@@ -178,12 +178,13 @@ class RecoveryTests(unittest.TestCase):
             with self.assertRaises(ValidationError):
                 Observation.from_payload(self.payload(cpu=cpu))
 
-    def test_stale_previous_snapshot_does_not_produce_delta_or_recovery(self):
+    def test_stale_previous_snapshot_skips_delta_but_retains_incident_history(self):
         self.record(status="degraded", cpu=95)
         self.now += timedelta(seconds=301)
         current = self.record()
         self.assertIsNone(current["assessment"]["comparison"])
-        self.assertEqual(current["assessment"]["phase"], "hold")
+        self.assertEqual(current["assessment"]["phase"], "partial")
+        self.assertEqual(current["assessment"]["normal_streak"], 1)
 
     def test_thread_service_isolation_and_restart_persistence(self):
         self.store.set_context("thread-a", targets=["payments-service"])

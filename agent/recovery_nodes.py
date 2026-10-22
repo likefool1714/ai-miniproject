@@ -16,7 +16,9 @@ ALIASES = {"인증 서비스": "auth-service", "결제 서비스": "payments-ser
            "캐시 서비스": "cache-service", "게이트웨이 서비스": "gateway-service",
            "로그 서비스": "log-service", "웹 서버": "web-01"}
 SERVICE_PATTERN = re.compile(r"(?<![a-z0-9_-])[a-z][a-z0-9]*(?:-[a-z0-9]+)*-(?:service|\d+)(?![a-z0-9_-])", re.I)
-OPERATIONAL_PATTERN = re.compile(r"장애|진단|느려|느리|지연|모니터링|조사|점검|CPU|메모리|상태|다운", re.I)
+OPERATIONAL_PATTERN = re.compile(
+    r"장애|진단|느려|느리|지연|모니터링|조사|점검|CPU|메모리|상태|다운|"
+    r"타임아웃|timeout|저하|원인|분석|오류|에러|보고서\s*형식|마크다운\s*형식|markdown\s*형식", re.I)
 
 
 def _target_mentions(query: str) -> list[tuple[int, int, str]]:
@@ -60,11 +62,18 @@ def _target_answer(query: str) -> bool:
 
 
 def command(query: str) -> str:
-    if re.search(r"보고서|내보내|다운로드|markdown|마크다운", query, re.I):
+    # '복구 방법/원인 분석'은 새 진단이고, '복구됐어?'는 상태 재점검이다.
+    # '보고서 형식'은 출력 형식 요청이지 저장 기록의 파일 내보내기가 아니다.
+    diagnostic = bool(re.search(
+        r"원인|분석|방법|절차|어떻게|로그.{0,20}(?:조사|확인|점검)", query, re.I))
+    formatted = bool(re.search(r"(?:보고서|markdown|마크다운)\s*형식", query, re.I))
+    if diagnostic:
+        return "legacy"
+    if not formatted and re.search(r"보고서|내보내|다운로드|markdown|마크다운", query, re.I):
         return "report"
     if re.search(r"이력(?!서)|히스토리|조사\s*기록|조회\s*기록", query):
         return "history"
-    if re.search(r"복구|회복|재점검|재발|다시.{0,12}(확인|조사|점검|봐)|재확인|상태.{0,8}(비교|변화)|이전.{0,8}비교", query):
+    if not formatted and re.search(r"복구|회복|재점검|재발|다시.{0,12}(확인|조사|점검|봐)|재확인|상태.{0,8}(비교|변화)|이전.{0,8}비교", query):
         return "recheck"
     return "legacy"
 
@@ -98,7 +107,7 @@ async def request_context_node(state, deps):
     operational = (bool(unknown) or action != "legacy" or bool(OPERATIONAL_PATTERN.search(query))
                    or bool(mentioned and not targets))
     explicit_reference = bool(re.search(r"그\s*서비스|그\s*시스템|이전\s*서비스|방금", query))
-    if not targets and not unknown and not mentioned and (action != "legacy" or explicit_reference):
+    if not targets and not unknown and not mentioned and (operational or explicit_reference):
         last_targets = context.get("targets", [])
         if len(last_targets) == 1 or re.search(r"모두|전부|전체|둘\s*다", query):
             targets = last_targets

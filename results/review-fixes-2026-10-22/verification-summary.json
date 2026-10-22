@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-22",
+  "python_tests": {
+    "passed": 91,
+    "new_tests": 14,
+    "seconds": 51.477,
+    "test_files": 6
+  },
+  "frontend_check_groups": 4,
+  "api_diagnoses": [
+    {
+      "case": "timeout",
+      "query": "gateway-service에서 payments-service 호출 시 타임아웃이 발생합니다",
+      "http_status": 200,
+      "targets": [
+        "gateway-service",
+        "payments-service"
+      ],
+      "validation_status": "validated",
+      "elapsed_seconds": 5.483
+    },
+    {
+      "case": "common-cause",
+      "query": "payments-service랑 cache-service 둘 다 저하됐는데 공통 원인이 있는지 분석해줘",
+      "http_status": 200,
+      "targets": [
+        "cache-service",
+        "payments-service"
+      ],
+      "validation_status": "validated",
+      "elapsed_seconds": 5.263
+    },
+    {
+      "case": "recovery-method",
+      "query": "payments-service 장애 복구 방법 알려줘",
+      "http_status": 200,
+      "targets": [
+        "payments-service"
+      ],
+      "validation_status": "validated",
+      "elapsed_seconds": 3.657
+    },
+    {
+      "case": "course-exact-timeout",
+      "query": "gateway-service에서 payments-service로 가는 요청이 타임아웃 나고 있어요",
+      "http_status": 200,
+      "targets": [
+        "gateway-service",
+        "payments-service"
+      ],
+      "validation_status": "validated",
+      "elapsed_seconds": 4.327
+    }
+  ],
+  "remote_calls": {
+    "count": 14,
+    "all_http_200": true,
+    "current_env_key_verified": true,
+    "total_tokens": 9351
+  },
+  "limits": [
+    "synthetic monitoring",
+    "virtual clock for long-duration tests",
+    "no new vector RAG or autonomous agent collaboration",
+    "no real logs or remediation",
+    "not a general accuracy benchmark"
+  ]
+}

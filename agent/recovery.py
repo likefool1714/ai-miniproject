@@ -137,16 +137,24 @@ def assess(rows: list[dict], policy: RecoveryPolicy, now: datetime,
                                 "previous_checked": previous.last_checked.isoformat(),
                                 "trend": trend}
 
-    # 현재부터 역순으로, 신선하고 시간 순서가 맞는 동일 서비스 관측만 비교한다.
+    # 현재 자료의 신선도(300초)와 장애 이력의 보존 범위(3600초)를 구분한다.
+    # 오래된 장애가 사라진 것처럼 처리하지 않되, 정상 관측 사이의 긴 공백은 끊는다.
+    def historical_usable(row, sample):
+        age = (current.last_checked - sample.last_checked).total_seconds()
+        return (sample.system_name == current.system_name
+                and sample.status != "unknown"
+                and row.get("assessment", {}).get("observation_usable", True)
+                and 0 <= age <= policy.recurrence_window_seconds)
+
     recent = []
     seen_ids = set()
     last_time = None
     for row, sample in reversed(list(zip(rows, samples))):
-        if sample.system_name != current.system_name or freshness_problem(sample, now, policy):
-            break
-        if row.get("assessment", {}).get("observation_usable") is False:
+        if not historical_usable(row, sample):
             break
         if last_time is not None and sample.last_checked >= last_time:
+            break
+        if last_time is not None and (last_time - sample.last_checked).total_seconds() > policy.freshness_seconds:
             break
         if sample.sample_id in seen_ids:
             continue
@@ -167,14 +175,12 @@ def assess(rows: list[dict], policy: RecoveryPolicy, now: datetime,
     result["normal_streak"] = normal_streak
     # 자료 공백 이전의 유효한 장애 이력은 보존하되 정상 횟수는 공백 뒤부터 다시 센다.
     had_incident = any(
-        s.system_name == current.system_name and s.last_checked < current.last_checked
-        and not freshness_problem(s, now, policy)
-        and r.get("assessment", {}).get("observation_usable", True)
+        historical_usable(r, s) and s.last_checked < current.last_checked
         and issues(s, policy)
         for r, s in zip(rows[:-1], samples[:-1]))
     if not current_issues:
         if not had_incident:
-            result["reasons"] = ["현재 정상 기준은 충족하지만 최근 장애 기록이 없어 복구 여부를 확정하지 않습니다."]
+            result["reasons"] = [f"현재 정상 기준은 충족하지만 최근 {policy.recurrence_window_seconds}초 범위에 유효한 장애 기록이 없어 복구 여부를 확정하지 않습니다."]
         elif normal_streak >= policy.required_normal_samples:
             result["phase"] = "recovered"
             result["reasons"] = [f"최근 장애 이후 {policy.minimum_interval_seconds}초 이상 간격의 정상 관측 {normal_streak}회가 확인됐습니다."]
