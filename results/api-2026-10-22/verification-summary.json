@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "verified_at_kst": "2026-10-22T09:02:53.109431+09:00",
+  "source_commit": "02c0e3dff67e59e660125afc87e326db4f0a7b78",
+  "fresh_dotenv_loaded": true,
+  "api_key_value_recorded": false,
+  "remote_calls": 12,
+  "all_http_200": true,
+  "all_authorization_matches_current_env": true,
+  "total_prompt_tokens": 6626,
+  "total_completion_tokens": 535,
+  "total_tokens": 7161,
+  "model_fallback_events": 0,
+  "post_diagnoses": 3,
+  "sse_diagnoses": 1,
+  "lifecycle_steps": 5,
+  "history_count": 5,
+  "report_download": "passed",
+  "target_check_requests": 6,
+  "target_check_additional_model_calls": 0,
+  "tracing_enabled": false,
+  "limits": "Synthetic monitoring; one selected compatibility run, not general accuracy, real recovery or actual billing."
+}
