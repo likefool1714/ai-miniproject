@@ -1,4 +1,6 @@
-# 최종 발표 구성 — 본문 10장 + 증거 부록 3장
+# 최종 제출용 발표 — 본문10장
+
+[최종 Google Slides](https://docs.google.com/presentation/d/1UQ8xrx058ZUoVMGhPkvKaf8F447qPV2bY3GZd8JIkvE/edit?usp=drivesdk) · [PDF](../output/pdf/AI-Mini-Project_G028_최민석_GoogleSlides_Final_20261022.pdf). 기동·보고서 부록3장은 제출용에서 제외했습니다. 아래13장 링크·부록 설명은 이전 Canva 보관본이며, 현재 제출은 위10장 링크를 사용합니다.
 
 승인된 최종 Canva 13장이다. 이름 `G028 최민석`은 표지 좌측 하단에만 작게 표기한다. 본문 10장 목표 300초이며 부록은 질문 시 사용한다.
 

@@ -1,5 +1,8 @@
 # AI Mini Project
 
+**제출용 최종 발표: 본문10장, 기동·보고서 부록 제외.** [Google Slides](https://docs.google.com/presentation/d/1UQ8xrx058ZUoVMGhPkvKaf8F447qPV2bY3GZd8JIkvE/edit?usp=drivesdk) · [동일한 PDF](output/pdf/AI-Mini-Project_G028_최민석_GoogleSlides_Final_20261022.pdf). 개선 전3장·개선 후7장에 실제 실행 사진,8장에 동일 조건 비교와 별도 최신 검증을 배치했습니다. 이전13장 Canva/PPTX는 보존합니다.
+
+
 **운영 장애 대응 에이전트의 상태 변화 비교·복구 확인 기능 개선**
 
 - 선택 과제: **1번 — 제공 Base AI Agent 기능 개선/추가**
